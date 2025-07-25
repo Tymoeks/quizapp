@@ -612,13 +612,12 @@
 
         .flashcard-wrapper {
             perspective: 1000px;
-            height: 350px;
             margin-bottom: 24px;
         }
 
         .flashcard {
             width: 100%;
-            height: 100%;
+            min-height: 350px;
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -632,7 +631,7 @@
         .flashcard-side {
             position: absolute;
             width: 100%;
-            height: 100%;
+            min-height: 350px;
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
             border-radius: 16px;
@@ -951,7 +950,7 @@
                 <h2 id="createTitle">Tworzenie nowego quizu</h2>
                 
                 <div class="ai-prompt">
-                    <h3>Prompt AI do generowania quizu:</h3>
+                    <h3 id="aiPromptTitle">Prompt AI do generowania:</h3>
                     <pre id="aiPrompt">Wygeneruj quiz w formacie JSON na temat [TWÓJ TEMAT]. 
 
 Parametry opcjonalne:
@@ -992,7 +991,7 @@ Przykład:
                 </div>
 
                 <div class="form-group">
-                    <label for="quizJson">Wklej JSON z quizem:</label>
+                    <label for="quizJson" id="jsonLabel">Wklej JSON:</label>
                     <textarea id="quizJson" placeholder="Wklej tutaj wygenerowany JSON..."></textarea>
                 </div>
 
@@ -1241,6 +1240,8 @@ Przykład:
             // Ustaw odpowiedni tytuł i prompt
             if (type === 'flashcard') {
                 document.getElementById('createTitle').textContent = 'Tworzenie nowych fiszek';
+                document.getElementById('aiPromptTitle').textContent = 'Prompt AI do generowania fiszek:';
+                document.getElementById('jsonLabel').textContent = 'Wklej JSON z fiszkami:';
                 document.getElementById('aiPrompt').textContent = `Wygeneruj fiszki w formacie JSON na temat [TWÓJ TEMAT].
 
 Parametry opcjonalne:
@@ -1257,6 +1258,8 @@ category: kategoria (opcjonalne)
 Przykład: { "title": "Angielski - Zwierzęta", "type": "flashcard", "cards": [ { "front": "dog", "back": "pies", "category": "zwierzęta domowe" }, { "front": "cat", "back": "kot", "category": "zwierzęta domowe" } ] }`;
             } else {
                 document.getElementById('createTitle').textContent = 'Tworzenie nowego quizu';
+                document.getElementById('aiPromptTitle').textContent = 'Prompt AI do generowania quizu:';
+                document.getElementById('jsonLabel').textContent = 'Wklej JSON z quizem:';
                 document.getElementById('aiPrompt').textContent = `Wygeneruj quiz w formacie JSON na temat [TWÓJ TEMAT].
 
 Parametry opcjonalne:
