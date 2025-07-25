@@ -632,34 +632,14 @@
             transform: rotateY(180deg);
         }
 
-        .flashcard-side {
-            width: 100%;
-            min-height: 350px;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            border-radius: 16px;
-            box-shadow: 0 8px 24px var(--shadow);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            text-align: center;
-            background: var(--surface);
-            border: 2px solid var(--border);
-        }
+        .flashcard-side { position: absolute; top: 0; left: 0; width: 100%; min-height: 350px; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 8px 24px var(--shadow); display: flex; align-items: center; justify-content: center; padding: 40px; text-align: center; background: var(--surface); border: 2px solid var(--border); }
 
         .flashcard-front {
-            position: absolute;
-            top: 0;
-            left: 0;
             z-index: 2;
             transform: rotateY(0deg);
         }
 
         .flashcard-back {
-            position: absolute;
-            top: 0;
-            left: 0;
             transform: rotateY(180deg);
             background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);
             border-color: var(--accent);
@@ -676,7 +656,21 @@
 
         .flashcard-actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-shrink: 0; width: 100%; max-width: 500px; }
 
-        .flashcard-btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; flex: 1; justify-content: center; min-width: 0; }
+        .flashcard-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+            min-width: 0;
+        }
 
         .flashcard-btn:hover {
             transform: translateY(-2px);
@@ -1688,6 +1682,11 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
 
             // Aktualizuj progress
             updateFlashcardProgress();
+            
+            // Dostosuj wysokość fiszki do zawartości
+            setTimeout(() => {
+                adjustFlashcardHeight();
+            }, 50);
         }
 
         function flipCard() {
@@ -1781,6 +1780,31 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
                 alert('Nie ma trudnych fiszek do powtórzenia!');
                 showHomeScreen();
             }
+        }
+
+        function adjustFlashcardHeight() {
+            const flashcard = document.getElementById('flashcard');
+            const frontSide = document.querySelector('.flashcard-front');
+            const backSide = document.querySelector('.flashcard-back');
+
+            // Tymczasowo pokaż obie strony żeby zmierzyć ich wysokość
+            frontSide.style.position = 'relative';
+            backSide.style.position = 'relative';
+            frontSide.style.visibility = 'visible';
+            backSide.style.visibility = 'visible';
+            
+            const frontHeight = frontSide.offsetHeight;
+            const backHeight = backSide.offsetHeight;
+            const maxHeight = Math.max(350, frontHeight, backHeight);
+            
+            // Przywróć normalne pozycjonowanie
+            frontSide.style.position = 'absolute';
+            backSide.style.position = 'absolute';
+            frontSide.style.visibility = '';
+            backSide.style.visibility = '';
+            
+            // Ustaw wysokość na większą z dwóch stron
+            flashcard.style.height = maxHeight + 'px';
         }
 
         // Funkcje pomocnicze
