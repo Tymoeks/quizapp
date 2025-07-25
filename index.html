@@ -262,6 +262,7 @@
             background: var(--surface);
             border: 1px solid var(--border);
             padding: 24px;
+            padding-left: 56px; /* Więcej miejsca na ikonę */
             padding-bottom: 60px; /* Więcej miejsca na datę */
             border-radius: 12px;
             cursor: pointer;
@@ -552,6 +553,156 @@
             color: white;
         }
 
+        /* Type Selection */
+        .type-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin: 32px 0;
+        }
+
+        .type-option {
+            background: var(--surface-alt);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-family: inherit;
+            display: block;
+        }
+
+        .type-option:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .type-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .type-option h3 {
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .type-option p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Quiz Type Icons */
+        .quiz-type-icon {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            font-size: 24px;
+            opacity: 0.8;
+        }
+
+        /* Flashcard Styles */
+        .flashcard-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .flashcard-wrapper {
+            perspective: 1000px;
+            height: 350px;
+            margin-bottom: 24px;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+            background: var(--surface);
+            border: 2px solid var(--border);
+        }
+
+        .flashcard-front {
+            z-index: 2;
+            transform: rotateY(0deg);
+        }
+
+        .flashcard-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);
+            border-color: var(--accent);
+        }
+
+        .flashcard-content {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--primary);
+        }
+
+        .flashcard-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 32px;
+        }
+
+        .flashcard-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flashcard-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .btn-hard {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-medium {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-easy {
+            background: var(--success);
+            color: white;
+        }
+
         /* Results Screen */
         .results-screen {
             text-align: center;
@@ -768,16 +919,36 @@
         <div id="homeScreen" class="screen animate-fadeIn">
             <div class="quiz-list" id="quizList"></div>
             <div class="text-center">
-                <button class="btn btn-primary" onclick="showCreateScreen()">
-                    Utwórz nowy quiz
-                </button>
+                <button class="btn btn-primary" onclick="showChooseTypeScreen()">Utwórz nowy</button>
+            </div>
+        </div>
+
+        <!-- Ekran wyboru typu -->
+        <div id="chooseTypeScreen" class="screen hidden">
+            <div class="card card-white animate-fadeIn">
+                <h2>Co chcesz utworzyć?</h2>
+                <div class="type-selection">
+                    <button class="type-option" onclick="showCreateScreen('quiz')">
+                        <div class="type-icon">📊</div>
+                        <h3>Quiz</h3>
+                        <p>Klasyczny test z pytaniami wielokrotnego wyboru</p>
+                    </button>
+                    <button class="type-option" onclick="showCreateScreen('flashcard')">
+                        <div class="type-icon">🎴</div>
+                        <h3>Fiszki</h3>
+                        <p>Karty do nauki z pytaniem i odpowiedzią</p>
+                    </button>
+                </div>
+                <div class="button-group center" style="margin-top: 24px;">
+                    <button class="btn" onclick="showHomeScreen()">Anuluj</button>
+                </div>
             </div>
         </div>
 
         <!-- Ekran tworzenia quizu -->
         <div id="createScreen" class="screen hidden">
             <div class="card card-white animate-fadeIn">
-                <h2>Tworzenie nowego quizu</h2>
+                <h2 id="createTitle">Tworzenie nowego quizu</h2>
                 
                 <div class="ai-prompt">
                     <h3>Prompt AI do generowania quizu:</h3>
@@ -825,7 +996,7 @@ Przykład:
                     <textarea id="quizJson" placeholder="Wklej tutaj wygenerowany JSON..."></textarea>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="answerCountGroup">
                     <label>Liczba odpowiedzi w pytaniach wielokrotnego wyboru:</label>
                     <select id="answerCount">
                         <option value="3">3 odpowiedzi</option>
@@ -906,13 +1077,113 @@ Przykład:
                 <h2>Quiz zakończony!</h2>
                 <div class="score-display" id="finalScore"></div>
                 <div class="points-display" id="finalPoints"></div>
-                
+
                 <div class="button-group center">
                     <button class="btn btn-primary" onclick="retakeQuiz()">Powtórz quiz</button>
                     <button class="btn" onclick="showHomeScreen()">Ekran główny</button>
                 </div>
             </div>
         </div>
+
+    <!-- Ekran przed fiszkamu -->
+    <div id="preFlashcardScreen" class="screen hidden">
+        <div class="card card-white animate-fadeIn">
+            <h2 id="preFlashcardTitle"></h2>
+            <p id="preFlashcardDescription" style="margin-bottom: 32px;"></p>
+
+            <div class="quiz-settings">
+                <div class="setting-row">
+                    <label>Losowa kolejność fiszek</label>
+                    <label class="toggle">
+                        <input type="checkbox" id="flashcardRandomOrder" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="button-group center">
+                <button class="btn btn-accent" onclick="startFlashcards()">Rozpocznij naukę</button>
+                <button class="btn" onclick="showHomeScreen()">Powrót</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ekran fiszek -->
+    <div id="flashcardScreen" class="screen hidden">
+        <div class="flashcard-container">
+            <div class="progress-bar" style="margin-bottom: 32px;">
+                <div class="progress-fill" id="flashcardProgress"></div>
+            </div>
+            
+            <div class="stats animate-slideIn" style="margin-bottom: 24px;">
+                <span id="flashcardNumber">Fiszka 1/10</span>
+                <span id="flashcardStats">Poznane: 0 | Trudne: 0</span>
+            </div>
+
+            <div class="flashcard-wrapper">
+                <div class="flashcard animate-fadeIn" id="flashcard" onclick="flipCard()">
+                    <div class="flashcard-side flashcard-front">
+                        <div class="flashcard-content" id="flashcardFront"></div>
+                    </div>
+                    <div class="flashcard-side flashcard-back">
+                        <div class="flashcard-content" id="flashcardBack"></div>
+                    </div>
+                </div>
+            </div>
+
+            <p style="text-align: center; margin-top: 16px; color: var(--text-secondary); font-size: 14px;">
+                Kliknij kartę aby zobaczyć odpowiedź
+            </p>
+
+            <div class="flashcard-actions" id="flashcardActions" style="display: none;">
+                <button class="flashcard-btn btn-hard" onclick="rateCard('hard')">
+                    ❌ Nie znam
+                </button>
+                <button class="flashcard-btn btn-medium" onclick="rateCard('medium')">
+                    🤔 Trudne
+                </button>
+                <button class="flashcard-btn btn-easy" onclick="rateCard('easy')">
+                    ✅ Znam
+                </button>
+            </div>
+
+            <div class="button-group center" style="margin-top: 32px;">
+                <button class="btn" onclick="endFlashcards()">Zakończ naukę</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ekran wyników fiszek -->
+    <div id="flashcardResultsScreen" class="screen hidden">
+        <div class="card card-white results-screen animate-fadeIn">
+            <h2>Sesja nauki zakończona!</h2>
+            <div class="stats" style="justify-content: center; margin: 32px 0; background: transparent; border: none;">
+                <div style="text-align: center; margin: 0 24px;">
+                    <div style="font-size: 2.5rem; font-weight: 200; color: var(--success);">
+                        <span id="flashcardEasyCount">0</span>
+                    </div>
+                    <p>Znane</p>
+                </div>
+                <div style="text-align: center; margin: 0 24px;">
+                    <div style="font-size: 2.5rem; font-weight: 200; color: var(--warning);">
+                        <span id="flashcardMediumCount">0</span>
+                    </div>
+                    <p>Trudne</p>
+                </div>
+                <div style="text-align: center; margin: 0 24px;">
+                    <div style="font-size: 2.5rem; font-weight: 200; color: var(--danger);">
+                        <span id="flashcardHardCount">0</span>
+                    </div>
+                    <p>Nieznane</p>
+                </div>
+            </div>
+            
+            <div class="button-group center">
+                <button class="btn btn-primary" onclick="restartFlashcards()">Powtórz trudne</button>
+                <button class="btn" onclick="showHomeScreen()">Ekran główny</button>
+            </div>
+        </div>
+    </div>
     </div>
 
     <script>
@@ -930,6 +1201,17 @@ Przykład:
             randomOrder: true,
             answerCount: 4
         };
+
+        // Stan fiszek
+        let currentFlashcards = null;
+        let currentCardIndex = 0;
+        let flashcardStats = {
+            easy: 0,
+            medium: 0,
+            hard: 0
+        };
+        let cards = [];
+        let isCardFlipped = false;
 
         // Inicjalizacja
         document.addEventListener('DOMContentLoaded', () => {
@@ -949,10 +1231,55 @@ Przykład:
             loadQuizzes();
         }
 
-        function showCreateScreen() {
+        function showChooseTypeScreen() { hideAllScreens(); document.getElementById('chooseTypeScreen').classList.remove('hidden'); }
+
+        function showCreateScreen(type) {
             hideAllScreens();
             document.getElementById('createScreen').classList.remove('hidden');
             document.getElementById('quizJson').value = '';
+            
+            // Ustaw odpowiedni tytuł i prompt
+            if (type === 'flashcard') {
+                document.getElementById('createTitle').textContent = 'Tworzenie nowych fiszek';
+                document.getElementById('aiPrompt').textContent = `Wygeneruj fiszki w formacie JSON na temat [TWÓJ TEMAT].
+
+Parametry opcjonalne:
+
+Liczba fiszek: [np. 20]
+Fiszki powinny zawierać:
+
+title: tytuł zestawu fiszek
+type: "flashcard"
+Tablicę cards z fiszkami, gdzie każda fiszka ma:
+front: przód karty (pytanie/słowo)
+back: tył karty (odpowiedź/tłumaczenie)
+category: kategoria (opcjonalne)
+Przykład: { "title": "Angielski - Zwierzęta", "type": "flashcard", "cards": [ { "front": "dog", "back": "pies", "category": "zwierzęta domowe" }, { "front": "cat", "back": "kot", "category": "zwierzęta domowe" } ] }`;
+            } else {
+                document.getElementById('createTitle').textContent = 'Tworzenie nowego quizu';
+                document.getElementById('aiPrompt').textContent = `Wygeneruj quiz w formacie JSON na temat [TWÓJ TEMAT].
+
+Parametry opcjonalne:
+
+Liczba pytań: [np. 10]
+Liczba pytań prawda/fałsz: [np. 3]
+Quiz powinien zawierać:
+
+title: tytuł quizu
+Tablicę questions z pytaniami, gdzie każde pytanie ma:
+question: treść pytania
+correct: poprawna odpowiedź
+wrong: tablica 3-4 błędnych odpowiedzi
+group: kategoria pytania (np. "osoba", "data", "miejsce")
+type: "tf" dla pytań prawda/fałsz (opcjonalne)
+Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pierwszym królem Polski?", "correct": "Bolesław Chrobry", "wrong": ["Mieszko I", "Kazimierz Wielki", "Władysław Jagiełło"], "group": "osoba" }, { "question": "Warszawa jest stolicą Polski", "correct": "Prawda", "wrong": ["Fałsz"], "type": "tf", "group": "geografia" } ] }`;
+            }
+
+            window.currentCreateType = type;
+
+            // Pokaż/ukryj opcje specyficzne dla quizu
+            document.getElementById('answerCountGroup').style.display = 
+                type === 'flashcard' ? 'none' : 'block';
         }
 
         function showEditScreen(quizId) {
@@ -1016,19 +1343,23 @@ Przykład:
                 return;
             }
             
-            quizList.innerHTML = quizzes.map(quiz => `
-                <div class="quiz-item animate-fadeIn" onclick="showPreQuizScreen('${quiz.id}')">
+            quizList.innerHTML = quizzes.map(quiz => { const isFlashcard = quiz.type === 'flashcard'; const icon = isFlashcard ? '🎴' : '📊'; const count = isFlashcard ? `${quiz.cards.length} fiszek` : `${quiz.questions.length} pytań`; const clickHandler = isFlashcard ? 'showFlashcardScreen' : 'showPreQuizScreen';
+
+            return `
+                <div class="quiz-item animate-fadeIn" onclick="${clickHandler}('${quiz.id}')">
+                    <div class="quiz-type-icon">${icon}</div>
                     <div class="quiz-actions">
                         <button onclick="event.stopPropagation(); showEditScreen('${quiz.id}')" title="Edytuj">✏️</button>
                         <button onclick="event.stopPropagation(); deleteQuiz('${quiz.id}')" title="Usuń">🗑️</button>
                     </div>
                     <h3>${quiz.title}</h3>
-                    <p>${quiz.questions.length} pytań</p>
+                    <p>${count}</p>
                     <div class="quiz-date">
                         ${formatDate(quiz.createdAt)}
                     </div>
                 </div>
-            `).join('');
+            `;
+        }).join('');
         }
 
         function copyPrompt() {
@@ -1045,9 +1376,17 @@ Przykład:
             try {
                 const quizData = JSON.parse(jsonText);
                 
-                // Walidacja
-                if (!quizData.title || !quizData.questions || !Array.isArray(quizData.questions)) {
-                    throw new Error('Nieprawidłowa struktura JSON');
+                // Walidacja w zależności od typu
+                if (window.currentCreateType === 'flashcard') {
+                    if (!quizData.title || !quizData.cards || !Array.isArray(quizData.cards)) {
+                        throw new Error('Nieprawidłowa struktura JSON dla fiszek');
+                    }
+                    quizData.type = 'flashcard';
+                } else {
+                    if (!quizData.title || !quizData.questions || !Array.isArray(quizData.questions)) {
+                        throw new Error('Nieprawidłowa struktura JSON dla quizu');
+                    }
+                    quizData.type = 'quiz';
                 }
                 
                 // Dodaj ID i zapisz
@@ -1288,6 +1627,117 @@ Przykład:
 
         function retakeQuiz() {
             showPreQuizScreen(currentQuiz.id);
+        }
+
+        // Funkcje fiszek
+        function showFlashcardScreen(flashcardId) {
+            hideAllScreens();
+            document.getElementById('preFlashcardScreen').classList.remove('hidden');
+
+            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            currentFlashcards = quizzes.find(q => q.id === flashcardId);
+            
+            if (currentFlashcards) {
+                document.getElementById('preFlashcardTitle').textContent = currentFlashcards.title;
+                document.getElementById('preFlashcardDescription').textContent = `${currentFlashcards.cards.length} fiszek do nauki`;
+            }
+        }
+
+        function startFlashcards() {
+            hideAllScreens();
+            document.getElementById('flashcardScreen').classList.remove('hidden');
+            
+            // Pobierz ustawienia
+            const randomOrder = document.getElementById('flashcardRandomOrder').checked;
+            
+            // Reset stanu
+            cards = [...currentFlashcards.cards];
+            if (randomOrder) {
+                cards = shuffleArray(cards);
+            }
+            currentCardIndex = 0;
+            flashcardStats = { easy: 0, medium: 0, hard: 0 };
+            isCardFlipped = false;
+            
+            displayFlashcard();
+        }
+
+        function displayFlashcard() {
+            if (currentCardIndex >= cards.length) {
+                endFlashcards();
+                return;
+            }
+            
+            const card = cards[currentCardIndex];
+            document.getElementById('flashcardFront').textContent = card.front;
+            document.getElementById('flashcardBack').textContent = card.back;
+            
+            // Reset karty
+            document.getElementById('flashcard').classList.remove('flipped');
+            document.getElementById('flashcardActions').style.display = 'none';
+            isCardFlipped = false;
+            
+            // Aktualizuj progress
+            updateFlashcardProgress();
+        }
+
+        function flipCard() {
+            if (!isCardFlipped) {
+                document.getElementById('flashcard').classList.add('flipped');
+                document.getElementById('flashcardActions').style.display = 'flex';
+                isCardFlipped = true;
+            }
+        }
+
+        function rateCard(difficulty) {
+            flashcardStats[difficulty]++;
+            
+            // Aktualizuj statystyki
+            updateFlashcardStats();
+            
+            // Przejdź do następnej karty
+            currentCardIndex++;
+            setTimeout(() => {
+                displayFlashcard();
+            }, 300);
+        }
+
+        function updateFlashcardProgress() {
+            const progress = ((currentCardIndex / cards.length) * 100);
+            document.getElementById('flashcardProgress').style.width = `${progress}%`;
+            document.getElementById('flashcardNumber').textContent = `Fiszka ${currentCardIndex + 1}/${cards.length}`;
+        }
+
+        function updateFlashcardStats() {
+            const total = flashcardStats.easy + flashcardStats.medium + flashcardStats.hard;
+            document.getElementById('flashcardStats').textContent = 
+                `Poznane: ${flashcardStats.easy} | Trudne: ${flashcardStats.medium} | Nieznane: ${flashcardStats.hard}`;
+        }
+
+        function endFlashcards() {
+            document.getElementById('flashcardEasyCount').textContent = flashcardStats.easy;
+            document.getElementById('flashcardMediumCount').textContent = flashcardStats.medium;
+            document.getElementById('flashcardHardCount').textContent = flashcardStats.hard;
+            
+            hideAllScreens();
+            document.getElementById('flashcardResultsScreen').classList.remove('hidden');
+        }
+
+        function restartFlashcards() {
+            // Powtórz tylko trudne i nieznane
+            cards = cards.filter((card, index) => {
+                // Zakładamy, że karty były oceniane w kolejności
+                return index < currentCardIndex && 
+                       (flashcardStats.medium > 0 || flashcardStats.hard > 0);
+            });
+            
+            if (cards.length > 0) {
+                currentCardIndex = 0;
+                flashcardStats = { easy: 0, medium: 0, hard: 0 };
+                showFlashcardScreen(currentFlashcards.id);
+            } else {
+                showHomeScreen();
+            }
         }
 
         // Funkcje pomocnicze
