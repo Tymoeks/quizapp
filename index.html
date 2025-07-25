@@ -614,6 +614,9 @@
         .flashcard-wrapper {
             perspective: 1000px;
             margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .flashcard {
@@ -671,26 +674,9 @@
             max-width: 100%;
         }
 
-        .flashcard-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-top: 24px;
-            flex-shrink: 0;
-        }
+        .flashcard-actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-shrink: 0; width: 100%; max-width: 500px; }
 
-        .flashcard-btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .flashcard-btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; flex: 1; justify-content: center; min-width: 0; }
 
         .flashcard-btn:hover {
             transform: translateY(-2px);
@@ -1138,22 +1124,22 @@ Przykład:
                         <div class="flashcard-content" id="flashcardBack"></div>
                     </div>
                 </div>
-            </div>
 
-            <p style="text-align: center; margin-top: 16px; color: var(--text-secondary); font-size: 14px;">
-                Kliknij kartę aby zobaczyć odpowiedź
-            </p>
+                <p style="text-align: center; margin-top: 16px; color: var(--text-secondary); font-size: 14px;">
+                    Kliknij kartę aby zobaczyć odpowiedź
+                </p>
 
-            <div class="flashcard-actions" id="flashcardActions" style="display: none;">
-                <button class="flashcard-btn btn-hard" onclick="rateCard('hard')">
-                    ❌ Nie znam
-                </button>
-                <button class="flashcard-btn btn-medium" onclick="rateCard('medium')">
-                    🤔 Trudne
-                </button>
-                <button class="flashcard-btn btn-easy" onclick="rateCard('easy')">
-                    ✅ Znam
-                </button>
+                <div class="flashcard-actions" id="flashcardActions" style="display: none;">
+                    <button class="flashcard-btn btn-hard" onclick="rateCard('hard')">
+                        ❌ Nie znam
+                    </button>
+                    <button class="flashcard-btn btn-medium" onclick="rateCard('medium')">
+                        🤔 Trudne
+                    </button>
+                    <button class="flashcard-btn btn-easy" onclick="rateCard('easy')">
+                        ✅ Znam
+                    </button>
+                </div>
             </div>
 
             <div class="button-group center" style="margin-top: 32px;">
@@ -1702,22 +1688,6 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
 
             // Aktualizuj progress
             updateFlashcardProgress();
-
-            // Dostosuj wysokość fiszki do zawartości
-            const flashcard = document.getElementById('flashcard');
-            const frontContent = document.getElementById('flashcardFront');
-            const backContent = document.getElementById('flashcardBack');
-
-            // Resetuj wysokość
-            flashcard.style.height = 'auto';
-
-            // Oblicz maksymalną wysokość
-            setTimeout(() => {
-                const frontHeight = frontContent.offsetHeight + 80; // padding
-                const backHeight = backContent.offsetHeight + 80; // padding
-                const maxHeight = Math.max(350, frontHeight, backHeight);
-                flashcard.style.minHeight = maxHeight + 'px';
-            }, 50);
         }
 
         function flipCard() {
