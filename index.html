@@ -651,7 +651,7 @@
             border-color: var(--accent);
         }
 
-        .flashcard-content { font-size: 1.5rem; font-weight: 400; color: var(--primary); word-wrap: break-word; overflow-wrap: break-word; width: 100%; height: 100%; overflow-y: auto; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .flashcard-content { font-size: 1.5rem; font-weight: 400; color: var(--primary); word-wrap: break-word; overflow-wrap: break-word; width: 100%; height: 100%; overflow-y: auto; display: flex; align-items: flex-start; justify-content: center; text-align: center; padding-top: 20px; }
 
         .flashcard-side::-webkit-scrollbar { width: 8px; }
 
@@ -1693,7 +1693,17 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
             // Aktualizuj back z opóźnieniem (po zakończeniu animacji)
             setTimeout(() => {
                 document.getElementById('flashcardBack').textContent = card.back;
+                
+                // Reset scroll do góry dla obu stron
+                const frontSide = document.querySelector('.flashcard-front');
+                const backSide = document.querySelector('.flashcard-back');
+                if (frontSide) frontSide.scrollTop = 0;
+                if (backSide) backSide.scrollTop = 0;
             }, 300);
+
+            // Reset scroll natychmiast dla aktualnie widocznej strony
+            const frontSide = document.querySelector('.flashcard-front');
+            if (frontSide) frontSide.scrollTop = 0;
 
             // Aktualizuj progress
             updateFlashcardProgress();
@@ -1704,6 +1714,12 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
                 document.getElementById('flashcard').classList.add('flipped');
                 document.getElementById('flashcardActions').style.display = 'flex';
                 isCardFlipped = true;
+
+                // Reset scroll dla tylnej strony gdy się obraca
+                setTimeout(() => {
+                    const backSide = document.querySelector('.flashcard-back');
+                    if (backSide) backSide.scrollTop = 0;
+                }, 100);
             }
         }
 
