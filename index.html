@@ -632,7 +632,23 @@
             transform: rotateY(180deg);
         }
 
-        .flashcard-side { width: 100%; height: 350px; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 8px 24px var(--shadow); display: flex; align-items: center; justify-content: center; padding: 40px; text-align: center; background: var(--surface); border: 2px solid var(--border); overflow-y: auto; }
+        .flashcard-side {
+            width: 100%;
+            height: 350px;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px var(--shadow);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 0;
+            text-align: center;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Dla iOS */
+        }
 
         .flashcard-front {
             position: absolute;
@@ -651,9 +667,24 @@
             border-color: var(--accent);
         }
 
-        .flashcard-content { font-size: 1.5rem; font-weight: 400; color: var(--primary); word-wrap: break-word; overflow-wrap: break-word; width: 100%; height: 100%; overflow-y: auto; display: flex; align-items: flex-start; justify-content: center; text-align: center; padding-top: 20px; }
+        .flashcard-content {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--primary);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            width: 100%;
+            min-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
 
-        .flashcard-side::-webkit-scrollbar { width: 8px; }
+        .flashcard-side::-webkit-scrollbar {
+            width: 8px;
+        }
 
         .flashcard-side::-webkit-scrollbar-track {
             background: var(--surface-alt);
@@ -669,7 +700,15 @@
             background: var(--secondary);
         }
 
-        .flashcard-actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-shrink: 0; width: 100%; max-width: 500px; }
+        .flashcard-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+            flex-shrink: 0;
+            width: 100%;
+            max-width: 500px;
+        }
 
         .flashcard-btn {
             padding: 12px 24px;
@@ -904,6 +943,16 @@
                 flex-direction: column;
                 gap: 8px;
             }
+            
+            /* Zachowaj poziomy układ dla statystyk w podsumowaniu */
+            .results-screen .stats {
+                flex-direction: row !important;
+                flex-wrap: wrap;
+            }
+            
+            .results-screen .stats > div {
+                min-width: 30%;
+            }
         }
     </style>
 </head>
@@ -922,7 +971,7 @@
         <!-- Ekran główny -->
         <div id="homeScreen" class="screen animate-fadeIn">
             <div class="quiz-list" id="quizList"></div>
-            <div class="text-center">
+            <div style="text-align: center;">
                 <button class="btn btn-primary" onclick="showChooseTypeScreen()">Utwórz nowy</button>
             </div>
         </div>
@@ -1066,6 +1115,7 @@ Przykład:
                     <span id="questionNumber">Pytanie 1/10</span>
                     <span id="accuracy">Poprawność: 0%</span>
                     <span id="score">Punkty: 0</span>
+                    <span id="quizTimer">00:00</span>
                 </div>
                 
                 <div class="question-card animate-fadeIn">
@@ -1081,6 +1131,7 @@ Przykład:
                 <h2>Quiz zakończony!</h2>
                 <div class="score-display" id="finalScore"></div>
                 <div class="points-display" id="finalPoints"></div>
+                <div class="time-display" id="finalTime" style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 20px;"></div>
 
                 <div class="button-group center">
                     <button class="btn btn-primary" onclick="retakeQuiz()">Powtórz quiz</button>
@@ -1089,105 +1140,107 @@ Przykład:
             </div>
         </div>
 
-    <!-- Ekran przed fiszkamu -->
-    <div id="preFlashcardScreen" class="screen hidden">
-        <div class="card card-white animate-fadeIn">
-            <h2 id="preFlashcardTitle"></h2>
-            <p id="preFlashcardDescription" style="margin-bottom: 32px;"></p>
+        <!-- Ekran przed fiszkamu -->
+        <div id="preFlashcardScreen" class="screen hidden">
+            <div class="card card-white animate-fadeIn">
+                <h2 id="preFlashcardTitle"></h2>
+                <p id="preFlashcardDescription" style="margin-bottom: 32px;"></p>
 
-            <div class="quiz-settings">
-                <div class="setting-row">
-                    <label>Losowa kolejność fiszek</label>
-                    <label class="toggle">
-                        <input type="checkbox" id="flashcardRandomOrder" checked>
-                        <span class="slider"></span>
-                    </label>
+                <div class="quiz-settings">
+                    <div class="setting-row">
+                        <label>Losowa kolejność fiszek</label>
+                        <label class="toggle">
+                            <input type="checkbox" id="flashcardRandomOrder" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <div class="button-group center">
-                <button class="btn btn-accent" onclick="startFlashcards()">Rozpocznij naukę</button>
-                <button class="btn" onclick="showHomeScreen()">Powrót</button>
+                <div class="button-group center">
+                    <button class="btn btn-accent" onclick="startFlashcards()">Rozpocznij naukę</button>
+                    <button class="btn" onclick="showHomeScreen()">Powrót</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Ekran fiszek -->
-    <div id="flashcardScreen" class="screen hidden">
-        <div class="flashcard-container">
-            <div class="progress-bar" style="margin-bottom: 32px;">
-                <div class="progress-fill" id="flashcardProgress"></div>
-            </div>
-            
-            <div class="stats animate-slideIn" style="margin-bottom: 24px;">
-                <span id="flashcardNumber">Fiszka 1/10</span>
-                <span id="flashcardStats">Poznane: 0 | Trudne: 0</span>
-            </div>
+        <!-- Ekran fiszek -->
+        <div id="flashcardScreen" class="screen hidden">
+            <div class="flashcard-container">
+                <div class="progress-bar" style="margin-bottom: 32px;">
+                    <div class="progress-fill" id="flashcardProgress"></div>
+                </div>
+                
+                <div class="stats animate-slideIn" style="margin-bottom: 24px;">
+                    <span id="flashcardNumber">Fiszka 1/10</span>
+                    <span id="flashcardStats">Poznane: 0 | Trudne: 0</span>
+                    <span id="flashcardTimer">00:00</span>
+                </div>
 
-            <div class="flashcard-wrapper">
-                <div class="flashcard animate-fadeIn" id="flashcard" onclick="flipCard()">
-                    <div class="flashcard-side flashcard-front">
-                        <div class="flashcard-content" id="flashcardFront"></div>
+                <div class="flashcard-wrapper">
+                    <div class="flashcard animate-fadeIn" id="flashcard" onclick="flipCard()">
+                        <div class="flashcard-side flashcard-front">
+                            <div class="flashcard-content" id="flashcardFront"></div>
+                        </div>
+                        <div class="flashcard-side flashcard-back">
+                            <div class="flashcard-content" id="flashcardBack"></div>
+                        </div>
                     </div>
-                    <div class="flashcard-side flashcard-back">
-                        <div class="flashcard-content" id="flashcardBack"></div>
+                    
+                    <p style="text-align: center; margin-top: 16px; color: var(--text-secondary); font-size: 14px;">
+                        Kliknij kartę aby zobaczyć odpowiedź
+                    </p>
+
+                    <div class="flashcard-actions" id="flashcardActions" style="display: none;">
+                        <button class="flashcard-btn btn-hard" onclick="rateCard('hard')">
+                            ❌ Nie znam
+                        </button>
+                        <button class="flashcard-btn btn-medium" onclick="rateCard('medium')">
+                            🤔 Trudne
+                        </button>
+                        <button class="flashcard-btn btn-easy" onclick="rateCard('easy')">
+                            ✅ Znam
+                        </button>
                     </div>
                 </div>
 
-                <p style="text-align: center; margin-top: 16px; color: var(--text-secondary); font-size: 14px;">
-                    Kliknij kartę aby zobaczyć odpowiedź
-                </p>
-
-                <div class="flashcard-actions" id="flashcardActions" style="display: none;">
-                    <button class="flashcard-btn btn-hard" onclick="rateCard('hard')">
-                        ❌ Nie znam
-                    </button>
-                    <button class="flashcard-btn btn-medium" onclick="rateCard('medium')">
-                        🤔 Trudne
-                    </button>
-                    <button class="flashcard-btn btn-easy" onclick="rateCard('easy')">
-                        ✅ Znam
-                    </button>
+                <div class="button-group center" style="margin-top: 32px;">
+                    <button class="btn" onclick="endFlashcards()">Zakończ naukę</button>
                 </div>
-            </div>
-
-            <div class="button-group center" style="margin-top: 32px;">
-                <button class="btn" onclick="endFlashcards()">Zakończ naukę</button>
             </div>
         </div>
-    </div>
 
-    <!-- Ekran wyników fiszek -->
-    <div id="flashcardResultsScreen" class="screen hidden">
-        <div class="card card-white results-screen animate-fadeIn">
-            <h2>Sesja nauki zakończona!</h2>
-            <div class="stats" style="justify-content: center; margin: 32px 0; background: transparent; border: none;">
-                <div style="text-align: center; margin: 0 24px; min-width: 80px;">
-                    <div style="font-size: 2.5rem; font-weight: 200; color: var(--success); line-height: 1; display: flex; justify-content: center; align-items: center; height: 60px;">
-                        <span id="flashcardEasyCount">0</span>
+        <!-- Ekran wyników fiszek -->
+        <div id="flashcardResultsScreen" class="screen hidden">
+            <div class="card card-white results-screen animate-fadeIn">
+                <h2>Sesja nauki zakończona!</h2>
+                <div class="time-display" id="flashcardFinalTime" style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 20px; text-align: center;"></div>
+                <div class="stats" style="justify-content: center; margin: 32px 0; background: transparent; border: none;">
+                    <div style="text-align: center; margin: 0 24px; min-width: 80px;">
+                        <div style="font-size: 2.5rem; font-weight: 200; color: var(--success); line-height: 1; display: flex; justify-content: center; align-items: center; height: 60px;">
+                            <span id="flashcardEasyCount">0</span>
+                        </div>
+                        <p>Znane</p>
                     </div>
-                    <p>Znane</p>
-                </div>
-                <div style="text-align: center; margin: 0 24px; min-width: 80px;">
-                    <div style="font-size: 2.5rem; font-weight: 200; color: var(--warning); line-height: 1; display: flex; justify-content: center; align-items: center; height: 60px;">
-                        <span id="flashcardMediumCount">0</span>
+                    <div style="text-align: center; margin: 0 24px; min-width: 80px;">
+                        <div style="font-size: 2.5rem; font-weight: 200; color: var(--warning); line-height: 1; display: flex; justify-content: center; align-items: center; height: 60px;">
+                            <span id="flashcardMediumCount">0</span>
+                        </div>
+                        <p>Trudne</p>
                     </div>
-                    <p>Trudne</p>
-                </div>
-                <div style="text-align: center; margin: 0 24px; min-width: 80px;">
-                    <div style="font-size: 2.5rem; font-weight: 200; color: var(--danger); line-height: 1; display: flex; justify-content: center; align-items: center; height: 60px;">
-                        <span id="flashcardHardCount">0</span>
+                    <div style="text-align: center; margin: 0 24px; min-width: 80px;">
+                        <div style="font-size: 2.5rem; font-weight: 200; color: var(--danger); line-height: 1; display: flex; justify-content: center; align-items: center; height: 60px;">
+                            <span id="flashcardHardCount">0</span>
+                        </div>
+                        <p>Nieznane</p>
                     </div>
-                    <p>Nieznane</p>
                 </div>
-            </div>
-            
-            <div class="button-group center">
-                <button class="btn btn-primary" onclick="restartFlashcards()">Powtórz trudne</button>
-                <button class="btn" onclick="showHomeScreen()">Ekran główny</button>
+                
+                <div class="button-group center">
+                    <button class="btn btn-primary" onclick="restartFlashcards()">Powtórz trudne</button>
+                    <button class="btn" onclick="showHomeScreen()">Ekran główny</button>
+                </div>
             </div>
         </div>
-    </div>
     </div>
 
     <script>
@@ -1205,6 +1258,7 @@ Przykład:
             randomOrder: true,
             answerCount: 4
         };
+        let timerInterval = null;
 
         // Stan fiszek
         let currentFlashcards = null;
@@ -1237,7 +1291,10 @@ Przykład:
             loadQuizzes();
         }
 
-        function showChooseTypeScreen() { hideAllScreens(); document.getElementById('chooseTypeScreen').classList.remove('hidden'); }
+        function showChooseTypeScreen() {
+            hideAllScreens();
+            document.getElementById('chooseTypeScreen').classList.remove('hidden');
+        }
 
         function showCreateScreen(type) {
             hideAllScreens();
@@ -1252,17 +1309,33 @@ Przykład:
                 document.getElementById('aiPrompt').textContent = `Wygeneruj fiszki w formacie JSON na temat [TWÓJ TEMAT].
 
 Parametry opcjonalne:
+- Liczba fiszek: [np. 20]
 
-Liczba fiszek: [np. 20]
 Fiszki powinny zawierać:
+- title: tytuł zestawu fiszek
+- type: "flashcard"
+- Tablicę cards z fiszkami, gdzie każda fiszka ma:
+  - front: przód karty (pytanie/słowo)
+  - back: tył karty (odpowiedź/tłumaczenie)
+  - category: kategoria (opcjonalne)
 
-title: tytuł zestawu fiszek
-type: "flashcard"
-Tablicę cards z fiszkami, gdzie każda fiszka ma:
-front: przód karty (pytanie/słowo)
-back: tył karty (odpowiedź/tłumaczenie)
-category: kategoria (opcjonalne)
-Przykład: { "title": "Angielski - Zwierzęta", "type": "flashcard", "cards": [ { "front": "dog", "back": "pies", "category": "zwierzęta domowe" }, { "front": "cat", "back": "kot", "category": "zwierzęta domowe" } ] }`;
+Przykład:
+{
+  "title": "Angielski - Zwierzęta",
+  "type": "flashcard",
+  "cards": [
+    {
+      "front": "dog",
+      "back": "pies",
+      "category": "zwierzęta domowe"
+    },
+    {
+      "front": "cat",
+      "back": "kot",
+      "category": "zwierzęta domowe"
+    }
+  ]
+}`;
             } else {
                 document.getElementById('createTitle').textContent = 'Tworzenie nowego quizu';
                 document.getElementById('aiPromptTitle').textContent = 'Prompt AI do generowania quizu:';
@@ -1270,23 +1343,41 @@ Przykład: { "title": "Angielski - Zwierzęta", "type": "flashcard", "cards": [ 
                 document.getElementById('aiPrompt').textContent = `Wygeneruj quiz w formacie JSON na temat [TWÓJ TEMAT].
 
 Parametry opcjonalne:
+- Liczba pytań: [np. 10]
+- Liczba pytań prawda/fałsz: [np. 3]
 
-Liczba pytań: [np. 10]
-Liczba pytań prawda/fałsz: [np. 3]
 Quiz powinien zawierać:
+- title: tytuł quizu
+- Tablicę questions z pytaniami, gdzie każde pytanie ma:
+  - question: treść pytania
+  - correct: poprawna odpowiedź
+  - wrong: tablica 3-4 błędnych odpowiedzi
+  - group: kategoria pytania (np. "osoba", "data", "miejsce")
+  - type: "tf" dla pytań prawda/fałsz (opcjonalne)
 
-title: tytuł quizu
-Tablicę questions z pytaniami, gdzie każde pytanie ma:
-question: treść pytania
-correct: poprawna odpowiedź
-wrong: tablica 3-4 błędnych odpowiedzi
-group: kategoria pytania (np. "osoba", "data", "miejsce")
-type: "tf" dla pytań prawda/fałsz (opcjonalne)
-Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pierwszym królem Polski?", "correct": "Bolesław Chrobry", "wrong": ["Mieszko I", "Kazimierz Wielki", "Władysław Jagiełło"], "group": "osoba" }, { "question": "Warszawa jest stolicą Polski", "correct": "Prawda", "wrong": ["Fałsz"], "type": "tf", "group": "geografia" } ] }`;
+Przykład:
+{
+  "title": "Quiz o Polsce",
+  "questions": [
+    {
+      "question": "Kto był pierwszym królem Polski?",
+      "correct": "Bolesław Chrobry",
+      "wrong": ["Mieszko I", "Kazimierz Wielki", "Władysław Jagiełło"],
+      "group": "osoba"
+    },
+    {
+      "question": "Warszawa jest stolicą Polski",
+      "correct": "Prawda",
+      "wrong": ["Fałsz"],
+      "type": "tf",
+      "group": "geografia"
+    }
+  ]
+}`;
             }
 
             window.currentCreateType = type;
-
+            
             // Pokaż/ukryj opcje specyficzne dla quizu
             document.getElementById('answerCountGroup').style.display = 
                 type === 'flashcard' ? 'none' : 'block';
@@ -1353,23 +1444,27 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
                 return;
             }
             
-            quizList.innerHTML = quizzes.map(quiz => { const isFlashcard = quiz.type === 'flashcard'; const icon = isFlashcard ? '🎴' : '📊'; const count = isFlashcard ? `${quiz.cards.length} fiszek` : `${quiz.questions.length} pytań`; const clickHandler = isFlashcard ? 'showFlashcardScreen' : 'showPreQuizScreen';
-
-            return `
-                <div class="quiz-item animate-fadeIn" onclick="${clickHandler}('${quiz.id}')">
-                    <div class="quiz-type-icon">${icon}</div>
-                    <div class="quiz-actions">
-                        <button onclick="event.stopPropagation(); showEditScreen('${quiz.id}')" title="Edytuj">✏️</button>
-                        <button onclick="event.stopPropagation(); deleteQuiz('${quiz.id}')" title="Usuń">🗑️</button>
+            quizList.innerHTML = quizzes.map(quiz => {
+                const isFlashcard = quiz.type === 'flashcard';
+                const icon = isFlashcard ? '🎴' : '📊';
+                const count = isFlashcard ? `${quiz.cards.length} fiszek` : `${quiz.questions.length} pytań`;
+                const clickHandler = isFlashcard ? 'showFlashcardScreen' : 'showPreQuizScreen';
+                
+                return `
+                    <div class="quiz-item animate-fadeIn" onclick="${clickHandler}('${quiz.id}')">
+                        <div class="quiz-type-icon">${icon}</div>
+                        <div class="quiz-actions">
+                            <button onclick="event.stopPropagation(); showEditScreen('${quiz.id}')" title="Edytuj">✏️</button>
+                            <button onclick="event.stopPropagation(); deleteQuiz('${quiz.id}')" title="Usuń">🗑️</button>
+                        </div>
+                        <h3>${quiz.title}</h3>
+                        <p>${count}</p>
+                        <div class="quiz-date">
+                            ${formatDate(quiz.createdAt)}
+                        </div>
                     </div>
-                    <h3>${quiz.title}</h3>
-                    <p>${count}</p>
-                    <div class="quiz-date">
-                        ${formatDate(quiz.createdAt)}
-                    </div>
-                </div>
-            `;
-        }).join('');
+                `;
+            }).join('');
         }
 
         function copyPrompt() {
@@ -1425,7 +1520,7 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
                 const updatedData = JSON.parse(jsonText);
                 
                 // Walidacja
-                if (!updatedData.title || !updatedData.questions || !Array.isArray(updatedData.questions)) {
+                if (!updatedData.title || (!updatedData.questions && !updatedData.cards)) {
                     throw new Error('Nieprawidłowa struktura JSON');
                 }
                 
@@ -1479,6 +1574,7 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
             
             showQuizScreen();
             displayQuestion();
+            startTimer('quizTimer');
         }
 
         function displayQuestion() {
@@ -1626,11 +1722,13 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
         }
 
         function endQuiz() {
+            stopTimer();
             const totalTime = (Date.now() - startTime) / 1000;
             const accuracy = Math.round((score / questions.length) * 100);
             
             document.getElementById('finalScore').textContent = `${score}/${questions.length}`;
             document.getElementById('finalPoints').textContent = `${totalPoints} punktów`;
+            document.getElementById('finalTime').textContent = `Czas: ${formatTime(totalTime)}`;
             
             showResultsScreen();
         }
@@ -1670,8 +1768,10 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
             isCardFlipped = false;
             isTransitioning = false;
             cardRatings = [];
+            startTime = Date.now();
             
             displayFlashcard();
+            startTimer('flashcardTimer');
         }
 
         function displayFlashcard() {
@@ -1687,6 +1787,12 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
             document.getElementById('flashcardActions').style.display = 'none';
             isCardFlipped = false;
 
+            // Reset scroll dla obu stron natychmiast
+            const frontSide = document.querySelector('.flashcard-front');
+            const backSide = document.querySelector('.flashcard-back');
+            if (frontSide) frontSide.scrollTop = 0;
+            if (backSide) backSide.scrollTop = 0;
+            
             // Aktualizuj front natychmiast
             document.getElementById('flashcardFront').textContent = card.front;
 
@@ -1694,16 +1800,9 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
             setTimeout(() => {
                 document.getElementById('flashcardBack').textContent = card.back;
                 
-                // Reset scroll do góry dla obu stron
-                const frontSide = document.querySelector('.flashcard-front');
-                const backSide = document.querySelector('.flashcard-back');
-                if (frontSide) frontSide.scrollTop = 0;
+                // Ponowny reset scroll po załadowaniu nowej treści
                 if (backSide) backSide.scrollTop = 0;
             }, 300);
-
-            // Reset scroll natychmiast dla aktualnie widocznej strony
-            const frontSide = document.querySelector('.flashcard-front');
-            if (frontSide) frontSide.scrollTop = 0;
 
             // Aktualizuj progress
             updateFlashcardProgress();
@@ -1714,7 +1813,7 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
                 document.getElementById('flashcard').classList.add('flipped');
                 document.getElementById('flashcardActions').style.display = 'flex';
                 isCardFlipped = true;
-
+                
                 // Reset scroll dla tylnej strony gdy się obraca
                 setTimeout(() => {
                     const backSide = document.querySelector('.flashcard-back');
@@ -1767,9 +1866,13 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
         }
 
         function endFlashcards() {
+            stopTimer();
+            const totalTime = (Date.now() - startTime) / 1000;
+            
             document.getElementById('flashcardEasyCount').textContent = flashcardStats.easy;
             document.getElementById('flashcardMediumCount').textContent = flashcardStats.medium;
             document.getElementById('flashcardHardCount').textContent = flashcardStats.hard;
+            document.getElementById('flashcardFinalTime').textContent = `Czas: ${formatTime(totalTime)}`;
             
             hideAllScreens();
             document.getElementById('flashcardResultsScreen').classList.remove('hidden');
@@ -1809,6 +1912,32 @@ Przykład: { "title": "Quiz o Polsce", "questions": [ { "question": "Kto był pi
         }
 
         // Funkcje pomocnicze
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function startTimer(elementId) {
+            stopTimer(); // Zatrzymaj poprzedni timer jeśli istnieje
+            const startTime = Date.now();
+            
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.textContent = formatTime(elapsed);
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
         function shuffleArray(array) {
             const newArray = [...array];
             for (let i = newArray.length - 1; i > 0; i--) {
