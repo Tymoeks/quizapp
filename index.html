@@ -680,6 +680,10 @@
             justify-content: center;
             text-align: center;
             padding: 40px;
+            /* iOS touch fix */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .flashcard-side::-webkit-scrollbar {
