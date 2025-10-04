@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
+     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuizApp 2.0 - Twórz i rozwiązuj quizy</title>
-    <style>
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>    <style>
         * {
             margin: 0;
             padding: 0;
@@ -2695,45 +2695,12 @@ Przykład:
          function retakeQuiz() {
         showPreQuizScreen(currentQuiz.id);
         }
-            function endQuizEarly() {
-                if (confirm('Czy na pewno chcesz zakończyć quiz? Postęp zostanie zapisany.')) {
-                    stopTimer();
-                    const totalTime = (Date.now() - startTime) / 1000;
-                    const answeredQuestions = currentQuestionIndex;
-                    const percentage = answeredQuestions > 0 ? Math.round((score / answeredQuestions) * 100) : 0;
-                    
-                    document.getElementById('finalScore').textContent = `${score}/${answeredQuestions} (${percentage}%)`;
-                    document.getElementById('finalPoints').textContent = `${totalPoints} punktów · Najdłuższa seria: ${maxStreak}🔥`;
-                    document.getElementById('finalTime').textContent = `Czas: ${formatTime(totalTime)} · Quiz zakończony przedwcześnie`;
-                    
-                    // Zapisz wynik tylko jeśli odpowiedziano na przynajmniej 1 pytanie
-                    if (answeredQuestions > 0) {
-                        saveQuizResult(currentQuiz.id, {
-                            score: score,
-                            total: answeredQuestions,
-                            percentage: percentage,
-                            points: totalPoints,
-                            time: totalTime,
-                            maxStreak: maxStreak,
-                            mistakes: mistakes,
-                            date: new Date().toISOString(),
-                            isLearningMode: currentQuizSettings.learningMode,
-                            incomplete: true // Oznacz jako niekompletny
-                        });
-                    }
-                    
-                    displayMistakes();
-                    
-                    const retakeBtn = document.getElementById('retakeWrongBtn');
-                    if (mistakes.length > 0) {
-                        retakeBtn.style.display = 'inline-flex';
-                    } else {
-                        retakeBtn.style.display = 'none';
-                    }
-                    
-                    showResultsScreen();
-                }
-            }
+        function endQuizEarly() {
+        if (confirm('Czy na pewno chcesz zakończyć quiz?')) {
+            stopTimer();
+            showHomeScreen();
+        }
+    }
         function retakeWrongAnswers() {
             if (mistakes.length === 0) {
                 showToast('Brak błędnych odpowiedzi', 'info');
@@ -3093,107 +3060,142 @@ Przykład:
         function shareQuiz(quizId) {
         const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
         const quiz = quizzes.find(q => q.id === quizId);
-                if (!quiz) {
-                    showToast('Quiz nie znaleziony', 'error');
-                    return;
+        
+        if (!quiz) {
+            showToast('Quiz nie znaleziony', 'error');
+            return;
+        }
+        
+        // Przygotuj dane do udostępnienia (maksymalnie skompresowane)
+        const shareData = {
+            t: quiz.title,
+            g: quiz.tags || [],
+            y: quiz.type,
+            a: quiz.answerCount
+        };
+        
+        if (quiz.type === 'flashcard') {
+            shareData.c = quiz.cards.map(card => ({
+                f: card.front,
+                b: card.back,
+                ...(card.category && { g: card.category })
+            }));
+        } else {
+            shareData.q = quiz.questions.map(q => ({
+                q: q.question,
+                c: q.correct,
+                w: q.wrong,
+                ...(q.group && { g: q.group }),
+                ...(q.type && { t: q.type })
+            }));
+        }
+        
+        try {
+            // Kompresuj używając LZ-String
+            const jsonString = JSON.stringify(shareData);
+            const compressed = LZString.compressToEncodedURIComponent(jsonString);
+            
+            // Utwórz link
+            const baseUrl = 'https://tymoeks.github.io/quizapp/';
+            const shareUrl = `${baseUrl}#q=${compressed}`;
+            
+            // Skopiuj do schowka
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showToast('Link skopiowany do schowka! 🔗', 'success');
+            }).catch(() => {
+                // Fallback - pokaż link w prompt
+                prompt('Skopiuj link:', shareUrl);
+            });
+        } catch (error) {
+            showToast('Błąd tworzenia linku: ' + error.message, 'error');
+        }
+    }        
+        function checkSharedQuiz() {
+        const hash = window.location.hash;
+        
+        if (hash.startsWith('#q=')) {
+            const compressed = hash.substring(3);
+            
+            try {
+                // Dekompresuj używając LZ-String
+                const jsonString = LZString.decompressFromEncodedURIComponent(compressed);
+                
+                if (!jsonString) {
+                    throw new Error('Nie udało się zdekompresować danych');
                 }
                 
-                // Przygotuj dane do udostępnienia (bez id, dat)
-                const shareData = {
-                    title: quiz.title,
-                    tags: quiz.tags || [],
-                    type: quiz.type,
-                    answerCount: quiz.answerCount
+                const compactData = JSON.parse(jsonString);
+                
+                // Przekształć ze skompresowanego formatu
+                const quizData = {
+                    title: compactData.t,
+                    tags: compactData.g || [],
+                    type: compactData.y,
+                    answerCount: compactData.a
                 };
                 
-                if (quiz.type === 'flashcard') {
-                    shareData.cards = quiz.cards;
+                if (compactData.y === 'flashcard') {
+                    quizData.cards = compactData.c.map(c => ({
+                        front: c.f,
+                        back: c.b,
+                        ...(c.g && { category: c.g })
+                    }));
                 } else {
-                    shareData.questions = quiz.questions;
+                    quizData.questions = compactData.q.map(q => ({
+                        question: q.q,
+                        correct: q.c,
+                        wrong: q.w,
+                        ...(q.g && { group: q.g }),
+                        ...(q.t && { type: q.t })
+                    }));
                 }
                 
-                try {
-                    // Zakoduj do base64
-                    const jsonString = JSON.stringify(shareData);
-                    const encoded = btoa(unescape(encodeURIComponent(jsonString)));
-                    
-                    // Utwórz link
-                    const baseUrl = 'https://tymoeks.github.io/quizapp/';
-                    const shareUrl = `${baseUrl}#share=${encoded}`;
-                    
-                    // Skopiuj do schowka
-                    navigator.clipboard.writeText(shareUrl).then(() => {
-                        showToast('Link skopiowany do schowka! 🔗', 'success');
-                    }).catch(() => {
-                        // Fallback - pokaż link w prompt
-                        prompt('Skopiuj link:', shareUrl);
-                    });
-                } catch (error) {
-                    showToast('Błąd tworzenia linku: ' + error.message, 'error');
-                }
-            }
-        
-            function checkSharedQuiz() {
-                const hash = window.location.hash;
+                // Sprawdź czy już istnieje
+                const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                const exists = quizzes.find(q => 
+                    q.title === quizData.title && 
+                    q.type === quizData.type &&
+                    JSON.stringify(q.questions || q.cards) === JSON.stringify(quizData.questions || quizData.cards)
+                );
                 
-                if (hash.startsWith('#share=')) {
-                    const encoded = hash.substring(7);
+                if (exists) {
+                    showToast('Quiz już istnieje w Twojej bibliotece!', 'info');
                     
-                    try {
-                        // Dekoduj z base64
-                        const jsonString = decodeURIComponent(escape(atob(encoded)));
-                        const quizData = JSON.parse(jsonString);
-                        
-                        // Sprawdź czy już istnieje (po tytule i typie)
-                        const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-                        const exists = quizzes.find(q => 
-                            q.title === quizData.title && 
-                            q.type === quizData.type &&
-                            JSON.stringify(q.questions || q.cards) === JSON.stringify(quizData.questions || quizData.cards)
-                        );
-                        
-                        if (exists) {
-                            // Quiz już istnieje - pokaż ekran startowy
-                            showToast('Quiz już istnieje w Twojej bibliotece!', 'info');
-                            
-                            if (quizData.type === 'flashcard') {
-                                showFlashcardScreen(exists.id);
-                            } else {
-                                showPreQuizScreen(exists.id);
-                            }
-                        } else {
-                            // Dodaj nowy quiz
-                            const newQuiz = {
-                                ...quizData,
-                                id: Date.now().toString(),
-                                createdAt: new Date().toISOString()
-                            };
-                            
-                            quizzes.push(newQuiz);
-                            localStorage.setItem('quizzes', JSON.stringify(quizzes));
-                            
-                            showToast('Quiz został dodany! 🎉', 'success');
-                            
-                            // Pokaż ekran startowy quizu
-                            if (quizData.type === 'flashcard') {
-                                showFlashcardScreen(newQuiz.id);
-                            } else {
-                                showPreQuizScreen(newQuiz.id);
-                            }
-                        }
-                        
-                        // Wyczyść hash
-                        history.replaceState(null, null, ' ');
-                        
-                    } catch (error) {
-                        showToast('Błąd wczytywania udostępnionego quizu: ' + error.message, 'error');
-                        showHomeScreen();
+                    if (quizData.type === 'flashcard') {
+                        showFlashcardScreen(exists.id);
+                    } else {
+                        showPreQuizScreen(exists.id);
                     }
                 } else {
-                    showHomeScreen();
+                    const newQuiz = {
+                        ...quizData,
+                        id: Date.now().toString(),
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    quizzes.push(newQuiz);
+                    localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                    
+                    showToast('Quiz został dodany! 🎉', 'success');
+                    
+                    if (quizData.type === 'flashcard') {
+                        showFlashcardScreen(newQuiz.id);
+                    } else {
+                        showPreQuizScreen(newQuiz.id);
+                    }
                 }
+                
+                // Wyczyść hash
+                history.replaceState(null, null, window.location.pathname);
+                
+            } catch (error) {
+                showToast('Błąd wczytywania udostępnionego quizu: ' + error.message, 'error');
+                showHomeScreen();
             }
-        
+        } else {
+            showHomeScreen();
+        }
+    }        
             // ==================== IMPORT/EXPORT ====================
             function copyPrompt() {
                 const prompt = document.getElementById('aiPrompt').textContent;
