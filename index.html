@@ -741,18 +741,19 @@
             transform: rotate(45deg);
         }
 
-        .question-card h2 {
-            font-weight: 400;
-            font-size: 1.5rem;
-            line-height: 1.4;
-            margin-bottom: 40px;
-            position: relative;
-            z-index: 1;
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            user-select: text;
+         .question-card h2 {
+        font-weight: 400;
+        font-size: 1.5rem;
+        line-height: 1.4;
+        margin-bottom: 40px;
+        margin-top: 0;
+        padding-top: 0;
+        position: relative;
+        z-index: 1;
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        user-select: text;
         }
-
         .question-category {
             position: absolute;
             top: 16px;
@@ -1392,10 +1393,11 @@
             padding: 24px 16px;
         }
 
-        .question-card h2 {
-            font-size: 1.25rem;
+         .question-card h2 {
+        font-size: 1.25rem;
+        padding-top: 30px;
+        margin-top: 0;
         }
-
         .answers-grid {
             grid-template-columns: 1fr !important;
         }
@@ -1765,12 +1767,16 @@
                 </div>
                 
                 <div class="question-card animate-fadeIn">
-                    <div class="question-category" id="questionCategory"></div>
-                    <h2 id="questionText"></h2>
-                    <div class="answers-grid" id="answersGrid"></div>
-                </div>
+                <div class="question-category" id="questionCategory"></div>
+                <h2 id="questionText"></h2>
+                <div class="answers-grid" id="answersGrid"></div>
+            </div>
 
-                <div class="keyboard-hint">
+            <div class="button-group center" style="margin-top: 24px;">
+                <button class="btn" onclick="endQuizEarly()">Zakończ quiz</button>
+            </div>
+
+            <div class="keyboard-hint">
                     <kbd class="kbd">1-4</kbd> Wybierz odpowiedź · 
                     <kbd class="kbd">Esc</kbd> Wyjdź
                 </div>
@@ -1926,12 +1932,9 @@
             <div class="form-group">
             <textarea id="importJson" placeholder="Lub wklej JSON tutaj..." style="min-height: 200px;"></textarea>
             </div>
-            <div class="form-group">
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="checkbox" id="importMergeMode" checked>
-            <span>Dodaj bez nadpisywania (nie duplikuj istniejących quizów)</span>
-            </label>
-            </div>
+            <p style="margin-bottom: 16px; font-size: 14px; color: var(--text-secondary);">
+            ℹ️ Istniejące quizy nie zostaną nadpisane - dodane zostaną tylko nowe.
+            </p>
             <div class="button-group">
             <button class="btn btn-primary" onclick="importQuiz()">📥 Importuj</button>
             <button class="btn" onclick="closeModal('importModal')">Anuluj</button>
@@ -2689,10 +2692,48 @@ Przykład:
             `;
         }
 
-        function retakeQuiz() {
-            showPreQuizScreen(currentQuiz.id);
+         function retakeQuiz() {
+        showPreQuizScreen(currentQuiz.id);
         }
-
+            function endQuizEarly() {
+                if (confirm('Czy na pewno chcesz zakończyć quiz? Postęp zostanie zapisany.')) {
+                    stopTimer();
+                    const totalTime = (Date.now() - startTime) / 1000;
+                    const answeredQuestions = currentQuestionIndex;
+                    const percentage = answeredQuestions > 0 ? Math.round((score / answeredQuestions) * 100) : 0;
+                    
+                    document.getElementById('finalScore').textContent = `${score}/${answeredQuestions} (${percentage}%)`;
+                    document.getElementById('finalPoints').textContent = `${totalPoints} punktów · Najdłuższa seria: ${maxStreak}🔥`;
+                    document.getElementById('finalTime').textContent = `Czas: ${formatTime(totalTime)} · Quiz zakończony przedwcześnie`;
+                    
+                    // Zapisz wynik tylko jeśli odpowiedziano na przynajmniej 1 pytanie
+                    if (answeredQuestions > 0) {
+                        saveQuizResult(currentQuiz.id, {
+                            score: score,
+                            total: answeredQuestions,
+                            percentage: percentage,
+                            points: totalPoints,
+                            time: totalTime,
+                            maxStreak: maxStreak,
+                            mistakes: mistakes,
+                            date: new Date().toISOString(),
+                            isLearningMode: currentQuizSettings.learningMode,
+                            incomplete: true // Oznacz jako niekompletny
+                        });
+                    }
+                    
+                    displayMistakes();
+                    
+                    const retakeBtn = document.getElementById('retakeWrongBtn');
+                    if (mistakes.length > 0) {
+                        retakeBtn.style.display = 'inline-flex';
+                    } else {
+                        retakeBtn.style.display = 'none';
+                    }
+                    
+                    showResultsScreen();
+                }
+            }
         function retakeWrongAnswers() {
             if (mistakes.length === 0) {
                 showToast('Brak błędnych odpowiedzi', 'info');
@@ -3179,9 +3220,9 @@ Przykład:
             reader.readAsText(file);
         }
 
-function importQuiz() {
+        function importQuiz() {
         const jsonText = document.getElementById('importJson').value;
-        const mergeMode = document.getElementById('importMergeMode').checked;
+        const mergeMode = true; // Zawsze włączony merge mode
         
         try {
             const data = JSON.parse(jsonText);
@@ -3192,18 +3233,16 @@ function importQuiz() {
                 let skippedCount = 0;
                 
                 data.forEach(quiz => {
-                    if (mergeMode) {
-                        // Sprawdź czy quiz już istnieje
-                        const exists = quizzes.find(q => 
-                            q.title === quiz.title && 
-                            q.type === quiz.type &&
-                            JSON.stringify(q.questions || q.cards) === JSON.stringify(quiz.questions || quiz.cards)
-                        );
-                        
-                        if (exists) {
-                            skippedCount++;
-                            return;
-                        }
+                    // Sprawdź czy quiz już istnieje
+                    const exists = quizzes.find(q => 
+                        q.title === quiz.title && 
+                        q.type === quiz.type &&
+                        JSON.stringify(q.questions || q.cards) === JSON.stringify(quiz.questions || quiz.cards)
+                    );
+                    
+                    if (exists) {
+                        skippedCount++;
+                        return;
                     }
                     
                     quiz.id = Date.now().toString() + Math.random();
@@ -3214,7 +3253,7 @@ function importQuiz() {
                 
                 localStorage.setItem('quizzes', JSON.stringify(quizzes));
                 
-                if (mergeMode && skippedCount > 0) {
+                if (skippedCount > 0) {
                     showToast(`Zaimportowano ${addedCount} quizów, pominięto ${skippedCount} duplikatów`, 'success');
                 } else {
                     showToast(`Zaimportowano ${addedCount} quizów!`, 'success');
@@ -3222,21 +3261,19 @@ function importQuiz() {
             } else {
                 const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
                 
-                if (mergeMode) {
-                    // Sprawdź czy quiz już istnieje
-                    const exists = quizzes.find(q => 
-                        q.title === data.title && 
-                        q.type === data.type &&
-                        JSON.stringify(q.questions || q.cards) === JSON.stringify(data.questions || data.cards)
-                    );
-                    
-                    if (exists) {
-                        showToast('Quiz już istnieje w bibliotece', 'info');
-                        closeModal('importModal');
-                        document.getElementById('importJson').value = '';
-                        document.getElementById('importFile').value = '';
-                        return;
-                    }
+                // Sprawdź czy quiz już istnieje
+                const exists = quizzes.find(q => 
+                    q.title === data.title && 
+                    q.type === data.type &&
+                    JSON.stringify(q.questions || q.cards) === JSON.stringify(data.questions || data.cards)
+                );
+                
+                if (exists) {
+                    showToast('Quiz już istnieje w bibliotece', 'info');
+                    closeModal('importModal');
+                    document.getElementById('importJson').value = '';
+                    document.getElementById('importFile').value = '';
+                    return;
                 }
                 
                 const quiz = {
