@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizApp - Twórz i rozwiązuj quizy</title>
+    <title>QuizApp 2.0 - Twórz i rozwiązuj quizy</title>
     <style>
         * {
             margin: 0;
@@ -29,6 +29,24 @@
             --gradient-dark: linear-gradient(135deg, #34495E 0%, #2C3E50 100%);
         }
 
+        [data-theme="dark"] {
+            --primary: #ECF0F1;
+            --secondary: #BDC3C7;
+            --accent: #3498DB;
+            --success: #27AE60;
+            --danger: #E74C3C;
+            --warning: #F39C12;
+            --background: #1a1a1a;
+            --surface: #2C3E50;
+            --surface-alt: #34495E;
+            --border: #4A5568;
+            --text: #ECF0F1;
+            --text-secondary: #BDC3C7;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --gradient-light: linear-gradient(135deg, #34495E 0%, #2C3E50 100%);
+            --gradient-dark: linear-gradient(135deg, #ECF0F1 0%, #BDC3C7 100%);
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: var(--background);
@@ -37,9 +55,12 @@
             line-height: 1.6;
             position: relative;
             overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
         }
 
-        /* Dekoracyjne elementy tła */
         body::before {
             content: '';
             position: fixed;
@@ -54,11 +75,11 @@
             z-index: -2;
         }
 
-        /* Geometryczne kształty w tle */
         .bg-decoration {
             position: fixed;
             opacity: 0.03;
             z-index: -1;
+            transition: opacity 0.3s ease;
         }
 
         .bg-square-1 {
@@ -89,7 +110,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 40px 20px;
             position: relative;
@@ -106,9 +127,7 @@
             font-weight: 300;
             letter-spacing: -1px;
             margin-bottom: 8px;
-            background: var(--gradient-dark);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text);
         }
 
         h2 {
@@ -154,6 +173,38 @@
             margin-top: 8px;
         }
 
+        .header-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
         /* Cards */
         .card {
             background: var(--surface);
@@ -164,6 +215,7 @@
             position: relative;
             overflow: hidden;
             box-shadow: 0 2px 4px var(--shadow);
+            transition: all 0.3s ease;
         }
 
         .card::before {
@@ -250,6 +302,75 @@
             border: none;
         }
 
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        /* Search & Filter Bar */
+        .search-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--surface-alt);
+            color: var(--text);
+            transition: all 0.2s ease;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            user-select: text;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--surface);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--surface-alt);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
         /* Quiz List */
         .quiz-list {
             display: grid;
@@ -262,8 +383,8 @@
             background: var(--surface);
             border: 1px solid var(--border);
             padding: 24px;
-            padding-left: 56px; /* Więcej miejsca na ikonę */
-            padding-bottom: 60px; /* Więcej miejsca na datę */
+            padding-left: 56px;
+            padding-bottom: 60px;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -344,6 +465,41 @@
             border-color: var(--primary);
         }
 
+        .quiz-stats-badge {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: var(--surface-alt);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .quiz-type-icon {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            font-size: 24px;
+            opacity: 0.8;
+        }
+
+        .quiz-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 3px 8px;
+            background: var(--accent);
+            color: white;
+            border-radius: 12px;
+            opacity: 0.8;
+        }
+
         /* Forms */
         .form-group {
             margin-bottom: 24px;
@@ -358,24 +514,91 @@
             color: var(--primary);
         }
 
+        .form-group input[type="text"],
         .form-group textarea {
             width: 100%;
             padding: 12px 16px;
             border: 1px solid var(--border);
             border-radius: 8px;
             font-size: 14px;
+            background: var(--surface-alt);
+            color: var(--text);
+            transition: all 0.2s ease;
+            font-family: inherit;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            user-select: text;
+        }
+
+        .form-group textarea {
             font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
             resize: vertical;
             min-height: 200px;
-            background: var(--surface-alt);
-            transition: all 0.2s ease;
         }
 
+        .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
             border-color: var(--accent);
             background: var(--surface);
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        /* Tag Input */
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface-alt);
+            min-height: 44px;
+            align-items: center;
+        }
+
+        .tag-input-container input {
+            border: none;
+            background: transparent;
+            flex: 1;
+            min-width: 120px;
+            padding: 4px;
+            font-size: 14px;
+            color: var(--text);
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            user-select: text;
+        }
+
+        .tag-input-container input:focus {
+            outline: none;
+        }
+
+        .tag-removable {
+            background: var(--accent);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tag-removable button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            font-size: 14px;
+            line-height: 1;
         }
 
         .ai-prompt {
@@ -410,6 +633,9 @@
             font-size: 13px;
             line-height: 1.5;
             color: var(--text-secondary);
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            user-select: text;
         }
 
         /* Quiz Gameplay */
@@ -446,10 +672,31 @@
             padding: 16px;
             border-radius: 8px;
             border: 1px solid var(--border);
+            flex-wrap: wrap;
         }
 
         .stats span {
             font-weight: 500;
+        }
+
+        .streak-indicator {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+            animation: pulse 0.5s ease;
+            z-index: 100;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .question-card {
@@ -492,6 +739,21 @@
             margin-bottom: 40px;
             position: relative;
             z-index: 1;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            user-select: text;
+        }
+
+        .question-category {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: var(--surface-alt);
+            padding: 6px 12px;
+            border-radius: 6px;
+            z-index: 1;
         }
 
         .answers-grid {
@@ -528,6 +790,9 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            user-select: text;
         }
 
         .answer-btn:hover:not(:disabled) {
@@ -551,6 +816,22 @@
             background: var(--danger);
             border-color: var(--danger);
             color: white;
+        }
+
+        .answer-letter {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 24px;
+            height: 24px;
+            background: var(--surface);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
         }
 
         /* Type Selection */
@@ -593,15 +874,6 @@
         .type-option p {
             font-size: 14px;
             color: var(--text-secondary);
-        }
-
-        /* Quiz Type Icons */
-        .quiz-type-icon {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            font-size: 24px;
-            opacity: 0.8;
         }
 
         /* Flashcard Styles */
@@ -647,7 +919,7 @@
             background: var(--surface);
             border: 2px solid var(--border);
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch; /* Dla iOS */
+            -webkit-overflow-scrolling: touch;
         }
 
         .flashcard-front {
@@ -680,10 +952,10 @@
             justify-content: center;
             text-align: center;
             padding: 40px;
-            /* iOS touch fix */
             -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            user-select: text;
         }
 
         .flashcard-side::-webkit-scrollbar {
@@ -772,15 +1044,53 @@
             font-weight: 200;
             margin-bottom: 16px;
             letter-spacing: -2px;
-            background: var(--gradient-dark);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text);
         }
 
         .points-display {
             font-size: 1.25rem;
             color: var(--text-secondary);
             margin-bottom: 40px;
+        }
+
+        .time-display {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        /* History/Stats */
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: var(--surface-alt);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .history-item:hover {
+            background: var(--border);
+        }
+
+        .history-info {
+            flex: 1;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            user-select: text;
+        }
+
+        .history-score {
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 18px;
         }
 
         /* Settings */
@@ -845,7 +1155,7 @@
         }
 
         input:checked + .slider {
-            background: var(--gradient-dark);
+            background: var(--accent);
         }
 
         input:checked + .slider:before {
@@ -858,6 +1168,7 @@
             border-radius: 6px;
             font-size: 14px;
             background: var(--surface);
+            color: var(--text);
             cursor: pointer;
             min-width: 120px;
             transition: all 0.2s ease;
@@ -874,10 +1185,117 @@
             display: flex;
             gap: 12px;
             margin-top: 32px;
+            flex-wrap: wrap;
         }
 
         .button-group.center {
             justify-content: center;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px var(--shadow);
+            z-index: 3000;
+            max-width: 300px;
+            opacity: 0;
+            transform: translateX(400px);
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .toast.info {
+            border-left: 4px solid var(--accent);
+        }
+
+        .toast.toast-show {
+            animation: slideInRight 0.3s ease forwards;
+        }
+
+        .toast.toast-hide {
+            animation: slideOutRight 0.3s ease forwards;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
         }
 
         /* Animations */
@@ -921,6 +1339,19 @@
             animation: shake 0.4s ease;
         }
 
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .container {
@@ -948,7 +1379,6 @@
                 gap: 8px;
             }
             
-            /* Zachowaj poziomy układ dla statystyk w podsumowaniu */
             .results-screen .stats {
                 flex-direction: row !important;
                 flex-wrap: wrap;
@@ -957,30 +1387,92 @@
             .results-screen .stats > div {
                 min-width: 30%;
             }
+
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .modal-content {
+                padding: 24px;
+            }
+        }
+
+        /* Keyboard Shortcuts Hint */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            box-shadow: 0 2px 8px var(--shadow);
+            z-index: 100;
+        }
+
+        .kbd {
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: monospace;
+            font-size: 11px;
         }
     </style>
 </head>
 <body>
-    <!-- Dekoracyjne elementy tła -->
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" onclick="toggleTheme()" title="Przełącz motyw">
+        <span id="themeIcon">🌙</span>
+    </div>
+
+    <!-- Background Decorations -->
     <div class="bg-decoration bg-square-1"></div>
     <div class="bg-decoration bg-square-2"></div>
     <div class="bg-decoration bg-square-3"></div>
 
     <div class="container">
         <div class="header">
-            <h1>QuizApp</h1>
+            <h1>QuizApp 2.0</h1>
             <p>Profesjonalna platforma do tworzenia i rozwiązywania quizów</p>
-        </div>
-
-        <!-- Ekran główny -->
-        <div id="homeScreen" class="screen animate-fadeIn">
-            <div class="quiz-list" id="quizList"></div>
-            <div style="text-align: center;">
-                <button class="btn btn-primary" onclick="showChooseTypeScreen()">Utwórz nowy</button>
+            <div class="header-actions">
+                <button class="btn btn-accent btn-small" onclick="showImportModal()">📥 Import</button>
+                <button class="btn btn-small" onclick="showBackupModal()">💾 Backup</button>
+                <button class="btn btn-small" onclick="showStatsModal()">📊 Statystyki</button>
             </div>
         </div>
 
-        <!-- Ekran wyboru typu -->
+        <!-- Home Screen -->
+        <div id="homeScreen" class="screen animate-fadeIn">
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Szukaj quizów..." oninput="filterQuizzes()">
+                <div class="filter-group">
+                    <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">Wszystkie</button>
+                    <button class="filter-btn" data-filter="quiz" onclick="setFilter('quiz')">📊 Quizy</button>
+                    <button class="filter-btn" data-filter="flashcard" onclick="setFilter('flashcard')">🎴 Fiszki</button>
+                </div>
+            </div>
+            <div class="quiz-list" id="quizList"></div>
+            <div style="text-align: center;">
+                <button class="btn btn-primary" onclick="showChooseTypeScreen()">➕ Utwórz nowy</button>
+            </div>
+        </div>
+
+        <!-- Choose Type Screen -->
         <div id="chooseTypeScreen" class="screen hidden">
             <div class="card card-white animate-fadeIn">
                 <h2>Co chcesz utworzyć?</h2>
@@ -1002,50 +1494,29 @@
             </div>
         </div>
 
-        <!-- Ekran tworzenia quizu -->
+        <!-- Create Screen -->
         <div id="createScreen" class="screen hidden">
             <div class="card card-white animate-fadeIn">
                 <h2 id="createTitle">Tworzenie nowego quizu</h2>
                 
                 <div class="ai-prompt">
                     <h3 id="aiPromptTitle">Prompt AI do generowania:</h3>
-                    <pre id="aiPrompt">Wygeneruj quiz w formacie JSON na temat [TWÓJ TEMAT]. 
-
-Parametry opcjonalne:
-- Liczba pytań: [np. 10]
-- Liczba pytań prawda/fałsz: [np. 3]
-
-Quiz powinien zawierać:
-- title: tytuł quizu
-- Tablicę questions z pytaniami, gdzie każde pytanie ma:
-  - question: treść pytania
-  - correct: poprawna odpowiedź
-  - wrong: tablica 3-4 błędnych odpowiedzi
-  - group: kategoria pytania (np. "osoba", "data", "miejsce")
-  - type: "tf" dla pytań prawda/fałsz (opcjonalne)
-
-Przykład:
-{
-  "title": "Quiz o Polsce",
-  "questions": [
-    {
-      "question": "Kto był pierwszym królem Polski?",
-      "correct": "Bolesław Chrobry",
-      "wrong": ["Mieszko I", "Kazimierz Wielki", "Władysław Jagiełło"],
-      "group": "osoba"
-    },
-    {
-      "question": "Warszawa jest stolicą Polski",
-      "correct": "Prawda",
-      "wrong": ["Fałsz"],
-      "type": "tf",
-      "group": "geografia"
-    }
-  ]
-}</pre>
+                    <pre id="aiPrompt"></pre>
                     <button class="btn" onclick="copyPrompt()" style="margin-top: 16px;">
-                        Kopiuj prompt
+                        📋 Kopiuj prompt
                     </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="quizTitle">Tytuł (opcjonalnie, jeśli już jest w JSON):</label>
+                    <input type="text" id="quizTitle" placeholder="Np. Quiz o historii Polski">
+                </div>
+
+                <div class="form-group">
+                    <label>Tagi (naciśnij Enter aby dodać, opcjonalnie):</label>
+                    <div class="tag-input-container" id="tagContainer">
+                        <input type="text" id="tagInput" placeholder="Dodaj tag..." onkeypress="handleTagInput(event)">
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -1054,7 +1525,7 @@ Przykład:
                 </div>
 
                 <div class="form-group" id="answerCountGroup">
-                    <label>Liczba odpowiedzi w pytaniach wielokrotnego wyboru:</label>
+                    <label>Liczba odpowiedzi w pytaniach:</label>
                     <select id="answerCount">
                         <option value="3">3 odpowiedzi</option>
                         <option value="4" selected>4 odpowiedzi</option>
@@ -1062,36 +1533,55 @@ Przykład:
                 </div>
 
                 <div class="button-group">
-                    <button class="btn btn-primary" onclick="saveQuiz()">Zapisz quiz</button>
+                    <button class="btn btn-primary" onclick="saveQuiz()">💾 Zapisz</button>
                     <button class="btn" onclick="showHomeScreen()">Anuluj</button>
                 </div>
             </div>
         </div>
 
-        <!-- Ekran edycji quizu -->
+        <!-- Edit Screen -->
         <div id="editScreen" class="screen hidden">
             <div class="card card-white animate-fadeIn">
-                <h2>Edycja quizu</h2>
+                <h2>Edycja</h2>
                 
                 <div class="form-group">
-                    <label for="editQuizJson">JSON quizu:</label>
+                    <label for="editQuizTitle">Tytuł:</label>
+                    <input type="text" id="editQuizTitle">
+                </div>
+
+                <div class="form-group">
+                    <label>Tagi:</label>
+                    <div class="tag-input-container" id="editTagContainer">
+                        <input type="text" id="editTagInput" placeholder="Dodaj tag..." onkeypress="handleEditTagInput(event)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="editQuizJson">JSON:</label>
                     <textarea id="editQuizJson"></textarea>
                 </div>
 
                 <div class="button-group">
-                    <button class="btn btn-primary" onclick="updateQuiz()">Zapisz zmiany</button>
+                    <button class="btn btn-primary" onclick="updateQuiz()">💾 Zapisz zmiany</button>
+                    <button class="btn btn-danger" onclick="deleteCurrentQuiz()">🗑️ Usuń</button>
                     <button class="btn" onclick="showHomeScreen()">Anuluj</button>
                 </div>
             </div>
         </div>
 
-        <!-- Ekran przed rozpoczęciem quizu -->
+        <!-- Pre-Quiz Screen -->
         <div id="preQuizScreen" class="screen hidden">
             <div class="card card-white animate-fadeIn">
                 <h2 id="preQuizTitle"></h2>
                 <p id="preQuizDescription" style="margin-bottom: 32px;"></p>
                 
+                <div id="quizHistorySection" class="quiz-settings" style="margin-bottom: 24px;">
+                    <h3 style="margin-bottom: 16px;">📊 Historia wyników</h3>
+                    <div id="quizHistory"></div>
+                </div>
+
                 <div class="quiz-settings">
+                    <h3 style="margin-bottom: 16px;">⚙️ Ustawienia</h3>
                     <div class="setting-row">
                         <label>Losowa kolejność pytań</label>
                         <label class="toggle">
@@ -1099,16 +1589,31 @@ Przykład:
                             <span class="slider"></span>
                         </label>
                     </div>
+                    <div class="setting-row">
+                        <label>Pokazuj litery odpowiedzi (A, B, C, D)</label>
+                        <label class="toggle">
+                            <input type="checkbox" id="showLetters" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-row">
+                        <label>Tryb nauki (tylko błędne pytania)</label>
+                        <label class="toggle">
+                            <input type="checkbox" id="learningMode">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="button-group center">
-                    <button class="btn btn-accent" onclick="startQuiz()">Rozpocznij quiz</button>
+                    <button class="btn btn-accent" onclick="startQuiz()">▶️ Rozpocznij quiz</button>
+                    <button class="btn btn-small" onclick="exportQuiz(currentQuiz.id)">📤 Eksportuj</button>
                     <button class="btn" onclick="showHomeScreen()">Powrót</button>
                 </div>
             </div>
         </div>
 
-        <!-- Ekran quizu -->
+        <!-- Quiz Screen -->
         <div id="quizScreen" class="screen hidden">
             <div class="quiz-container">
                 <div class="progress-bar">
@@ -1119,38 +1624,54 @@ Przykład:
                     <span id="questionNumber">Pytanie 1/10</span>
                     <span id="accuracy">Poprawność: 0%</span>
                     <span id="score">Punkty: 0</span>
+                    <span id="streak">Seria: 0🔥</span>
                     <span id="quizTimer">00:00</span>
                 </div>
                 
                 <div class="question-card animate-fadeIn">
+                    <div class="question-category" id="questionCategory"></div>
                     <h2 id="questionText"></h2>
                     <div class="answers-grid" id="answersGrid"></div>
+                </div>
+
+                <div class="keyboard-hint">
+                    <kbd class="kbd">1-4</kbd> Wybierz odpowiedź · 
+                    <kbd class="kbd">Esc</kbd> Wyjdź
                 </div>
             </div>
         </div>
 
-        <!-- Ekran wyników -->
+        <!-- Results Screen -->
         <div id="resultsScreen" class="screen hidden">
             <div class="card card-white results-screen animate-fadeIn">
                 <h2>Quiz zakończony!</h2>
                 <div class="score-display" id="finalScore"></div>
                 <div class="points-display" id="finalPoints"></div>
-                <div class="time-display" id="finalTime" style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 20px;"></div>
+                <div class="time-display" id="finalTime"></div>
+
+                <div id="mistakesSection" style="margin: 32px 0;"></div>
 
                 <div class="button-group center">
-                    <button class="btn btn-primary" onclick="retakeQuiz()">Powtórz quiz</button>
-                    <button class="btn" onclick="showHomeScreen()">Ekran główny</button>
+                    <button class="btn btn-primary" onclick="retakeQuiz()">🔄 Powtórz quiz</button>
+                    <button class="btn btn-accent" onclick="retakeWrongAnswers()" id="retakeWrongBtn">📚 Powtórz błędy</button>
+                    <button class="btn" onclick="showHomeScreen()">🏠 Ekran główny</button>
                 </div>
             </div>
         </div>
 
-        <!-- Ekran przed fiszkamu -->
+        <!-- Pre-Flashcard Screen -->
         <div id="preFlashcardScreen" class="screen hidden">
             <div class="card card-white animate-fadeIn">
                 <h2 id="preFlashcardTitle"></h2>
                 <p id="preFlashcardDescription" style="margin-bottom: 32px;"></p>
 
+                <div id="flashcardHistorySection" class="quiz-settings" style="margin-bottom: 24px;">
+                    <h3 style="margin-bottom: 16px;">📊 Historia nauki</h3>
+                    <div id="flashcardHistory"></div>
+                </div>
+
                 <div class="quiz-settings">
+                    <h3 style="margin-bottom: 16px;">⚙️ Ustawienia</h3>
                     <div class="setting-row">
                         <label>Losowa kolejność fiszek</label>
                         <label class="toggle">
@@ -1161,13 +1682,14 @@ Przykład:
                 </div>
 
                 <div class="button-group center">
-                    <button class="btn btn-accent" onclick="startFlashcards()">Rozpocznij naukę</button>
+                    <button class="btn btn-accent" onclick="startFlashcards()">▶️ Rozpocznij naukę</button>
+                    <button class="btn btn-small" onclick="exportQuiz(currentFlashcards.id)">📤 Eksportuj</button>
                     <button class="btn" onclick="showHomeScreen()">Powrót</button>
                 </div>
             </div>
         </div>
 
-        <!-- Ekran fiszek -->
+        <!-- Flashcard Screen -->
         <div id="flashcardScreen" class="screen hidden">
             <div class="flashcard-container">
                 <div class="progress-bar" style="margin-bottom: 32px;">
@@ -1191,7 +1713,7 @@ Przykład:
                     </div>
                     
                     <p style="text-align: center; margin-top: 16px; color: var(--text-secondary); font-size: 14px;">
-                        Kliknij kartę aby zobaczyć odpowiedź
+                        Kliknij kartę lub naciśnij <kbd class="kbd">Spacja</kbd> aby zobaczyć odpowiedź
                     </p>
 
                     <div class="flashcard-actions" id="flashcardActions" style="display: none;">
@@ -1210,14 +1732,21 @@ Przykład:
                 <div class="button-group center" style="margin-top: 32px;">
                     <button class="btn" onclick="endFlashcards()">Zakończ naukę</button>
                 </div>
+
+                <div class="keyboard-hint">
+                    <kbd class="kbd">1</kbd> Nie znam · 
+                    <kbd class="kbd">2</kbd> Trudne · 
+                    <kbd class="kbd">3</kbd> Znam · 
+                    <kbd class="kbd">Spacja</kbd> Obróć
+                </div>
             </div>
         </div>
 
-        <!-- Ekran wyników fiszek -->
+        <!-- Flashcard Results Screen -->
         <div id="flashcardResultsScreen" class="screen hidden">
             <div class="card card-white results-screen animate-fadeIn">
                 <h2>Sesja nauki zakończona!</h2>
-                <div class="time-display" id="flashcardFinalTime" style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 20px; text-align: center;"></div>
+                <div class="time-display" id="flashcardFinalTime"></div>
                 <div class="stats" style="justify-content: center; margin: 32px 0; background: transparent; border: none;">
                     <div style="text-align: center; margin: 0 24px; min-width: 80px;">
                         <div style="font-size: 2.5rem; font-weight: 200; color: var(--success); line-height: 1; display: flex; justify-content: center; align-items: center; height: 60px;">
@@ -1240,15 +1769,71 @@ Przykład:
                 </div>
                 
                 <div class="button-group center">
-                    <button class="btn btn-primary" onclick="restartFlashcards()">Powtórz trudne</button>
-                    <button class="btn" onclick="showHomeScreen()">Ekran główny</button>
+                    <button class="btn btn-primary" onclick="restartFlashcards()">🔄 Powtórz trudne</button>
+                    <button class="btn" onclick="showHomeScreen()">🏠 Ekran główny</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Import Modal -->
+    <div id="importModal" class="modal hidden" onclick="closeModal('importModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Importuj quiz</h2>
+                <button class="modal-close" onclick="closeModal('importModal')">×</button>
+            </div>
+            <div class="form-group">
+                <label>Wybierz plik JSON lub wklej dane:</label>
+                <input type="file" id="importFile" accept=".json" onchange="handleFileImport(event)">
+            </div>
+            <div class="form-group">
+                <textarea id="importJson" placeholder="Lub wklej JSON tutaj..." style="min-height: 200px;"></textarea>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="importQuiz()">📥 Importuj</button>
+                <button class="btn" onclick="closeModal('importModal')">Anuluj</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup Modal -->
+    <div id="backupModal" class="modal hidden" onclick="closeModal('backupModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Zarządzanie danymi</h2>
+                <button class="modal-close" onclick="closeModal('backupModal')">×</button>
+            </div>
+            <p style="margin-bottom: 24px; color: var(--text-secondary);">
+                Wykonaj kopię zapasową wszystkich quizów i danych lub przywróć z pliku.
+            </p>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="exportAllData()">💾 Eksportuj wszystko</button>
+                <button class="btn btn-accent" onclick="document.getElementById('restoreFile').click()">📂 Przywróć z pliku</button>
+                <input type="file" id="restoreFile" accept=".json" style="display: none;" onchange="restoreData(event)">
+            </div>
+            <div style="margin-top: 24px; padding: 16px; background: var(--surface-alt); border-radius: 8px;">
+                <p style="font-size: 14px; color: var(--text-secondary);">
+                    <strong>Rozmiar danych:</strong> <span id="dataSize">0 KB</span><br>
+                    <strong>Liczba quizów:</strong> <span id="quizCount">0</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div id="statsModal" class="modal hidden" onclick="closeModal('statsModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>📊 Statystyki</h2>
+                <button class="modal-close" onclick="closeModal('statsModal')">×</button>
+            </div>
+            <div id="statsContent"></div>
+        </div>
+    </div>
+
     <script>
-        // Stan aplikacji
+        // ==================== STATE ====================
         let currentQuiz = null;
         let currentQuestionIndex = 0;
         let score = 0;
@@ -1260,29 +1845,59 @@ Przykład:
         let currentEditingQuizId = null;
         let currentQuizSettings = {
             randomOrder: true,
-            answerCount: 4
+            answerCount: 4,
+            showLetters: true,
+            learningMode: false
         };
         let timerInterval = null;
+        let currentStreak = 0;
+        let maxStreak = 0;
+        let mistakes = [];
+        let currentFilter = 'all';
+        let currentTags = [];
+        let editTags = [];
 
-        // Stan fiszek
+        // Flashcard state
         let currentFlashcards = null;
         let currentCardIndex = 0;
-        let flashcardStats = {
-            easy: 0,
-            medium: 0,
-            hard: 0
-        };
+        let flashcardStats = { easy: 0, medium: 0, hard: 0 };
         let cards = [];
         let isCardFlipped = false;
         let isTransitioning = false;
         let cardRatings = [];
 
-        // Inicjalizacja
+        // Toast queue system
+        let activeToast = null;
+        let queuedToast = null;
+
+        // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
             showHomeScreen();
+            setupKeyboardShortcuts();
         });
 
-        // Nawigacja między ekranami
+        // ==================== THEME ====================
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+            showToast('Zmieniono motyw na ' + (newTheme === 'dark' ? 'ciemny' : 'jasny'), 'success');
+        }
+
+        function updateThemeIcon(theme) {
+            document.getElementById('themeIcon').textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // ==================== NAVIGATION ====================
         function hideAllScreens() {
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.add('hidden');
@@ -1304,47 +1919,12 @@ Przykład:
             hideAllScreens();
             document.getElementById('createScreen').classList.remove('hidden');
             document.getElementById('quizJson').value = '';
+            document.getElementById('quizTitle').value = '';
+            currentTags = [];
+            renderTags();
             
-            // Ustaw odpowiedni tytuł i prompt
-            if (type === 'flashcard') {
-                document.getElementById('createTitle').textContent = 'Tworzenie nowych fiszek';
-                document.getElementById('aiPromptTitle').textContent = 'Prompt AI do generowania fiszek:';
-                document.getElementById('jsonLabel').textContent = 'Wklej JSON z fiszkami:';
-                document.getElementById('aiPrompt').textContent = `Wygeneruj fiszki w formacie JSON na temat [TWÓJ TEMAT].
-
-Parametry opcjonalne:
-- Liczba fiszek: [np. 20]
-
-Fiszki powinny zawierać:
-- title: tytuł zestawu fiszek
-- type: "flashcard"
-- Tablicę cards z fiszkami, gdzie każda fiszka ma:
-  - front: przód karty (pytanie/słowo)
-  - back: tył karty (odpowiedź/tłumaczenie)
-  - category: kategoria (opcjonalne)
-
-Przykład:
-{
-  "title": "Angielski - Zwierzęta",
-  "type": "flashcard",
-  "cards": [
-    {
-      "front": "dog",
-      "back": "pies",
-      "category": "zwierzęta domowe"
-    },
-    {
-      "front": "cat",
-      "back": "kot",
-      "category": "zwierzęta domowe"
-    }
-  ]
-}`;
-            } else {
-                document.getElementById('createTitle').textContent = 'Tworzenie nowego quizu';
-                document.getElementById('aiPromptTitle').textContent = 'Prompt AI do generowania quizu:';
-                document.getElementById('jsonLabel').textContent = 'Wklej JSON z quizem:';
-                document.getElementById('aiPrompt').textContent = `Wygeneruj quiz w formacie JSON na temat [TWÓJ TEMAT].
+            const prompts = {
+                quiz: `Wygeneruj quiz w formacie JSON na temat [TWÓJ TEMAT].
 
 Parametry opcjonalne:
 - Liczba pytań: [np. 10]
@@ -1352,6 +1932,7 @@ Parametry opcjonalne:
 
 Quiz powinien zawierać:
 - title: tytuł quizu
+- tags: tablica 3 tagów opisujących quiz (np. ["historia", "polska", "edukacja"])
 - Tablicę questions z pytaniami, gdzie każde pytanie ma:
   - question: treść pytania
   - correct: poprawna odpowiedź
@@ -1362,6 +1943,7 @@ Quiz powinien zawierać:
 Przykład:
 {
   "title": "Quiz o Polsce",
+  "tags": ["historia", "polska", "edukacja"],
   "questions": [
     {
       "question": "Kto był pierwszym królem Polski?",
@@ -1377,12 +1959,50 @@ Przykład:
       "group": "geografia"
     }
   ]
-}`;
-            }
+}`,
+                flashcard: `Wygeneruj fiszki w formacie JSON na temat [TWÓJ TEMAT].
+
+Parametry opcjonalne:
+- Liczba fiszek: [np. 20]
+
+Fiszki powinny zawierać:
+- title: tytuł zestawu fiszek
+- tags: tablica 3 tagów opisujących zestaw (np. ["angielski", "zwierzęta", "podstawy"])
+- type: "flashcard"
+- Tablicę cards z fiszkami, gdzie każda fiszka ma:
+  - front: przód karty (pytanie/słowo)
+  - back: tył karty (odpowiedź/tłumaczenie)
+  - category: kategoria (opcjonalne)
+
+Przykład:
+{
+  "title": "Angielski - Zwierzęta",
+  "tags": ["angielski", "zwierzęta", "podstawy"],
+  "type": "flashcard",
+  "cards": [
+    {
+      "front": "dog",
+      "back": "pies",
+      "category": "zwierzęta domowe"
+    },
+    {
+      "front": "cat",
+      "back": "kot",
+      "category": "zwierzęta domowe"
+    }
+  ]
+}`
+            };
+
+            document.getElementById('createTitle').textContent = type === 'flashcard' ? 
+                'Tworzenie nowych fiszek' : 'Tworzenie nowego quizu';
+            document.getElementById('aiPromptTitle').textContent = type === 'flashcard' ? 
+                'Prompt AI do generowania fiszek:' : 'Prompt AI do generowania quizu:';
+            document.getElementById('jsonLabel').textContent = type === 'flashcard' ? 
+                'Wklej JSON z fiszkami:' : 'Wklej JSON z quizem:';
+            document.getElementById('aiPrompt').textContent = prompts[type];
 
             window.currentCreateType = type;
-            
-            // Pokaż/ukryj opcje specyficzne dla quizu
             document.getElementById('answerCountGroup').style.display = 
                 type === 'flashcard' ? 'none' : 'block';
         }
@@ -1395,7 +2015,19 @@ Przykład:
             const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
             const quiz = quizzes.find(q => q.id === quizId);
             if (quiz) {
-                document.getElementById('editQuizJson').value = JSON.stringify(quiz, null, 2);
+                document.getElementById('editQuizTitle').value = quiz.title || '';
+                editTags = quiz.tags || [];
+                renderEditTags();
+                
+                const jsonData = {...quiz};
+                delete jsonData.title;
+                delete jsonData.tags;
+                delete jsonData.id;
+                delete jsonData.createdAt;
+                delete jsonData.updatedAt;
+                delete jsonData.answerCount;
+                
+                document.getElementById('editQuizJson').value = JSON.stringify(jsonData, null, 2);
             }
         }
 
@@ -1413,6 +2045,8 @@ Przykład:
                 document.getElementById('preQuizDescription').textContent = 
                     `${currentQuiz.questions.length} pytań (${mcQuestions} wielokrotnego wyboru, ${tfQuestions} prawda/fałsz)`;
                 currentQuizSettings.answerCount = currentQuiz.answerCount || 4;
+                
+                displayQuizHistory(quizId);
             }
         }
 
@@ -1426,81 +2060,137 @@ Przykład:
             document.getElementById('resultsScreen').classList.remove('hidden');
         }
 
-        // Formatowanie daty
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const year = date.getFullYear();
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
+        function showFlashcardScreen(flashcardId) {
+            hideAllScreens();
+            document.getElementById('preFlashcardScreen').classList.remove('hidden');
+
+            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            currentFlashcards = quizzes.find(q => q.id === flashcardId);
             
-            return `${day}.${month}.${year} ${hours}:${minutes}`;
+            if (currentFlashcards) {
+                document.getElementById('preFlashcardTitle').textContent = currentFlashcards.title;
+                document.getElementById('preFlashcardDescription').textContent = 
+                    `${currentFlashcards.cards.length} fiszek do nauki`;
+                
+                displayFlashcardHistory(flashcardId);
+            }
         }
 
-        // Zarządzanie quizami
+        // ==================== QUIZ MANAGEMENT ====================
         function loadQuizzes() {
             const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
             const quizList = document.getElementById('quizList');
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
             
-            if (quizzes.length === 0) {
-                quizList.innerHTML = '<p style="text-align: center; color: var(--text-secondary); grid-column: 1/-1;">Nie masz jeszcze żadnych quizów. Utwórz pierwszy!</p>';
+            let filtered = quizzes.filter(quiz => {
+                const matchesSearch = quiz.title.toLowerCase().includes(searchQuery) ||
+                    (quiz.tags && quiz.tags.some(tag => tag.toLowerCase().includes(searchQuery)));
+                const matchesFilter = currentFilter === 'all' || 
+                    (currentFilter === 'quiz' && quiz.type !== 'flashcard') ||
+                    (currentFilter === 'flashcard' && quiz.type === 'flashcard');
+                return matchesSearch && matchesFilter;
+            });
+            
+            if (filtered.length === 0) {
+                quizList.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>Brak wyników</h3>
+                        <p>Nie znaleziono quizów spełniających kryteria</p>
+                    </div>
+                `;
                 return;
             }
             
-            quizList.innerHTML = quizzes.map(quiz => {
+            quizList.innerHTML = filtered.map(quiz => {
                 const isFlashcard = quiz.type === 'flashcard';
                 const icon = isFlashcard ? '🎴' : '📊';
                 const count = isFlashcard ? `${quiz.cards.length} fiszek` : `${quiz.questions.length} pytań`;
                 const clickHandler = isFlashcard ? 'showFlashcardScreen' : 'showPreQuizScreen';
+                
+                const history = getQuizHistory(quiz.id);
+                const normalAttempts = history.filter(h => !h.isLearningMode);
+                const attempts = normalAttempts.length;
+                
+                let bestResult = null;
+                if (attempts > 0) {
+                    bestResult = normalAttempts.reduce((best, current) => {
+                        return current.points > best.points ? current : best;
+                    }, normalAttempts[0]);
+                }
+                
+                const tagsHtml = quiz.tags && quiz.tags.length > 0 ? 
+                    `<div class="quiz-tags">${quiz.tags.map(tag => 
+                        `<span class="tag">${tag}</span>`
+                    ).join('')}</div>` : '';
                 
                 return `
                     <div class="quiz-item animate-fadeIn" onclick="${clickHandler}('${quiz.id}')">
                         <div class="quiz-type-icon">${icon}</div>
                         <div class="quiz-actions">
                             <button onclick="event.stopPropagation(); showEditScreen('${quiz.id}')" title="Edytuj">✏️</button>
-                            <button onclick="event.stopPropagation(); deleteQuiz('${quiz.id}')" title="Usuń">🗑️</button>
+                            <button onclick="event.stopPropagation(); confirmDelete('${quiz.id}')" title="Usuń">🗑️</button>
                         </div>
                         <h3>${quiz.title}</h3>
                         <p>${count}</p>
-                        <div class="quiz-date">
-                            ${formatDate(quiz.createdAt)}
-                        </div>
+                        ${tagsHtml}
+                        ${bestResult ? `<div class="quiz-stats-badge">
+                            ${attempts} ${attempts === 1 ? 'podejście' : 'podejść'} · 
+                            Najlepszy: ${bestResult.percentage}% (${bestResult.points} pkt)
+                        </div>` : ''}
+                        <div class="quiz-date">${formatDate(quiz.createdAt)}</div>
                     </div>
                 `;
             }).join('');
         }
 
-        function copyPrompt() {
-            const prompt = document.getElementById('aiPrompt').textContent;
-            navigator.clipboard.writeText(prompt).then(() => {
-                alert('Prompt został skopiowany do schowka!');
+        function filterQuizzes() {
+            loadQuizzes();
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filter);
             });
+            loadQuizzes();
         }
 
         function saveQuiz() {
             const jsonText = document.getElementById('quizJson').value;
+            const titleInput = document.getElementById('quizTitle').value.trim();
             const answerCount = parseInt(document.getElementById('answerCount').value);
             
             try {
                 const quizData = JSON.parse(jsonText);
                 
-                // Walidacja w zależności od typu
+                // Walidacja
                 if (window.currentCreateType === 'flashcard') {
-                    if (!quizData.title || !quizData.cards || !Array.isArray(quizData.cards)) {
+                    if (!quizData.cards || !Array.isArray(quizData.cards)) {
                         throw new Error('Nieprawidłowa struktura JSON dla fiszek');
                     }
                     quizData.type = 'flashcard';
                 } else {
-                    if (!quizData.title || !quizData.questions || !Array.isArray(quizData.questions)) {
+                    if (!quizData.questions || !Array.isArray(quizData.questions)) {
                         throw new Error('Nieprawidłowa struktura JSON dla quizu');
                     }
                     quizData.type = 'quiz';
                 }
                 
-                // Dodaj ID i zapisz
+                // Użyj tytułu z pola input, jeśli podany, w przeciwnym razie z JSON
+                const finalTitle = titleInput || quizData.title;
+                if (!finalTitle) {
+                    throw new Error('Brak tytułu quizu');
+                }
+                
+                // Scal tagi z inputu i z JSON (jeśli są)
+                const jsonTags = quizData.tags || [];
+                const allTags = [...new Set([...currentTags, ...jsonTags])]; // Usuń duplikaty
+                
                 const quiz = {
                     ...quizData,
+                    title: finalTitle,
+                    tags: allTags,
                     id: Date.now().toString(),
                     answerCount: answerCount,
                     createdAt: new Date().toISOString()
@@ -1510,21 +2200,25 @@ Przykład:
                 quizzes.push(quiz);
                 localStorage.setItem('quizzes', JSON.stringify(quizzes));
                 
-                alert('Quiz został zapisany!');
+                showToast('Quiz został zapisany!', 'success');
                 showHomeScreen();
             } catch (error) {
-                alert('Błąd: Nieprawidłowy format JSON. Sprawdź składnię i spróbuj ponownie.');
+                showToast('Błąd: ' + error.message, 'error');
             }
         }
 
         function updateQuiz() {
             const jsonText = document.getElementById('editQuizJson').value;
+            const title = document.getElementById('editQuizTitle').value.trim();
             
             try {
                 const updatedData = JSON.parse(jsonText);
                 
-                // Walidacja
-                if (!updatedData.title || (!updatedData.questions && !updatedData.cards)) {
+                if (!title) {
+                    throw new Error('Brak tytułu');
+                }
+                
+                if (!updatedData.questions && !updatedData.cards) {
                     throw new Error('Nieprawidłowa struktura JSON');
                 }
                 
@@ -1532,48 +2226,151 @@ Przykład:
                 const index = quizzes.findIndex(q => q.id === currentEditingQuizId);
                 
                 if (index !== -1) {
+                    // Scal tagi z edytora i z JSON
+                    const jsonTags = updatedData.tags || [];
+                    const allTags = [...new Set([...editTags, ...jsonTags])];
+                    
                     quizzes[index] = {
                         ...updatedData,
+                        title: title,
+                        tags: allTags,
                         id: currentEditingQuizId,
                         answerCount: quizzes[index].answerCount,
+                        type: quizzes[index].type,
                         createdAt: quizzes[index].createdAt,
                         updatedAt: new Date().toISOString()
                     };
                     
                     localStorage.setItem('quizzes', JSON.stringify(quizzes));
-                    alert('Quiz został zaktualizowany!');
+                    showToast('Quiz został zaktualizowany!', 'success');
                     showHomeScreen();
                 }
             } catch (error) {
-                alert('Błąd: Nieprawidłowy format JSON. Sprawdź składnię i spróbuj ponownie.');
+                showToast('Błąd: ' + error.message, 'error');
+            }
+        }
+
+        function deleteCurrentQuiz() {
+            if (confirm('Czy na pewno chcesz usunąć ten quiz?')) {
+                deleteQuiz(currentEditingQuizId);
+                showHomeScreen();
+            }
+        }
+
+        function confirmDelete(quizId) {
+            if (confirm('Czy na pewno chcesz usunąć ten quiz? Tej operacji nie można cofnąć.')) {
+                deleteQuiz(quizId);
             }
         }
 
         function deleteQuiz(quizId) {
-            if (confirm('Czy na pewno chcesz usunąć ten quiz?')) {
-                const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-                const filtered = quizzes.filter(q => q.id !== quizId);
-                localStorage.setItem('quizzes', JSON.stringify(filtered));
-                loadQuizzes();
+            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const filtered = quizzes.filter(q => q.id !== quizId);
+            localStorage.setItem('quizzes', JSON.stringify(filtered));
+            
+            const history = JSON.parse(localStorage.getItem('quizHistory') || '{}');
+            delete history[quizId];
+            localStorage.setItem('quizHistory', JSON.stringify(history));
+            
+            showToast('Quiz został usunięty', 'success');
+            loadQuizzes();
+        }
+
+        // ==================== TAGS ====================
+        function handleTagInput(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const input = document.getElementById('tagInput');
+                const tag = input.value.trim();
+                if (tag && !currentTags.includes(tag)) {
+                    currentTags.push(tag);
+                    renderTags();
+                    input.value = '';
+                }
             }
         }
 
-        // Mechanika quizu
-        function startQuiz() {
-            // Pobierz ustawienia
-            currentQuizSettings.randomOrder = document.getElementById('randomOrder').checked;
+        function handleEditTagInput(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const input = document.getElementById('editTagInput');
+                const tag = input.value.trim();
+                if (tag && !editTags.includes(tag)) {
+                    editTags.push(tag);
+                    renderEditTags();
+                    input.value = '';
+                }
+            }
+        }
+
+        function renderTags() {
+            const container = document.getElementById('tagContainer');
+            const input = document.getElementById('tagInput');
             
-            // Przygotuj pytania
-            questions = [...currentQuiz.questions];
+            const tagsHtml = currentTags.map((tag, index) => `
+                <span class="tag-removable">
+                    ${tag}
+                    <button onclick="removeTag(${index})">×</button>
+                </span>
+            `).join('');
+            
+            container.innerHTML = tagsHtml;
+            container.appendChild(input);
+        }
+
+        function renderEditTags() {
+            const container = document.getElementById('editTagContainer');
+            const input = document.getElementById('editTagInput');
+            
+            const tagsHtml = editTags.map((tag, index) => `
+                <span class="tag-removable">
+                    ${tag}
+                    <button onclick="removeEditTag(${index})">×</button>
+                </span>
+            `).join('');
+            
+            container.innerHTML = tagsHtml;
+            container.appendChild(input);
+        }
+
+        function removeTag(index) {
+            currentTags.splice(index, 1);
+            renderTags();
+        }
+
+        function removeEditTag(index) {
+            editTags.splice(index, 1);
+            renderEditTags();
+        }
+
+        // ==================== QUIZ GAMEPLAY ====================
+        function startQuiz() {
+            currentQuizSettings.randomOrder = document.getElementById('randomOrder').checked;
+            currentQuizSettings.showLetters = document.getElementById('showLetters').checked;
+            currentQuizSettings.learningMode = document.getElementById('learningMode').checked;
+            
+            if (currentQuizSettings.learningMode) {
+                const wrongQuestions = getWrongQuestions(currentQuiz.id);
+                if (wrongQuestions.length === 0) {
+                    showToast('Brak błędnych pytań do powtórzenia!', 'info');
+                    return;
+                }
+                questions = wrongQuestions;
+            } else {
+                questions = [...currentQuiz.questions];
+            }
+            
             if (currentQuizSettings.randomOrder) {
                 questions = shuffleArray(questions);
             }
             
-            // Reset stanu
             currentQuestionIndex = 0;
             score = 0;
             totalPoints = 0;
             correctAnswers = 0;
+            currentStreak = 0;
+            maxStreak = 0;
+            mistakes = [];
             startTime = Date.now();
             
             showQuizScreen();
@@ -1590,33 +2387,201 @@ Przykład:
             const question = questions[currentQuestionIndex];
             document.getElementById('questionText').textContent = question.question;
             
-            // Sprawdź czy to pytanie prawda/fałsz
-            const isTrueFalse = question.type === 'tf';
+            const categoryEl = document.getElementById('questionCategory');
+            if (question.group) {
+                categoryEl.textContent = question.group;
+                categoryEl.style.display = 'block';
+            } else {
+                categoryEl.style.display = 'none';
+            }
             
-            // Przygotuj odpowiedzi
+            const isTrueFalse = question.type === 'tf';
             const answers = isTrueFalse ? 
                 prepareAnswersForTrueFalse(question) : 
                 prepareAnswers(question);
             
             const answersGrid = document.getElementById('answersGrid');
-            
-            // Ustaw klasę dla siatki odpowiedzi
             answersGrid.className = `answers-grid ${isTrueFalse ? 'two-answers' : 'four-answers'}`;
             
+            const letters = ['A', 'B', 'C', 'D'];
             answersGrid.innerHTML = answers.map((answer, index) => `
-                <button class="answer-btn" onclick="selectAnswer('${answer}', '${question.correct}')" data-answer="${answer}">
+                <button class="answer-btn" onclick="selectAnswer('${escapeHtml(answer)}', '${escapeHtml(question.correct)}')" data-answer="${escapeHtml(answer)}">
+                    ${currentQuizSettings.showLetters ? `<span class="answer-letter">${letters[index]}</span>` : ''}
                     ${answer}
                 </button>
             `).join('');
             
-            // Aktualizuj progress
             updateProgress();
-            
             questionStartTime = Date.now();
         }
 
+        function selectAnswer(selected, correct) {
+            selected = decodeHtml(selected);
+            correct = decodeHtml(correct);
+            
+            const timeElapsed = (Date.now() - questionStartTime) / 1000;
+            const basePoints = 1000;
+            let earnedPoints = 0;
+            
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                const btnAnswer = decodeHtml(btn.dataset.answer);
+                if (btnAnswer === correct) {
+                    btn.classList.add('correct');
+                }
+            });
+            
+            const selectedBtn = Array.from(buttons).find(btn => decodeHtml(btn.dataset.answer) === selected);
+            
+            if (selected === correct) {
+                correctAnswers++;
+                score++;
+                currentStreak++;
+                maxStreak = Math.max(maxStreak, currentStreak);
+                
+                earnedPoints = basePoints - Math.min(500, Math.round(timeElapsed * 10));
+                totalPoints += earnedPoints;
+                
+                if (currentStreak >= 3) {
+                    showStreakIndicator();
+                }
+            } else {
+                currentStreak = 0;
+                selectedBtn.classList.add('incorrect');
+                selectedBtn.classList.add('animate-shake');
+                
+                mistakes.push({
+                    question: questions[currentQuestionIndex].question,
+                    correct: correct,
+                    selected: selected,
+                    category: questions[currentQuestionIndex].group
+                });
+            }
+            
+            updateStats();
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                displayQuestion();
+            }, 1500);
+        }
+
+        function showStreakIndicator() {
+            const existing = document.querySelector('.streak-indicator');
+            if (existing) existing.remove();
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'streak-indicator';
+            indicator.textContent = `${currentStreak} 🔥`;
+            document.body.appendChild(indicator);
+            
+            setTimeout(() => indicator.remove(), 2000);
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestionIndex / questions.length) * 100);
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('questionNumber').textContent = 
+                `Pytanie ${currentQuestionIndex + 1}/${questions.length}`;
+        }
+
+        function updateStats() {
+            const accuracy = currentQuestionIndex > 0 ? 
+                Math.round((correctAnswers / (currentQuestionIndex + 1)) * 100) : 0;
+            document.getElementById('accuracy').textContent = `Poprawność: ${accuracy}%`;
+            document.getElementById('score').textContent = `Punkty: ${totalPoints}`;
+            document.getElementById('streak').textContent = `Seria: ${currentStreak}🔥`;
+        }
+
+        function endQuiz() {
+            stopTimer();
+            const totalTime = (Date.now() - startTime) / 1000;
+            const percentage = Math.round((score / questions.length) * 100);
+            
+            document.getElementById('finalScore').textContent = `${score}/${questions.length} (${percentage}%)`;
+            document.getElementById('finalPoints').textContent = `${totalPoints} punktów · Najdłuższa seria: ${maxStreak}🔥`;
+            document.getElementById('finalTime').textContent = `Czas: ${formatTime(totalTime)}`;
+            
+            saveQuizResult(currentQuiz.id, {
+                score: score,
+                total: questions.length,
+                percentage: percentage,
+                points: totalPoints,
+                time: totalTime,
+                maxStreak: maxStreak,
+                mistakes: mistakes,
+                date: new Date().toISOString(),
+                isLearningMode: currentQuizSettings.learningMode
+            });
+            
+            displayMistakes();
+            
+            const retakeBtn = document.getElementById('retakeWrongBtn');
+            if (mistakes.length > 0) {
+                retakeBtn.style.display = 'inline-flex';
+            } else {
+                retakeBtn.style.display = 'none';
+            }
+            
+            showResultsScreen();
+        }
+
+        function displayMistakes() {
+            const section = document.getElementById('mistakesSection');
+            if (mistakes.length === 0) {
+                section.innerHTML = '<p style="color: var(--success); text-align: center;">🎉 Wszystkie odpowiedzi poprawne!</p>';
+                return;
+            }
+            
+            section.innerHTML = `
+                <h3 style="margin-bottom: 16px;">Błędne odpowiedzi (${mistakes.length}):</h3>
+                <div style="max-height: 300px; overflow-y: auto;">
+                    ${mistakes.map(m => `
+                        <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid var(--danger);">
+                            <strong>${m.question}</strong><br>
+                            <span style="color: var(--danger);">❌ Twoja odpowiedź: ${m.selected}</span><br>
+                            <span style="color: var(--success);">✅ Poprawna: ${m.correct}</span>
+                            ${m.category ? `<br><span style="font-size: 12px; color: var(--text-secondary);">Kategoria: ${m.category}</span>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function retakeQuiz() {
+            showPreQuizScreen(currentQuiz.id);
+        }
+
+        function retakeWrongAnswers() {
+            if (mistakes.length === 0) {
+                showToast('Brak błędnych odpowiedzi', 'info');
+                return;
+            }
+            
+            const wrongQuestionTexts = mistakes.map(m => m.question);
+            questions = currentQuiz.questions.filter(q => wrongQuestionTexts.includes(q.question));
+            
+            if (questions.length === 0) {
+                showToast('Nie można znaleźć pytań do powtórzenia', 'error');
+                return;
+            }
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            totalPoints = 0;
+            correctAnswers = 0;
+            currentStreak = 0;
+            maxStreak = 0;
+            mistakes = [];
+            startTime = Date.now();
+            
+            showQuizScreen();
+            displayQuestion();
+            startTimer('quizTimer');
+        }
+
         function prepareAnswersForTrueFalse(question) {
-            // Dla pytań prawda/fałsz zawsze zwracamy dokładnie 2 odpowiedzi
             return shuffleArray(['Prawda', 'Fałsz']);
         }
 
@@ -1624,16 +2589,13 @@ Przykład:
             let answers = [question.correct];
             let wrongAnswers = [...question.wrong];
             
-            // Określ ile błędnych odpowiedzi potrzebujemy
             const neededWrongAnswers = currentQuizSettings.answerCount - 1;
             
-            // Jeśli brakuje błędnych odpowiedzi
             if (wrongAnswers.length < neededWrongAnswers) {
                 const additionalAnswers = getAdditionalWrongAnswers(question, neededWrongAnswers - wrongAnswers.length);
                 wrongAnswers = [...wrongAnswers, ...additionalAnswers];
             }
             
-            // Wybierz losowe błędne odpowiedzi
             wrongAnswers = shuffleArray(wrongAnswers).slice(0, neededWrongAnswers);
             answers = [...answers, ...wrongAnswers];
             
@@ -1643,25 +2605,23 @@ Przykład:
         function getAdditionalWrongAnswers(currentQuestion, needed) {
             const additional = [];
             
-            // Najpierw próbuj z tej samej grupy
             const sameGroupQuestions = questions.filter(q => 
                 q !== currentQuestion && 
                 q.group === currentQuestion.group && 
                 q.correct !== currentQuestion.correct &&
-                q.type !== 'tf' // Nie bierz odpowiedzi z pytań prawda/fałsz
+                q.type !== 'tf'
             );
             
             for (let i = 0; i < Math.min(needed, sameGroupQuestions.length); i++) {
                 additional.push(sameGroupQuestions[i].correct);
             }
             
-            // Jeśli nadal brakuje, weź z innych pytań
             if (additional.length < needed) {
                 const otherQuestions = questions.filter(q => 
                     q !== currentQuestion && 
                     q.correct !== currentQuestion.correct &&
                     !additional.includes(q.correct) &&
-                    q.type !== 'tf' // Nie bierz odpowiedzi z pytań prawda/fałsz
+                    q.type !== 'tf'
                 );
                 
                 for (let i = 0; i < Math.min(needed - additional.length, otherQuestions.length); i++) {
@@ -1672,97 +2632,13 @@ Przykład:
             return additional;
         }
 
-        function selectAnswer(selected, correct) {
-            // Oblicz punkty
-            const timeElapsed = (Date.now() - questionStartTime) / 1000;
-            const basePoints = 1000;
-            let earnedPoints = 0;
-            
-            // Dezaktywuj wszystkie przyciski
-            const buttons = document.querySelectorAll('.answer-btn');
-            buttons.forEach(btn => {
-                btn.disabled = true;
-                if (btn.dataset.answer === correct) {
-                    btn.classList.add('correct');
-                }
-            });
-            
-            // Zaznacz wybraną odpowiedź
-            const selectedBtn = document.querySelector(`[data-answer="${selected}"]`);
-            if (selected === correct) {
-                correctAnswers++;
-                score++;
-                
-                // Punkty bazowe minus kara za czas (max 500 punktów kary)
-                earnedPoints = basePoints - Math.min(500, Math.round(timeElapsed * 10));
-                totalPoints += earnedPoints;
-            } else {
-                selectedBtn.classList.add('incorrect');
-                selectedBtn.classList.add('animate-shake');
-            }
-            
-            // Aktualizuj statystyki
-            updateStats();
-            
-            // Przejdź do następnego pytania po opóźnieniu
-            setTimeout(() => {
-                currentQuestionIndex++;
-                displayQuestion();
-            }, 1500);
-        }
-
-        function updateProgress() {
-            const progress = ((currentQuestionIndex / questions.length) * 100);
-            const progressBar = document.getElementById('progressBar');
-            progressBar.style.width = `${progress}%`;
-            
-            document.getElementById('questionNumber').textContent = `Pytanie ${currentQuestionIndex + 1}/${questions.length}`;
-        }
-
-        function updateStats() {
-            const accuracy = currentQuestionIndex > 0 ? Math.round((correctAnswers / (currentQuestionIndex + 1)) * 100) : 0;
-            document.getElementById('accuracy').textContent = `Poprawność: ${accuracy}%`;
-            document.getElementById('score').textContent = `Punkty: ${totalPoints}`;
-        }
-
-        function endQuiz() {
-            stopTimer();
-            const totalTime = (Date.now() - startTime) / 1000;
-            const accuracy = Math.round((score / questions.length) * 100);
-            
-            document.getElementById('finalScore').textContent = `${score}/${questions.length}`;
-            document.getElementById('finalPoints').textContent = `${totalPoints} punktów`;
-            document.getElementById('finalTime').textContent = `Czas: ${formatTime(totalTime)}`;
-            
-            showResultsScreen();
-        }
-
-        function retakeQuiz() {
-            showPreQuizScreen(currentQuiz.id);
-        }
-
-        // Funkcje fiszek
-        function showFlashcardScreen(flashcardId) {
-            hideAllScreens();
-            document.getElementById('preFlashcardScreen').classList.remove('hidden');
-
-            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-            currentFlashcards = quizzes.find(q => q.id === flashcardId);
-            
-            if (currentFlashcards) {
-                document.getElementById('preFlashcardTitle').textContent = currentFlashcards.title;
-                document.getElementById('preFlashcardDescription').textContent = `${currentFlashcards.cards.length} fiszek do nauki`;
-            }
-        }
-
+        // ==================== FLASHCARDS ====================
         function startFlashcards() {
             hideAllScreens();
             document.getElementById('flashcardScreen').classList.remove('hidden');
             
-            // Pobierz ustawienia
             const randomOrder = document.getElementById('flashcardRandomOrder').checked;
             
-            // Reset stanu
             cards = [...currentFlashcards.cards];
             if (randomOrder) {
                 cards = shuffleArray(cards);
@@ -1786,29 +2662,22 @@ Przykład:
 
             const card = cards[currentCardIndex];
 
-            // Reset karty
             document.getElementById('flashcard').classList.remove('flipped');
             document.getElementById('flashcardActions').style.display = 'none';
             isCardFlipped = false;
 
-            // Reset scroll dla obu stron natychmiast
             const frontSide = document.querySelector('.flashcard-front');
             const backSide = document.querySelector('.flashcard-back');
             if (frontSide) frontSide.scrollTop = 0;
             if (backSide) backSide.scrollTop = 0;
             
-            // Aktualizuj front natychmiast
             document.getElementById('flashcardFront').textContent = card.front;
 
-            // Aktualizuj back z opóźnieniem (po zakończeniu animacji)
             setTimeout(() => {
                 document.getElementById('flashcardBack').textContent = card.back;
-                
-                // Ponowny reset scroll po załadowaniu nowej treści
                 if (backSide) backSide.scrollTop = 0;
             }, 300);
 
-            // Aktualizuj progress
             updateFlashcardProgress();
         }
 
@@ -1818,7 +2687,6 @@ Przykład:
                 document.getElementById('flashcardActions').style.display = 'flex';
                 isCardFlipped = true;
                 
-                // Reset scroll dla tylnej strony gdy się obraca
                 setTimeout(() => {
                     const backSide = document.querySelector('.flashcard-back');
                     if (backSide) backSide.scrollTop = 0;
@@ -1827,33 +2695,26 @@ Przykład:
         }
 
         function rateCard(difficulty) {
-            // Sprawdź czy nie ma cooldownu
             if (isTransitioning) return;
 
             isTransitioning = true;
             flashcardStats[difficulty]++;
-
-            // Zapisz ocenę karty
             cardRatings[currentCardIndex] = difficulty;
 
-            // Aktualizuj statystyki
             updateFlashcardStats();
 
-            // Wyłącz przyciski na czas cooldownu
             const buttons = document.querySelectorAll('.flashcard-btn');
             buttons.forEach(btn => btn.disabled = true);
 
-            // Przejdź do następnej karty
             currentCardIndex++;
             setTimeout(() => {
                 displayFlashcard();
 
-                // Włącz przyciski po cooldownie
                 setTimeout(() => {
                     const buttons = document.querySelectorAll('.flashcard-btn');
                     buttons.forEach(btn => btn.disabled = false);
                     isTransitioning = false;
-                }, 1000); // 1 sekunda cooldown
+                }, 1000);
             }, 300);
         }
 
@@ -1864,7 +2725,6 @@ Przykład:
         }
 
         function updateFlashcardStats() {
-            const total = flashcardStats.easy + flashcardStats.medium + flashcardStats.hard;
             document.getElementById('flashcardStats').textContent = 
                 `Poznane: ${flashcardStats.easy} | Trudne: ${flashcardStats.medium} | Nieznane: ${flashcardStats.hard}`;
         }
@@ -1878,12 +2738,20 @@ Przykład:
             document.getElementById('flashcardHardCount').textContent = flashcardStats.hard;
             document.getElementById('flashcardFinalTime').textContent = `Czas: ${formatTime(totalTime)}`;
             
+            saveFlashcardResult(currentFlashcards.id, {
+                easy: flashcardStats.easy,
+                medium: flashcardStats.medium,
+                hard: flashcardStats.hard,
+                total: cards.length,
+                time: totalTime,
+                date: new Date().toISOString()
+            });
+            
             hideAllScreens();
             document.getElementById('flashcardResultsScreen').classList.remove('hidden');
         }
 
         function restartFlashcards() {
-            // Filtruj tylko trudne i nieznane karty
             const difficultCards = [];
             for (let i = 0; i < cardRatings.length; i++) {
                 if (cardRatings[i] === 'medium' || cardRatings[i] === 'hard') {
@@ -1892,13 +2760,11 @@ Przykład:
             }
 
             if (difficultCards.length > 0) {
-                // Utwórz tymczasowy zestaw fiszek tylko z trudnymi
                 currentFlashcards = {
                     ...currentFlashcards,
                     cards: difficultCards
                 };
                 
-                // Zresetuj stan
                 cards = [...difficultCards];
                 currentCardIndex = 0;
                 flashcardStats = { easy: 0, medium: 0, hard: 0 };
@@ -1910,12 +2776,487 @@ Przykład:
                 document.getElementById('flashcardScreen').classList.remove('hidden');
                 displayFlashcard();
             } else {
-                alert('Nie ma trudnych fiszek do powtórzenia!');
+                showToast('Nie ma trudnych fiszek do powtórzenia!', 'info');
                 showHomeScreen();
             }
         }
 
-        // Funkcje pomocnicze
+        // ==================== HISTORY ====================
+        function saveQuizResult(quizId, result) {
+            const history = JSON.parse(localStorage.getItem('quizHistory') || '{}');
+            if (!history[quizId]) {
+                history[quizId] = [];
+            }
+            history[quizId].push(result);
+            
+            if (result.mistakes && result.mistakes.length > 0 && !result.isLearningMode) {
+                const wrongQuestions = JSON.parse(localStorage.getItem('wrongQuestions') || '{}');
+                if (!wrongQuestions[quizId]) {
+                    wrongQuestions[quizId] = [];
+                }
+                result.mistakes.forEach(m => {
+                    if (!wrongQuestions[quizId].includes(m.question)) {
+                        wrongQuestions[quizId].push(m.question);
+                    }
+                });
+                localStorage.setItem('wrongQuestions', JSON.stringify(wrongQuestions));
+            }
+            
+            localStorage.setItem('quizHistory', JSON.stringify(history));
+        }
+
+        function saveFlashcardResult(flashcardId, result) {
+            const history = JSON.parse(localStorage.getItem('flashcardHistory') || '{}');
+            if (!history[flashcardId]) {
+                history[flashcardId] = [];
+            }
+            history[flashcardId].push(result);
+            localStorage.setItem('flashcardHistory', JSON.stringify(history));
+        }
+
+        function getQuizHistory(quizId) {
+            const history = JSON.parse(localStorage.getItem('quizHistory') || '{}');
+            return history[quizId] || [];
+        }
+
+        function getFlashcardHistory(flashcardId) {
+            const history = JSON.parse(localStorage.getItem('flashcardHistory') || '{}');
+            return history[flashcardId] || [];
+        }
+
+        function getWrongQuestions(quizId) {
+            const wrongQuestions = JSON.parse(localStorage.getItem('wrongQuestions') || '{}');
+            const wrongTexts = wrongQuestions[quizId] || [];
+            
+            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const quiz = quizzes.find(q => q.id === quizId);
+            if (!quiz) return [];
+            
+            return quiz.questions.filter(q => wrongTexts.includes(q.question));
+        }
+
+        function displayQuizHistory(quizId) {
+            const history = getQuizHistory(quizId);
+            const section = document.getElementById('quizHistorySection');
+            const container = document.getElementById('quizHistory');
+            
+            if (history.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            
+            const recent = history.slice(-5).reverse();
+            
+            container.innerHTML = `
+                <div class="history-list">
+                    ${recent.map(h => `
+                        <div class="history-item">
+                            <div class="history-info">
+                                <div style="font-size: 12px; color: var(--text-secondary);">
+                                    ${h.isLearningMode ? '📚 Tryb nauki · ' : ''}${formatDate(h.date)}
+                                </div>
+                                <div style="font-size: 14px; margin-top: 4px;">
+                                    ${h.points} pkt · Czas: ${formatTime(h.time)} · Seria: ${h.maxStreak}🔥
+                                </div>
+                            </div>
+                            <div class="history-score">${h.percentage}%</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function displayFlashcardHistory(flashcardId) {
+            const history = getFlashcardHistory(flashcardId);
+            const section = document.getElementById('flashcardHistorySection');
+            const container = document.getElementById('flashcardHistory');
+            
+            if (history.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            
+            const recent = history.slice(-5).reverse();
+            
+            container.innerHTML = `
+                <div class="history-list">
+                    ${recent.map(h => {
+                        const knownPercent = Math.round((h.easy / h.total) * 100);
+                        return `
+                            <div class="history-item">
+                                <div class="history-info">
+                                    <div style="font-size: 12px; color: var(--text-secondary);">
+                                        ${formatDate(h.date)}
+                                    </div>
+                                    <div style="font-size: 14px; margin-top: 4px;">
+                                        ✅${h.easy} 🤔${h.medium} ❌${h.hard} · Czas: ${formatTime(h.time)}
+                                    </div>
+                                </div>
+                                <div class="history-score">${knownPercent}%</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        // ==================== IMPORT/EXPORT ====================
+        function copyPrompt() {
+            const prompt = document.getElementById('aiPrompt').textContent;
+            navigator.clipboard.writeText(prompt).then(() => {
+                showToast('Prompt skopiowany do schowka!', 'success');
+            });
+        }
+
+        function showImportModal() {
+            document.getElementById('importModal').classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('importJson').value = e.target.result;
+            };
+            reader.readAsText(file);
+        }
+
+        function importQuiz() {
+            const jsonText = document.getElementById('importJson').value;
+            
+            try {
+                const data = JSON.parse(jsonText);
+                
+                if (Array.isArray(data)) {
+                    const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                    data.forEach(quiz => {
+                        quiz.id = Date.now().toString() + Math.random();
+                        quiz.createdAt = new Date().toISOString();
+                        quizzes.push(quiz);
+                    });
+                    localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                    showToast(`Zaimportowano ${data.length} quizów!`, 'success');
+                } else {
+                    const quiz = {
+                        ...data,
+                        id: Date.now().toString(),
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                    quizzes.push(quiz);
+                    localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                    showToast('Quiz zaimportowany!', 'success');
+                }
+                
+                closeModal('importModal');
+                document.getElementById('importJson').value = '';
+                document.getElementById('importFile').value = '';
+                loadQuizzes();
+            } catch (error) {
+                showToast('Błąd importu: ' + error.message, 'error');
+            }
+        }
+
+        function exportQuiz(quizId) {
+            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const quiz = quizzes.find(q => q.id === quizId);
+            
+            if (!quiz) {
+                showToast('Quiz nie znaleziony', 'error');
+                return;
+            }
+            
+            const exportData = {...quiz};
+            delete exportData.id;
+            delete exportData.createdAt;
+            delete exportData.updatedAt;
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${quiz.title.replace(/[^a-z0-9]/gi, '_')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('Quiz wyeksportowany!', 'success');
+        }
+
+        function exportAllData() {
+            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const history = JSON.parse(localStorage.getItem('quizHistory') || '{}');
+            const flashcardHistory = JSON.parse(localStorage.getItem('flashcardHistory') || '{}');
+            
+            const backup = {
+                version: '2.0',
+                exportDate: new Date().toISOString(),
+                quizzes: quizzes,
+                history: history,
+                flashcardHistory: flashcardHistory
+            };
+            
+            const blob = new Blob([JSON.stringify(backup, null, 2)], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `quizapp_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('Backup utworzony!', 'success');
+        }
+
+        function restoreData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!confirm('Czy na pewno chcesz przywrócić dane? Obecne dane zostaną nadpisane!')) {
+                event.target.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const backup = JSON.parse(e.target.result);
+                    
+                    if (backup.quizzes) {
+                        localStorage.setItem('quizzes', JSON.stringify(backup.quizzes));
+                    }
+                    if (backup.history) {
+                        localStorage.setItem('quizHistory', JSON.stringify(backup.history));
+                    }
+                    if (backup.flashcardHistory) {
+                        localStorage.setItem('flashcardHistory', JSON.stringify(backup.flashcardHistory));
+                    }
+                    
+                    showToast('Dane przywrócone!', 'success');
+                    closeModal('backupModal');
+                    loadQuizzes();
+                } catch (error) {
+                    showToast('Błąd przywracania: ' + error.message, 'error');
+                }
+                
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function showBackupModal() {
+            const modal = document.getElementById('backupModal');
+            modal.classList.remove('hidden');
+            
+            const quizzes = localStorage.getItem('quizzes') || '[]';
+            const history = localStorage.getItem('quizHistory') || '{}';
+            const flashcardHistory = localStorage.getItem('flashcardHistory') || '{}';
+            const totalSize = (quizzes.length + history.length + flashcardHistory.length) / 1024;
+            
+            document.getElementById('dataSize').textContent = `${totalSize.toFixed(2)} KB`;
+            document.getElementById('quizCount').textContent = JSON.parse(quizzes).length;
+        }
+
+        function showStatsModal() {
+            const modal = document.getElementById('statsModal');
+            modal.classList.remove('hidden');
+            
+            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const history = JSON.parse(localStorage.getItem('quizHistory') || '{}');
+            const flashcardHistory = JSON.parse(localStorage.getItem('flashcardHistory') || '{}');
+            
+            let totalQuizAttempts = 0;
+            let totalQuizScore = 0;
+            let totalFlashcardSessions = 0;
+            
+            Object.values(history).forEach(h => {
+                const normalAttempts = h.filter(attempt => !attempt.isLearningMode);
+                totalQuizAttempts += normalAttempts.length;
+                normalAttempts.forEach(attempt => {
+                    totalQuizScore += attempt.percentage;
+                });
+            });
+            
+            Object.values(flashcardHistory).forEach(h => {
+                totalFlashcardSessions += h.length;
+            });
+            
+            const avgScore = totalQuizAttempts > 0 ? 
+                (totalQuizScore / totalQuizAttempts).toFixed(1) : 0;
+            
+            const quizCount = quizzes.filter(q => q.type !== 'flashcard').length;
+            const flashcardCount = quizzes.filter(q => q.type === 'flashcard').length;
+            
+            document.getElementById('statsContent').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <div style="background: var(--surface-alt); padding: 20px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: 200; color: var(--accent);">${quizCount}</div>
+                        <div style="color: var(--text-secondary);">Quizów</div>
+                    </div>
+                    <div style="background: var(--surface-alt); padding: 20px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: 200; color: var(--accent);">${flashcardCount}</div>
+                        <div style="color: var(--text-secondary);">Zestawów fiszek</div>
+                    </div>
+                    <div style="background: var(--surface-alt); padding: 20px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: 200; color: var(--success);">${totalQuizAttempts}</div>
+                        <div style="color: var(--text-secondary);">Podejść do quizów</div>
+                    </div>
+                    <div style="background: var(--surface-alt); padding: 20px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: 200; color: var(--warning);">${avgScore}%</div>
+                        <div style="color: var(--text-secondary);">Średni wynik</div>
+                    </div>
+                    <div style="background: var(--surface-alt); padding: 20px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: 200; color: var(--accent);">${totalFlashcardSessions}</div>
+                        <div style="color: var(--text-secondary);">Sesji z fiszkami</div>
+                    </div>
+                </div>
+                
+                ${quizzes.length > 0 ? `
+                    <h3 style="margin-top: 32px; margin-bottom: 16px;">Najpopularniejsze quizy</h3>
+                    <div>
+                        ${quizzes
+                            .map(q => {
+                                const qHistory = history[q.id] || [];
+                                const normalAttempts = qHistory.filter(h => !h.isLearningMode);
+                                return {
+                                    ...q,
+                                    attempts: normalAttempts.length
+                                };
+                            })
+                            .sort((a, b) => b.attempts - a.attempts)
+                            .slice(0, 5)
+                            .map(q => `
+                                <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                    <span>${q.type === 'flashcard' ? '🎴' : '📊'} ${q.title}</span>
+                                    <span style="color: var(--text-secondary);">${q.attempts} ${q.attempts === 1 ? 'podejście' : 'podejść'}</span>
+                                </div>
+                            `).join('')}
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        // ==================== KEYBOARD SHORTCUTS ====================
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                const activeScreen = document.querySelector('.screen:not(.hidden)');
+                if (!activeScreen) return;
+                
+                if (activeScreen.id === 'quizScreen') {
+                    if (e.key === 'Escape') {
+                        if (confirm('Czy na pewno chcesz przerwać quiz?')) {
+                            showHomeScreen();
+                        }
+                    } else if (['1', '2', '3', '4'].includes(e.key)) {
+                        const index = parseInt(e.key) - 1;
+                        const buttons = document.querySelectorAll('.answer-btn:not(:disabled)');
+                        if (buttons[index]) {
+                            buttons[index].click();
+                        }
+                    }
+                }
+                
+                if (activeScreen.id === 'flashcardScreen') {
+                    if (e.key === ' ' || e.key === 'Spacebar') {
+                        e.preventDefault();
+                        flipCard();
+                    } else if (e.key === '1') {
+                        const btn = document.querySelector('.btn-hard:not(:disabled)');
+                        if (btn) btn.click();
+                    } else if (e.key === '2') {
+                        const btn = document.querySelector('.btn-medium:not(:disabled)');
+                        if (btn) btn.click();
+                    } else if (e.key === '3') {
+                        const btn = document.querySelector('.btn-easy:not(:disabled)');
+                        if (btn) btn.click();
+                    }
+                }
+            });
+        }
+
+        // ==================== TOAST SYSTEM ====================
+        function showToast(message, type = 'info') {
+            const newToast = { message, type };
+            
+            if (activeToast) {
+                // Jeśli jest aktywne powiadomienie
+                queuedToast = newToast; // Nadpisz kolejkę
+                
+                // Przyspiesz ukrycie aktywnego powiadomienia
+                hideActiveToast(500);
+            } else {
+                // Brak aktywnego powiadomienia - wyświetl od razu
+                displayToast(newToast);
+            }
+        }
+
+        function displayToast(toastData) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${toastData.type}`;
+            toast.textContent = toastData.message;
+            document.body.appendChild(toast);
+            
+            activeToast = toast;
+            
+            // Pokaż z animacją
+            setTimeout(() => toast.classList.add('toast-show'), 10);
+            
+            // Auto-hide po 3 sekundach
+            setTimeout(() => hideActiveToast(300), 3000);
+        }
+
+        function hideActiveToast(hideDelay) {
+            if (!activeToast) return;
+            
+            const toast = activeToast;
+            toast.classList.remove('toast-show');
+            toast.classList.add('toast-hide');
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+                
+                // Sprawdź czy jest coś w kolejce
+                if (activeToast === toast) {
+                    activeToast = null;
+                    
+                    if (queuedToast) {
+                        const next = queuedToast;
+                        queuedToast = null;
+                        displayToast(next);
+                    }
+                }
+            }, hideDelay);
+        }
+
+        // ==================== UTILITIES ====================
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            
+            return `${day}.${month}.${year} ${hours}:${minutes}`;
+        }
+
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
@@ -1923,7 +3264,7 @@ Przykład:
         }
 
         function startTimer(elementId) {
-            stopTimer(); // Zatrzymaj poprzedni timer jeśli istnieje
+            stopTimer();
             const startTime = Date.now();
             
             timerInterval = setInterval(() => {
@@ -1949,6 +3290,18 @@ Przykład:
                 [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
             }
             return newArray;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function decodeHtml(html) {
+            const txt = document.createElement('textarea');
+            txt.innerHTML = html;
+            return txt.value;
         }
     </script>
 </body>
