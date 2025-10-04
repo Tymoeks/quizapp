@@ -1556,14 +1556,19 @@
                 }
             }
         .kbd {
-            background: var(--surface-alt);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 2px 6px;
-            font-family: monospace;
-            font-size: 11px;
+        background: var(--surface-alt);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-family: monospace;
+        font-size: 11px;
         }
-    </style>
+            input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+                cursor: pointer;
+                accent-color: var(--accent);
+            }    </style>
 </head>
 <body>
     <!-- Theme Toggle -->
@@ -1693,11 +1698,11 @@
                 </div>
 
                 <div class="button-group">
-                    <button class="btn btn-primary" onclick="updateQuiz()">💾 Zapisz zmiany</button>
-                    <button class="btn btn-danger" onclick="deleteCurrentQuiz()">🗑️ Usuń</button>
-                    <button class="btn" onclick="showHomeScreen()">Anuluj</button>
-                </div>
-            </div>
+                <button class="btn btn-primary" onclick="updateQuiz()">💾 Zapisz zmiany</button>
+                <button class="btn btn-accent" onclick="shareQuiz(currentEditingQuizId)">🔗 Udostępnij</button>
+                <button class="btn btn-danger" onclick="deleteCurrentQuiz()">🗑️ Usuń</button>
+                <button class="btn" onclick="showHomeScreen()">Anuluj</button>
+                </div>            </div>
         </div>
 
         <!-- Pre-Quiz Screen -->
@@ -1737,11 +1742,11 @@
                 </div>
 
                 <div class="button-group center">
-                    <button class="btn btn-accent" onclick="startQuiz()">▶️ Rozpocznij quiz</button>
-                    <button class="btn btn-small" onclick="exportQuiz(currentQuiz.id)">📤 Eksportuj</button>
-                    <button class="btn" onclick="showHomeScreen()">Powrót</button>
-                </div>
-            </div>
+                <button class="btn btn-accent" onclick="startQuiz()">▶️ Rozpocznij quiz</button>
+                <button class="btn btn-small" onclick="shareQuiz(currentQuiz.id)">🔗 Udostępnij</button>
+                <button class="btn btn-small" onclick="exportQuiz(currentQuiz.id)">📤 Eksportuj</button>
+                <button class="btn" onclick="showHomeScreen()">Powrót</button>
+                </div>            </div>
         </div>
 
         <!-- Quiz Screen -->
@@ -1813,11 +1818,11 @@
                 </div>
 
                 <div class="button-group center">
-                    <button class="btn btn-accent" onclick="startFlashcards()">▶️ Rozpocznij naukę</button>
-                    <button class="btn btn-small" onclick="exportQuiz(currentFlashcards.id)">📤 Eksportuj</button>
-                    <button class="btn" onclick="showHomeScreen()">Powrót</button>
-                </div>
-            </div>
+                <button class="btn btn-accent" onclick="startFlashcards()">▶️ Rozpocznij naukę</button>
+                <button class="btn btn-small" onclick="shareQuiz(currentFlashcards.id)">🔗 Udostępnij</button>
+                <button class="btn btn-small" onclick="exportQuiz(currentFlashcards.id)">📤 Eksportuj</button>
+                <button class="btn" onclick="showHomeScreen()">Powrót</button>
+                </div>            </div>
         </div>
 
         <!-- Flashcard Screen -->
@@ -1915,17 +1920,22 @@
                 <button class="modal-close" onclick="closeModal('importModal')">×</button>
             </div>
             <div class="form-group">
-                <label>Wybierz plik JSON lub wklej dane:</label>
-                <input type="file" id="importFile" accept=".json" onchange="handleFileImport(event)">
+            <label>Wybierz plik JSON lub wklej dane:</label>
+            <input type="file" id="importFile" accept=".json" onchange="handleFileImport(event)">
             </div>
             <div class="form-group">
-                <textarea id="importJson" placeholder="Lub wklej JSON tutaj..." style="min-height: 200px;"></textarea>
+            <textarea id="importJson" placeholder="Lub wklej JSON tutaj..." style="min-height: 200px;"></textarea>
+            </div>
+            <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="importMergeMode" checked>
+            <span>Dodaj bez nadpisywania (nie duplikuj istniejących quizów)</span>
+            </label>
             </div>
             <div class="button-group">
-                <button class="btn btn-primary" onclick="importQuiz()">📥 Importuj</button>
-                <button class="btn" onclick="closeModal('importModal')">Anuluj</button>
-            </div>
-        </div>
+            <button class="btn btn-primary" onclick="importQuiz()">📥 Importuj</button>
+            <button class="btn" onclick="closeModal('importModal')">Anuluj</button>
+            </div>        </div>
     </div>
 
     <!-- Backup Modal -->
@@ -2003,11 +2013,10 @@
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            showHomeScreen();
-            setupKeyboardShortcuts();
+        initTheme();
+        checkSharedQuiz(); // Sprawdź czy jest udostępniony quiz w URL
+        setupKeyboardShortcuts();
         });
-
         // ==================== THEME ====================
         function initTheme() {
             const savedTheme = localStorage.getItem('theme') || 'light';
@@ -2259,10 +2268,10 @@ Przykład:
                     <div class="quiz-item animate-fadeIn" onclick="${clickHandler}('${quiz.id}')">
                         <div class="quiz-type-icon">${icon}</div>
                         <div class="quiz-actions">
-                            <button onclick="event.stopPropagation(); showEditScreen('${quiz.id}')" title="Edytuj">✏️</button>
-                            <button onclick="event.stopPropagation(); confirmDelete('${quiz.id}')" title="Usuń">🗑️</button>
-                        </div>
-                        <h3>${quiz.title}</h3>
+                        <button onclick="event.stopPropagation(); shareQuiz('${quiz.id}')" title="Udostępnij">🔗</button>
+                        <button onclick="event.stopPropagation(); showEditScreen('${quiz.id}')" title="Edytuj">✏️</button>
+                        <button onclick="event.stopPropagation(); confirmDelete('${quiz.id}')" title="Usuń">🗑️</button>
+                        </div>                        <h3>${quiz.title}</h3>
                         <p>${count}</p>
                         ${tagsHtml}
                         ${bestResult ? `<div class="quiz-stats-badge">
@@ -3039,14 +3048,118 @@ Przykład:
             `;
         }
 
-        // ==================== IMPORT/EXPORT ====================
-        function copyPrompt() {
-            const prompt = document.getElementById('aiPrompt').textContent;
-            navigator.clipboard.writeText(prompt).then(() => {
-                showToast('Prompt skopiowany do schowka!', 'success');
-            });
-        }
-
+        // ==================== SHARING ====================
+        function shareQuiz(quizId) {
+        const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+        const quiz = quizzes.find(q => q.id === quizId);
+                if (!quiz) {
+                    showToast('Quiz nie znaleziony', 'error');
+                    return;
+                }
+                
+                // Przygotuj dane do udostępnienia (bez id, dat)
+                const shareData = {
+                    title: quiz.title,
+                    tags: quiz.tags || [],
+                    type: quiz.type,
+                    answerCount: quiz.answerCount
+                };
+                
+                if (quiz.type === 'flashcard') {
+                    shareData.cards = quiz.cards;
+                } else {
+                    shareData.questions = quiz.questions;
+                }
+                
+                try {
+                    // Zakoduj do base64
+                    const jsonString = JSON.stringify(shareData);
+                    const encoded = btoa(unescape(encodeURIComponent(jsonString)));
+                    
+                    // Utwórz link
+                    const baseUrl = 'https://tymoeks.github.io/quizapp/';
+                    const shareUrl = `${baseUrl}#share=${encoded}`;
+                    
+                    // Skopiuj do schowka
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                        showToast('Link skopiowany do schowka! 🔗', 'success');
+                    }).catch(() => {
+                        // Fallback - pokaż link w prompt
+                        prompt('Skopiuj link:', shareUrl);
+                    });
+                } catch (error) {
+                    showToast('Błąd tworzenia linku: ' + error.message, 'error');
+                }
+            }
+        
+            function checkSharedQuiz() {
+                const hash = window.location.hash;
+                
+                if (hash.startsWith('#share=')) {
+                    const encoded = hash.substring(7);
+                    
+                    try {
+                        // Dekoduj z base64
+                        const jsonString = decodeURIComponent(escape(atob(encoded)));
+                        const quizData = JSON.parse(jsonString);
+                        
+                        // Sprawdź czy już istnieje (po tytule i typie)
+                        const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                        const exists = quizzes.find(q => 
+                            q.title === quizData.title && 
+                            q.type === quizData.type &&
+                            JSON.stringify(q.questions || q.cards) === JSON.stringify(quizData.questions || quizData.cards)
+                        );
+                        
+                        if (exists) {
+                            // Quiz już istnieje - pokaż ekran startowy
+                            showToast('Quiz już istnieje w Twojej bibliotece!', 'info');
+                            
+                            if (quizData.type === 'flashcard') {
+                                showFlashcardScreen(exists.id);
+                            } else {
+                                showPreQuizScreen(exists.id);
+                            }
+                        } else {
+                            // Dodaj nowy quiz
+                            const newQuiz = {
+                                ...quizData,
+                                id: Date.now().toString(),
+                                createdAt: new Date().toISOString()
+                            };
+                            
+                            quizzes.push(newQuiz);
+                            localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                            
+                            showToast('Quiz został dodany! 🎉', 'success');
+                            
+                            // Pokaż ekran startowy quizu
+                            if (quizData.type === 'flashcard') {
+                                showFlashcardScreen(newQuiz.id);
+                            } else {
+                                showPreQuizScreen(newQuiz.id);
+                            }
+                        }
+                        
+                        // Wyczyść hash
+                        history.replaceState(null, null, ' ');
+                        
+                    } catch (error) {
+                        showToast('Błąd wczytywania udostępnionego quizu: ' + error.message, 'error');
+                        showHomeScreen();
+                    }
+                } else {
+                    showHomeScreen();
+                }
+            }
+        
+            // ==================== IMPORT/EXPORT ====================
+            function copyPrompt() {
+                const prompt = document.getElementById('aiPrompt').textContent;
+                navigator.clipboard.writeText(prompt).then(() => {
+                    showToast('Prompt skopiowany do schowka!', 'success');
+                });
+            }
         function showImportModal() {
             document.getElementById('importModal').classList.remove('hidden');
         }
@@ -3066,42 +3179,85 @@ Przykład:
             reader.readAsText(file);
         }
 
-        function importQuiz() {
-            const jsonText = document.getElementById('importJson').value;
+function importQuiz() {
+        const jsonText = document.getElementById('importJson').value;
+        const mergeMode = document.getElementById('importMergeMode').checked;
+        
+        try {
+            const data = JSON.parse(jsonText);
             
-            try {
-                const data = JSON.parse(jsonText);
+            if (Array.isArray(data)) {
+                const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                let addedCount = 0;
+                let skippedCount = 0;
                 
-                if (Array.isArray(data)) {
-                    const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-                    data.forEach(quiz => {
-                        quiz.id = Date.now().toString() + Math.random();
-                        quiz.createdAt = new Date().toISOString();
-                        quizzes.push(quiz);
-                    });
-                    localStorage.setItem('quizzes', JSON.stringify(quizzes));
-                    showToast(`Zaimportowano ${data.length} quizów!`, 'success');
-                } else {
-                    const quiz = {
-                        ...data,
-                        id: Date.now().toString(),
-                        createdAt: new Date().toISOString()
-                    };
+                data.forEach(quiz => {
+                    if (mergeMode) {
+                        // Sprawdź czy quiz już istnieje
+                        const exists = quizzes.find(q => 
+                            q.title === quiz.title && 
+                            q.type === quiz.type &&
+                            JSON.stringify(q.questions || q.cards) === JSON.stringify(quiz.questions || quiz.cards)
+                        );
+                        
+                        if (exists) {
+                            skippedCount++;
+                            return;
+                        }
+                    }
                     
-                    const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                    quiz.id = Date.now().toString() + Math.random();
+                    quiz.createdAt = new Date().toISOString();
                     quizzes.push(quiz);
-                    localStorage.setItem('quizzes', JSON.stringify(quizzes));
-                    showToast('Quiz zaimportowany!', 'success');
+                    addedCount++;
+                });
+                
+                localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                
+                if (mergeMode && skippedCount > 0) {
+                    showToast(`Zaimportowano ${addedCount} quizów, pominięto ${skippedCount} duplikatów`, 'success');
+                } else {
+                    showToast(`Zaimportowano ${addedCount} quizów!`, 'success');
+                }
+            } else {
+                const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                
+                if (mergeMode) {
+                    // Sprawdź czy quiz już istnieje
+                    const exists = quizzes.find(q => 
+                        q.title === data.title && 
+                        q.type === data.type &&
+                        JSON.stringify(q.questions || q.cards) === JSON.stringify(data.questions || data.cards)
+                    );
+                    
+                    if (exists) {
+                        showToast('Quiz już istnieje w bibliotece', 'info');
+                        closeModal('importModal');
+                        document.getElementById('importJson').value = '';
+                        document.getElementById('importFile').value = '';
+                        return;
+                    }
                 }
                 
-                closeModal('importModal');
-                document.getElementById('importJson').value = '';
-                document.getElementById('importFile').value = '';
-                loadQuizzes();
-            } catch (error) {
-                showToast('Błąd importu: ' + error.message, 'error');
+                const quiz = {
+                    ...data,
+                    id: Date.now().toString(),
+                    createdAt: new Date().toISOString()
+                };
+                
+                quizzes.push(quiz);
+                localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                showToast('Quiz zaimportowany!', 'success');
             }
+            
+            closeModal('importModal');
+            document.getElementById('importJson').value = '';
+            document.getElementById('importFile').value = '';
+            loadQuizzes();
+        } catch (error) {
+            showToast('Błąd importu: ' + error.message, 'error');
         }
+    }
 
         function exportQuiz(quizId) {
             const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
