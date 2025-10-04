@@ -1,26 +1,27 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-        <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuizApp 2.0 - Twórz i rozwiązuj quizy</title>
-
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tymoeks.github.io/quizapp/">
     <meta property="og:title" content="QuizApp 2.0 - Quiz udostępniony">
     <meta property="og:description" content="Ktoś udostępnił Ci quiz! Kliknij aby rozwiązać.">
     <meta property="og:image" content="https://tymoeks.github.io/quizapp/preview.png">
-
+    
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://tymoeks.github.io/quizapp/">
     <meta property="twitter:title" content="QuizApp 2.0 - Quiz udostępniony">
     <meta property="twitter:description" content="Ktoś udostępnił Ci quiz! Kliknij aby rozwiązać.">
     <meta property="twitter:image" content="https://tymoeks.github.io/quizapp/preview.png">
-
+    
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>    <style>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -63,29 +64,31 @@
             --gradient-dark: linear-gradient(135deg, #ECF0F1 0%, #BDC3C7 100%);
         }
 
-           html {
-        overflow-x: hidden;
-        width: 100%;
-        height: 100%;
-        position: fixed;
-        -webkit-overflow-scrolling: touch;
+        html {
+            overflow-x: hidden;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            -webkit-overflow-scrolling: touch;
         }
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                background: var(--background);
-                min-height: 100vh;
-                height: 100%;
-                color: var(--text);
-                line-height: 1.6;
-                position: relative;
-                overflow-x: hidden;
-                overflow-y: auto;
-                transition: background 0.3s ease, color 0.3s ease;
-                -webkit-user-select: none;
-                -moz-user-select: none;
-                user-select: none;
-                -webkit-overflow-scrolling: touch;
-            }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--background);
+            min-height: 100vh;
+            height: 100%;
+            color: var(--text);
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            transition: background 0.3s ease, color 0.3s ease;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
         body::before {
             content: '';
             position: fixed;
@@ -134,14 +137,15 @@
             transform: rotate(-20deg);
         }
 
-           .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 40px 20px;
-        position: relative;
-        z-index: 1;
-        touch-action: pan-y;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+            touch-action: pan-y;
         }
+
         .hidden {
             display: none !important;
         }
@@ -261,21 +265,22 @@
         }
 
         /* Buttons */
-           .btn {
-        padding: 12px 24px;
-        border: none;
-        border-radius: 8px;
-        font-size: 15px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        background: var(--surface-alt);
-        color: var(--text);
-        border: 1px solid var(--border);
-        position: relative;
-        overflow: hidden;
-        touch-action: manipulation;
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--surface-alt);
+            color: var(--text);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            touch-action: manipulation;
         }
+
         .btn::before {
             content: '';
             position: absolute;
@@ -757,19 +762,20 @@
             transform: rotate(45deg);
         }
 
-         .question-card h2 {
-        font-weight: 400;
-        font-size: 1.5rem;
-        line-height: 1.4;
-        margin-bottom: 40px;
-        margin-top: 0;
-        padding-top: 0;
-        position: relative;
-        z-index: 1;
-        -webkit-user-select: text;
-        -moz-user-select: text;
-        user-select: text;
+        .question-card h2 {
+            font-weight: 400;
+            font-size: 1.5rem;
+            line-height: 1.4;
+            margin-bottom: 40px;
+            margin-top: 0;
+            padding-top: 0;
+            position: relative;
+            z-index: 1;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            user-select: text;
         }
+
         .question-category {
             position: absolute;
             top: 16px;
@@ -917,37 +923,39 @@
             align-items: center;
         }
 
-           .flashcard {
-        width: 100%;
-        height: 350px;
-        position: relative;
-        transform-style: preserve-3d;
-        transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
-        cursor: pointer;
-        touch-action: manipulation;
+        .flashcard {
+            width: 100%;
+            height: 350px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            cursor: pointer;
+            touch-action: manipulation;
         }
+
         .flashcard.flipped {
             transform: rotateY(180deg);
         }
 
-           .flashcard-side {
-        width: 100%;
-        height: 350px;
-        -webkit-backface-visibility: hidden;
-        backface-visibility: hidden;
-        border-radius: 16px;
-        box-shadow: 0 8px 24px var(--shadow);
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        padding: 0;
-        text-align: center;
-        background: var(--surface);
-        border: 2px solid var(--border);
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        touch-action: pan-y;
+        .flashcard-side {
+            width: 100%;
+            height: 350px;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px var(--shadow);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 0;
+            text-align: center;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
         }
+
         .flashcard-front {
             position: absolute;
             top: 0;
@@ -965,25 +973,26 @@
             border-color: var(--accent);
         }
 
-           .flashcard-content {
-        font-size: 1.5rem;
-        font-weight: 400;
-        color: var(--primary);
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        width: 100%;
-        min-height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 40px;
-        -webkit-touch-callout: none;
-        -webkit-user-select: text;
-        -moz-user-select: text;
-        user-select: text;
-        touch-action: pan-y;
+        .flashcard-content {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--primary);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            width: 100%;
+            min-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            -webkit-touch-callout: none;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            user-select: text;
+            touch-action: pan-y;
         }
+
         .flashcard-side::-webkit-scrollbar {
             width: 8px;
         }
@@ -1378,215 +1387,218 @@
             opacity: 0.5;
         }
 
+        /* Keyboard Shortcuts Hint */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            box-shadow: 0 2px 8px var(--shadow);
+            z-index: 100;
+        }
+
+        .kbd {
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: monospace;
+            font-size: 11px;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
-        .container {
-            padding: 20px 15px;
-        }
-
-        h1 {
-            font-size: 1.75rem;
-        }
-
-        h2 {
-            font-size: 1.5rem;
-        }
-
-        .header {
-            margin-bottom: 40px;
-            padding: 20px 0;
-        }
-
-        .header p {
-            font-size: 1rem;
-        }
-
-        .header-actions {
-            gap: 8px;
-        }
-
-        .question-card {
-            padding: 24px 16px;
-        }
-
-         .question-card h2 {
-        font-size: 1.25rem;
-        padding-top: 30px;
-        margin-top: 0;
-        }
-        .answers-grid {
-            grid-template-columns: 1fr !important;
-        }
-
-        .answer-btn {
-            min-height: 60px;
-            padding: 16px 20px;
-            font-size: 15px;
-        }
-
-        .quiz-list {
-            grid-template-columns: 1fr;
-            gap: 16px;
-        }
-
-        .quiz-item {
-            padding: 20px;
-            padding-left: 52px;
-            padding-bottom: 55px;
-        }
-
-        .stats {
-            flex-direction: column;
-            gap: 8px;
-            padding: 12px;
-        }
-        
-        .results-screen .stats {
-            flex-direction: row !important;
-            flex-wrap: wrap;
-        }
-        
-        .results-screen .stats > div {
-            min-width: 30%;
-        }
-
-        .search-bar {
-            flex-direction: column;
-            padding: 16px;
-        }
-
-        .search-input {
-            width: 100%;
-        }
-
-        .filter-group {
-            width: 100%;
-            justify-content: space-between;
-        }
-
-        .filter-btn {
-            flex: 1;
-        }
-
-        .theme-toggle {
-            top: 10px;
-            right: 10px;
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
-        }
-
-        .modal-content {
-            padding: 24px 16px;
-            margin: 10px;
-        }
-
-        .card {
-            padding: 24px 16px;
-        }
-
-        .btn {
-            padding: 14px 20px;
-            font-size: 16px;
-            min-height: 48px;
-            touch-action: manipulation;
-        }
-
-        .btn-small {
-            padding: 10px 16px;
-            min-height: 40px;
-        }
-
-        .flashcard {
-            height: 300px;
-        }
-
-        .flashcard-side {
-            height: 300px;
-        }
-
-        .flashcard-content {
-            font-size: 1.25rem;
-            padding: 30px 20px;
-        }
-
-        .flashcard-btn {
-            font-size: 13px;
-            padding: 14px 16px;
-            min-height: 48px;
-        }
-
-        .score-display {
-            font-size: 2.5rem;
-        }
-
-        .type-selection {
-            grid-template-columns: 1fr;
-        }
-
-        .type-option {
-            padding: 24px;
-        }
-
-        .button-group {
-            flex-direction: column;
-        }
-
-        .button-group.center {
-            flex-direction: column;
-        }
-
-        .button-group .btn {
-            width: 100%;
-        }
-
-        input[type="text"],
-        textarea,
-        select {
-            font-size: 16px;
-        }
-
-        .toast {
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            max-width: none;
-        }
-    }
-
-        /* Keyboard Shortcuts Hint */
-           .keyboard-hint {
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        padding: 12px 16px;
-        border-radius: 8px;
-        font-size: 12px;
-        color: var(--text-secondary);
-        box-shadow: 0 2px 8px var(--shadow);
-        z-index: 100;
-        }
-            @media (max-width: 768px) {
-                .keyboard-hint {
-                    display: none;
-                }
+            .keyboard-hint {
+                display: none;
             }
-        .kbd {
-        background: var(--surface-alt);
-        border: 1px solid var(--border);
-        border-radius: 4px;
-        padding: 2px 6px;
-        font-family: monospace;
-        font-size: 11px;
+
+            .container {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .header {
+                margin-bottom: 40px;
+                padding: 20px 0;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .header-actions {
+                gap: 8px;
+            }
+
+            .question-card {
+                padding: 24px 16px;
+            }
+
+            .question-card h2 {
+                font-size: 1.25rem;
+                padding-top: 30px;
+                margin-top: 0;
+            }
+
+            .answers-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .answer-btn {
+                min-height: 60px;
+                padding: 16px 20px;
+                font-size: 15px;
+            }
+
+            .quiz-list {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .quiz-item {
+                padding: 20px;
+                padding-left: 52px;
+                padding-bottom: 55px;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px;
+            }
+            
+            .results-screen .stats {
+                flex-direction: row !important;
+                flex-wrap: wrap;
+            }
+            
+            .results-screen .stats > div {
+                min-width: 30%;
+            }
+
+            .search-bar {
+                flex-direction: column;
+                padding: 16px;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .filter-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .filter-btn {
+                flex: 1;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .modal-content {
+                padding: 24px 16px;
+                margin: 10px;
+            }
+
+            .card {
+                padding: 24px 16px;
+            }
+
+            .btn {
+                padding: 14px 20px;
+                font-size: 16px;
+                min-height: 48px;
+                touch-action: manipulation;
+            }
+
+            .btn-small {
+                padding: 10px 16px;
+                min-height: 40px;
+            }
+
+            .flashcard {
+                height: 300px;
+            }
+
+            .flashcard-side {
+                height: 300px;
+            }
+
+            .flashcard-content {
+                font-size: 1.25rem;
+                padding: 30px 20px;
+            }
+
+            .flashcard-btn {
+                font-size: 13px;
+                padding: 14px 16px;
+                min-height: 48px;
+            }
+
+            .score-display {
+                font-size: 2.5rem;
+            }
+
+            .type-selection {
+                grid-template-columns: 1fr;
+            }
+
+            .type-option {
+                padding: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group.center {
+                flex-direction: column;
+            }
+
+            .button-group .btn {
+                width: 100%;
+            }
+
+            input[type="text"],
+            textarea,
+            select {
+                font-size: 16px;
+            }
+
+            .toast {
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+                max-width: none;
+            }
         }
-            input[type="checkbox"] {
-                width: 18px;
-                height: 18px;
-                cursor: pointer;
-                accent-color: var(--accent);
-            }    </style>
+    </style>
 </head>
 <body>
     <!-- Theme Toggle -->
@@ -1716,11 +1728,12 @@
                 </div>
 
                 <div class="button-group">
-                <button class="btn btn-primary" onclick="updateQuiz()">💾 Zapisz zmiany</button>
-                <button class="btn btn-accent" onclick="shareQuiz(currentEditingQuizId)">🔗 Udostępnij</button>
-                <button class="btn btn-danger" onclick="deleteCurrentQuiz()">🗑️ Usuń</button>
-                <button class="btn" onclick="showHomeScreen()">Anuluj</button>
-                </div>            </div>
+                    <button class="btn btn-primary" onclick="updateQuiz()">💾 Zapisz zmiany</button>
+                    <button class="btn btn-accent" onclick="shareQuiz(currentEditingQuizId)">🔗 Udostępnij</button>
+                    <button class="btn btn-danger" onclick="deleteCurrentQuiz()">🗑️ Usuń</button>
+                    <button class="btn" onclick="showHomeScreen()">Anuluj</button>
+                </div>
+            </div>
         </div>
 
         <!-- Pre-Quiz Screen -->
@@ -1744,7 +1757,7 @@
                         </label>
                     </div>
                     <div class="setting-row">
-                        <label>Pokazuj litery odpowiedzi</label>
+                        <label>Pokazuj litery odpowiedzi (A, B, C, D)</label>
                         <label class="toggle">
                             <input type="checkbox" id="showLetters" checked>
                             <span class="slider"></span>
@@ -1760,11 +1773,12 @@
                 </div>
 
                 <div class="button-group center">
-                <button class="btn btn-accent" onclick="startQuiz()">▶️ Rozpocznij quiz</button>
-                <button class="btn btn-small" onclick="shareQuiz(currentQuiz.id)">🔗 Udostępnij</button>
-                <button class="btn btn-small" onclick="exportQuiz(currentQuiz.id)">📤 Eksportuj</button>
-                <button class="btn" onclick="showHomeScreen()">Powrót</button>
-                </div>            </div>
+                    <button class="btn btn-accent" onclick="startQuiz()">▶️ Rozpocznij quiz</button>
+                    <button class="btn btn-small" onclick="shareQuiz(currentQuiz.id)">🔗 Udostępnij</button>
+                    <button class="btn btn-small" onclick="exportQuiz(currentQuiz.id)">📤 Eksportuj</button>
+                    <button class="btn" onclick="showHomeScreen()">Powrót</button>
+                </div>
+            </div>
         </div>
 
         <!-- Quiz Screen -->
@@ -1783,16 +1797,16 @@
                 </div>
                 
                 <div class="question-card animate-fadeIn">
-                <div class="question-category" id="questionCategory"></div>
-                <h2 id="questionText"></h2>
-                <div class="answers-grid" id="answersGrid"></div>
-            </div>
+                    <div class="question-category" id="questionCategory"></div>
+                    <h2 id="questionText"></h2>
+                    <div class="answers-grid" id="answersGrid"></div>
+                </div>
 
-            <div class="button-group center" style="margin-top: 24px;">
-                <button class="btn" onclick="endQuizEarly()">Zakończ quiz</button>
-            </div>
+                <div class="button-group center" style="margin-top: 24px;">
+                    <button class="btn" onclick="endQuizEarly()">Zakończ quiz</button>
+                </div>
 
-            <div class="keyboard-hint">
+                <div class="keyboard-hint">
                     <kbd class="kbd">1-4</kbd> Wybierz odpowiedź · 
                     <kbd class="kbd">Esc</kbd> Wyjdź
                 </div>
@@ -1840,11 +1854,12 @@
                 </div>
 
                 <div class="button-group center">
-                <button class="btn btn-accent" onclick="startFlashcards()">▶️ Rozpocznij naukę</button>
-                <button class="btn btn-small" onclick="shareQuiz(currentFlashcards.id)">🔗 Udostępnij</button>
-                <button class="btn btn-small" onclick="exportQuiz(currentFlashcards.id)">📤 Eksportuj</button>
-                <button class="btn" onclick="showHomeScreen()">Powrót</button>
-                </div>            </div>
+                    <button class="btn btn-accent" onclick="startFlashcards()">▶️ Rozpocznij naukę</button>
+                    <button class="btn btn-small" onclick="shareQuiz(currentFlashcards.id)">🔗 Udostępnij</button>
+                    <button class="btn btn-small" onclick="exportQuiz(currentFlashcards.id)">📤 Eksportuj</button>
+                    <button class="btn" onclick="showHomeScreen()">Powrót</button>
+                </div>
+            </div>
         </div>
 
         <!-- Flashcard Screen -->
@@ -1942,19 +1957,20 @@
                 <button class="modal-close" onclick="closeModal('importModal')">×</button>
             </div>
             <div class="form-group">
-            <label>Wybierz plik JSON lub wklej dane:</label>
-            <input type="file" id="importFile" accept=".json" onchange="handleFileImport(event)">
+                <label>Wybierz plik JSON lub wklej dane:</label>
+                <input type="file" id="importFile" accept=".json" onchange="handleFileImport(event)">
             </div>
             <div class="form-group">
-            <textarea id="importJson" placeholder="Lub wklej JSON tutaj..." style="min-height: 200px;"></textarea>
+                <textarea id="importJson" placeholder="Lub wklej JSON tutaj..." style="min-height: 200px;"></textarea>
             </div>
             <p style="margin-bottom: 16px; font-size: 14px; color: var(--text-secondary);">
-            ℹ️ Istniejące quizy nie zostaną nadpisane - dodane zostaną tylko nowe.
+                ℹ️ Istniejące quizy nie zostaną nadpisane - dodane zostaną tylko nowe.
             </p>
             <div class="button-group">
-            <button class="btn btn-primary" onclick="importQuiz()">📥 Importuj</button>
-            <button class="btn" onclick="closeModal('importModal')">Anuluj</button>
-            </div>        </div>
+                <button class="btn btn-primary" onclick="importQuiz()">📥 Importuj</button>
+                <button class="btn" onclick="closeModal('importModal')">Anuluj</button>
+            </div>
+        </div>
     </div>
 
     <!-- Backup Modal -->
@@ -2044,13 +2060,15 @@
         // Toast queue system
         let activeToast = null;
         let queuedToast = null;
+        let toastTimeout = null;
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', () => {
-        initTheme();
-        checkSharedQuiz(); // Sprawdź czy jest udostępniony quiz w URL
-        setupKeyboardShortcuts();
+            initTheme();
+            checkSharedQuiz();
+            setupKeyboardShortcuts();
         });
+
         // ==================== THEME ====================
         function initTheme() {
             const savedTheme = localStorage.getItem('theme') || 'light';
@@ -2302,10 +2320,11 @@ Przykład:
                     <div class="quiz-item animate-fadeIn" onclick="${clickHandler}('${quiz.id}')">
                         <div class="quiz-type-icon">${icon}</div>
                         <div class="quiz-actions">
-                        <button onclick="event.stopPropagation(); shareQuiz('${quiz.id}')" title="Udostępnij">🔗</button>
-                        <button onclick="event.stopPropagation(); showEditScreen('${quiz.id}')" title="Edytuj">✏️</button>
-                        <button onclick="event.stopPropagation(); confirmDelete('${quiz.id}')" title="Usuń">🗑️</button>
-                        </div>                        <h3>${quiz.title}</h3>
+                            <button onclick="event.stopPropagation(); shareQuiz('${quiz.id}')" title="Udostępnij">🔗</button>
+                            <button onclick="event.stopPropagation(); showEditScreen('${quiz.id}')" title="Edytuj">✏️</button>
+                            <button onclick="event.stopPropagation(); confirmDelete('${quiz.id}')" title="Usuń">🗑️</button>
+                        </div>
+                        <h3>${quiz.title}</h3>
                         <p>${count}</p>
                         ${tagsHtml}
                         ${bestResult ? `<div class="quiz-stats-badge">
@@ -2338,7 +2357,6 @@ Przykład:
             try {
                 const quizData = JSON.parse(jsonText);
                 
-                // Walidacja
                 if (window.currentCreateType === 'flashcard') {
                     if (!quizData.cards || !Array.isArray(quizData.cards)) {
                         throw new Error('Nieprawidłowa struktura JSON dla fiszek');
@@ -2351,15 +2369,13 @@ Przykład:
                     quizData.type = 'quiz';
                 }
                 
-                // Użyj tytułu z pola input, jeśli podany, w przeciwnym razie z JSON
                 const finalTitle = titleInput || quizData.title;
                 if (!finalTitle) {
                     throw new Error('Brak tytułu quizu');
                 }
                 
-                // Scal tagi z inputu i z JSON (jeśli są)
                 const jsonTags = quizData.tags || [];
-                const allTags = [...new Set([...currentTags, ...jsonTags])]; // Usuń duplikaty
+                const allTags = [...new Set([...currentTags, ...jsonTags])];
                 
                 const quiz = {
                     ...quizData,
@@ -2400,7 +2416,6 @@ Przykład:
                 const index = quizzes.findIndex(q => q.id === currentEditingQuizId);
                 
                 if (index !== -1) {
-                    // Scal tagi z edytora i z JSON
                     const jsonTags = updatedData.tags || [];
                     const allTags = [...new Set([...editTags, ...jsonTags])];
                     
@@ -2515,6 +2530,328 @@ Przykład:
         function removeEditTag(index) {
             editTags.splice(index, 1);
             renderEditTags();
+        }
+
+        // ==================== SHARING ====================
+        async function shareQuiz(quizId) {
+            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const quiz = quizzes.find(q => q.id === quizId);
+            
+            if (!quiz) {
+                showToast('Quiz nie znaleziony', 'error');
+                return;
+            }
+            
+            document.getElementById('shareModal').classList.remove('hidden');
+            document.getElementById('shareContent').innerHTML = `
+                <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 14px; text-align: center;">
+                    <span style="font-size: 32px;">⏳</span><br>
+                    Generowanie linku...
+                </p>
+            `;
+            
+            // Ultra-kompresja: Array format
+            const shareData = [
+                quiz.title,
+                quiz.tags && quiz.tags.length ? quiz.tags : null,
+                quiz.type === 'flashcard' ? 1 : 0,
+                quiz.answerCount || 4
+            ];
+            
+            if (quiz.type === 'flashcard') {
+                shareData[4] = quiz.cards.map(card => {
+                    const arr = [card.front, card.back];
+                    if (card.category) arr[2] = card.category;
+                    return arr;
+                });
+            } else {
+                shareData[4] = quiz.questions.map(q => {
+                    const arr = [q.question, q.correct, q.wrong];
+                    if (q.group) arr[3] = q.group;
+                    if (q.type) arr[4] = q.type;
+                    return arr;
+                });
+            }
+            
+            try {
+                const jsonString = JSON.stringify(shareData);
+                const compressed = LZString.compressToBase64(jsonString)
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .replace(/=/g, '');
+                
+                const baseUrl = 'https://tymoeks.github.io/quizapp/';
+                const fullUrl = `${baseUrl}#q=${compressed}`;
+                
+                let shortUrl = null;
+                let shortUrlError = false;
+                
+                const itemCount = quiz.type === 'flashcard' ? quiz.cards.length : quiz.questions.length;
+                
+                if (fullUrl.length > 500) {
+                    try {
+                        const response = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`);
+                        const data = await response.json();
+                        
+                        if (data.shorturl) {
+                            shortUrl = data.shorturl;
+                        } else if (data.errormessage) {
+                            shortUrlError = true;
+                            console.error('is.gd error:', data.errormessage);
+                        }
+                    } catch (error) {
+                        shortUrlError = true;
+                        console.error('is.gd API error:', error);
+                    }
+                }
+                
+                const itemType = quiz.type === 'flashcard' ? 'fiszek' : 'pytań';
+                
+                let contentHtml = `
+                    <div style="margin-bottom: 24px;">
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
+                            <strong>${quiz.title}</strong><br>
+                            ${itemCount} ${itemType}
+                        </p>
+                    </div>
+                `;
+                
+                if (shortUrl) {
+                    contentHtml += `
+                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                                ✅ Link skrócony (działa w Messenger i WhatsApp):
+                            </p>
+                            <input type="text" value="${shortUrl}" readonly 
+                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--surface);"
+                                onclick="this.select()" id="shortUrlInput">
+                            <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Skrócony link skopiowany! 🔗')" 
+                                style="width: 100%; margin-top: 12px;">
+                                📋 Kopiuj link
+                            </button>
+                        </div>
+                    `;
+                    
+                    if (itemCount <= 25) {
+                        contentHtml += `
+                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                                    📱 Kod QR (zeskanuj telefonem):
+                                </p>
+                                <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div>
+                            </div>
+                        `;
+                    }
+                    
+                    contentHtml += `
+                        <p style="font-size: 12px; color: var(--success); text-align: center; margin-bottom: 16px;">
+                            ✅ Link pokazuje nazwę strony w podglądzie
+                        </p>
+                        <details style="margin-top: 16px;">
+                            <summary style="cursor: pointer; color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
+                                Pokaż pełny link (zaawansowane)
+                            </summary>
+                            <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-top: 8px;">
+                                <input type="text" value="${fullUrl}" readonly 
+                                    style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: monospace; background: var(--surface);"
+                                    onclick="this.select()">
+                                <button class="btn btn-small" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Pełny link skopiowany!')" 
+                                    style="width: 100%; margin-top: 8px;">
+                                    📋 Kopiuj pełny link
+                                </button>
+                            </div>
+                        </details>
+                    `;
+                    
+                    if (itemCount <= 25) {
+                        setTimeout(() => {
+                            const qrDiv = document.getElementById('qrcode');
+                            if (qrDiv) {
+                                qrDiv.innerHTML = '';
+                                new QRCode(qrDiv, {
+                                    text: shortUrl,
+                                    width: 160,
+                                    height: 160,
+                                    colorDark: '#2C3E50',
+                                    colorLight: '#ffffff',
+                                    correctLevel: QRCode.CorrectLevel.M
+                                });
+                            }
+                        }, 100);
+                    }
+                } else {
+                    const warningHtml = shortUrlError ? `
+                        <p style="color: var(--warning); font-size: 13px; margin-bottom: 12px;">
+                            ⚠️ Nie udało się skrócić linku. W Messengerze kliknij w sam tekst linku, nie w podgląd.
+                        </p>
+                    ` : '';
+                    
+                    contentHtml += `
+                        ${warningHtml}
+                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                                ${fullUrl.length > 500 ? '📝 Link (może być długi):' : '✅ Link do udostępnienia (z podglądem):'}
+                            </p>
+                            <input type="text" value="${fullUrl}" readonly 
+                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: monospace; background: var(--surface); word-break: break-all;"
+                                onclick="this.select()" id="fullUrlInput">
+                            <button class="btn btn-primary" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Link skopiowany! 🔗')" 
+                                style="width: 100%; margin-top: 12px;">
+                                📋 Kopiuj link
+                            </button>
+                        </div>
+                    `;
+                    
+                    if (fullUrl.length < 500) {
+                        contentHtml += `
+                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                                    📱 Kod QR (zeskanuj telefonem):
+                                </p>
+                                <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div>
+                            </div>
+                            <p style="font-size: 12px; color: var(--success); text-align: center;">
+                                ✅ Ten link pokaże podgląd w Messengerze i WhatsApp
+                            </p>
+                        `;
+                        
+                        setTimeout(() => {
+                            const qrDiv = document.getElementById('qrcode');
+                            if (qrDiv) {
+                                qrDiv.innerHTML = '';
+                                new QRCode(qrDiv, {
+                                    text: fullUrl,
+                                    width: 160,
+                                    height: 160,
+                                    colorDark: '#2C3E50',
+                                    colorLight: '#ffffff',
+                                    correctLevel: QRCode.CorrectLevel.M
+                                });
+                            }
+                        }, 100);
+                    } else {
+                        contentHtml += `
+                            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+                                💡 <strong>Wskazówki:</strong><br>
+                                • W Messengerze: Kliknij w <strong>sam tekst linku</strong>, nie w podgląd<br>
+                                • W WhatsApp: Zaznacz i skopiuj <strong>cały link</strong><br>
+                                • Alternatywnie: Użyj przycisku Eksportuj i wyślij plik
+                            </p>
+                        `;
+                    }
+                }
+                
+                document.getElementById('shareContent').innerHTML = contentHtml;
+                
+            } catch (error) {
+                document.getElementById('shareContent').innerHTML = `
+                    <p style="color: var(--danger); text-align: center;">
+                        ❌ Błąd: ${error.message}
+                    </p>
+                `;
+            }
+        }
+        
+        function copyToClipboard(text, message) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(message, 'success');
+                closeModal('shareModal');
+            }).catch(() => {
+                showToast('Nie udało się skopiować', 'error');
+            });
+        }
+
+        function checkSharedQuiz() {
+            const hash = window.location.hash;
+            
+            if (hash.startsWith('#q=')) {
+                const compressed = hash.substring(3);
+                
+                try {
+                    let jsonString = null;
+                    
+                    const base64 = compressed
+                        .replace(/-/g, '+')
+                        .replace(/_/g, '/');
+                    
+                    jsonString = LZString.decompressFromBase64(base64);
+                    
+                    if (!jsonString) {
+                        jsonString = LZString.decompressFromEncodedURIComponent(compressed);
+                    }
+                    
+                    if (!jsonString) {
+                        throw new Error('Nie udało się zdekompresować danych');
+                    }
+                    
+                    const compactData = JSON.parse(jsonString);
+                    
+                    const quizData = {
+                        title: compactData[0],
+                        tags: compactData[1] || [],
+                        type: compactData[2] === 1 ? 'flashcard' : 'quiz',
+                        answerCount: compactData[3] || 4
+                    };
+                    
+                    if (compactData[2] === 1) {
+                        quizData.cards = compactData[4].map(c => ({
+                            front: c[0],
+                            back: c[1],
+                            ...(c[2] && { category: c[2] })
+                        }));
+                    } else {
+                        quizData.questions = compactData[4].map(q => ({
+                            question: q[0],
+                            correct: q[1],
+                            wrong: q[2],
+                            ...(q[3] && { group: q[3] }),
+                            ...(q[4] && { type: q[4] })
+                        }));
+                    }
+                    
+                    const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                    const exists = quizzes.find(q => 
+                        q.title === quizData.title && 
+                        q.type === quizData.type &&
+                        JSON.stringify(q.questions || q.cards) === JSON.stringify(quizData.questions || quizData.cards)
+                    );
+                    
+                    if (exists) {
+                        showToast('Quiz już istnieje w Twojej bibliotece!', 'info');
+                        
+                        if (quizData.type === 'flashcard') {
+                            showFlashcardScreen(exists.id);
+                        } else {
+                            showPreQuizScreen(exists.id);
+                        }
+                    } else {
+                        const newQuiz = {
+                            ...quizData,
+                            id: Date.now().toString(),
+                            createdAt: new Date().toISOString()
+                        };
+                        
+                        quizzes.push(newQuiz);
+                        localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                        
+                        showToast('Quiz został dodany! 🎉', 'success');
+                        
+                        if (quizData.type === 'flashcard') {
+                            showFlashcardScreen(newQuiz.id);
+                        } else {
+                            showPreQuizScreen(newQuiz.id);
+                        }
+                    }
+                    
+                    history.replaceState(null, null, window.location.pathname);
+                    
+                } catch (error) {
+                    showToast('Błąd wczytywania udostępnionego quizu: ' + error.message, 'error');
+                    showHomeScreen();
+                }
+            } else {
+                showHomeScreen();
+            }
         }
 
         // ==================== QUIZ GAMEPLAY ====================
@@ -2723,15 +3060,17 @@ Przykład:
             `;
         }
 
-         function retakeQuiz() {
-        showPreQuizScreen(currentQuiz.id);
+        function retakeQuiz() {
+            showPreQuizScreen(currentQuiz.id);
         }
+
         function endQuizEarly() {
-        if (confirm('Czy na pewno chcesz zakończyć quiz?')) {
-            stopTimer();
-            showHomeScreen();
+            if (confirm('Czy na pewno chcesz zakończyć quiz?')) {
+                stopTimer();
+                showHomeScreen();
+            }
         }
-    }
+
         function retakeWrongAnswers() {
             if (mistakes.length === 0) {
                 showToast('Brak błędnych odpowiedzi', 'info');
@@ -2834,35 +3173,34 @@ Przykład:
         }
 
         function displayFlashcard() {
-        if (currentCardIndex >= cards.length) {
-            endFlashcards();
-            return;
-        }
+            if (currentCardIndex >= cards.length) {
+                endFlashcards();
+                return;
+            }
 
-        const card = cards[currentCardIndex];
-        const flashcardEl = document.getElementById('flashcard');
-        const wasFlipped = flashcardEl.classList.contains('flipped');
+            const card = cards[currentCardIndex];
+            const flashcardEl = document.getElementById('flashcard');
+            const wasFlipped = flashcardEl.classList.contains('flipped');
 
-        flashcardEl.classList.remove('flipped');
-        document.getElementById('flashcardActions').style.display = 'none';
-        isCardFlipped = false;
+            flashcardEl.classList.remove('flipped');
+            document.getElementById('flashcardActions').style.display = 'none';
+            isCardFlipped = false;
 
-        const frontSide = document.querySelector('.flashcard-front');
-        const backSide = document.querySelector('.flashcard-back');
-        if (frontSide) frontSide.scrollTop = 0;
-        if (backSide) backSide.scrollTop = 0;
-        
-        document.getElementById('flashcardFront').textContent = card.front;
-
-        // Aktualizuj back tylko po zakończeniu animacji obrotu (jeśli była obrócona)
-        const delay = wasFlipped ? 300 : 0;
-        setTimeout(() => {
-            document.getElementById('flashcardBack').textContent = card.back;
+            const frontSide = document.querySelector('.flashcard-front');
+            const backSide = document.querySelector('.flashcard-back');
+            if (frontSide) frontSide.scrollTop = 0;
             if (backSide) backSide.scrollTop = 0;
-        }, delay);
+            
+            document.getElementById('flashcardFront').textContent = card.front;
 
-        updateFlashcardProgress();
-    }
+            const delay = wasFlipped ? 300 : 0;
+            setTimeout(() => {
+                document.getElementById('flashcardBack').textContent = card.back;
+                if (backSide) backSide.scrollTop = 0;
+            }, delay);
+
+            updateFlashcardProgress();
+        }
 
         function flipCard() {
             if (!isCardFlipped && !isTransitioning) {
@@ -2936,7 +3274,7 @@ Przykład:
 
         function restartFlashcards() {
             const difficultCards = [];
-            for (let i = 0; i < cardRatings.length; i++) {
+                        for (let i = 0; i < cardRatings.length; i++) {
                 if (cardRatings[i] === 'medium' || cardRatings[i] === 'hard') {
                     difficultCards.push(currentFlashcards.cards[i]);
                 }
@@ -3089,339 +3427,344 @@ Przykład:
 
         // ==================== SHARING ====================
         async function shareQuiz(quizId) {
-        const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-        const quiz = quizzes.find(q => q.id === quizId);
-        
-        if (!quiz) {
-            showToast('Quiz nie znaleziony', 'error');
-            return;
-        }
-        
-        // Pokaż modal z loadingiem
-        document.getElementById('shareModal').classList.remove('hidden');
-        document.getElementById('shareContent').innerHTML = `
-            <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 14px; text-align: center;">
-                <span style="font-size: 32px;">⏳</span><br>
-                Generowanie linku...
-            </p>
-        `;
-        
-        // Przygotuj dane do udostępnienia (ultra-kompresja)
-        const shareData = [
-            quiz.title,                           // [0] title
-            quiz.tags && quiz.tags.length ? quiz.tags : null,  // [1] tags (null jeśli puste)
-            quiz.type === 'flashcard' ? 1 : 0,   // [2] type (1=flashcard, 0=quiz)
-            quiz.answerCount || 4                 // [3] answerCount
-        ];
-        
-        if (quiz.type === 'flashcard') {
-            // [4] cards as array of arrays: [front, back, category?]
-            shareData[4] = quiz.cards.map(card => {
-                const arr = [card.front, card.back];
-                if (card.category) arr[2] = card.category;
-                return arr;
-            });
-        } else {
-            // [4] questions as array of arrays: [question, correct, [wrong1,wrong2,...], group?, type?]
-            shareData[4] = quiz.questions.map(q => {
-                const arr = [q.question, q.correct, q.wrong];
-                if (q.group) arr[3] = q.group;
-                if (q.type) arr[4] = q.type;
-                return arr;
-            });
-        }
-        
-        try {
-            // Ultra-kompresja: JSON.stringify + LZ-String Base64
-            const jsonString = JSON.stringify(shareData);
-            const compressed = LZString.compressToBase64(jsonString)
-                .replace(/\+/g, '-')
-                .replace(/\//g, '_')
-                .replace(/=/g, '');
+            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const quiz = quizzes.find(q => q.id === quizId);
             
-            // Utwórz pełny link
-            const baseUrl = 'https://tymoeks.github.io/quizapp/';
-            const fullUrl = `${baseUrl}#q=${compressed}`;
-            
-            let shortUrl = null;
-            let shortUrlError = false;
-            
-            // Spróbuj skrócić link przez is.gd (dla linków >500 znaków)
-            if (fullUrl.length > 500) {
-                try {
-                    const response = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`);
-                    const data = await response.json();
-                    
-                    if (data.shorturl) {
-                        shortUrl = data.shorturl;
-                    } else if (data.errormessage) {
-                        shortUrlError = true;
-                        console.error('is.gd error:', data.errormessage);
-                    }
-                } catch (error) {
-                    shortUrlError = true;
-                    console.error('is.gd API error:', error);
-                }
+            if (!quiz) {
+                showToast('Quiz nie znaleziony', 'error');
+                return;
             }
             
-            // Pokaż wyniki w modalu
-            const itemCount = quiz.type === 'flashcard' ? quiz.cards.length : quiz.questions.length;
-            const itemType = quiz.type === 'flashcard' ? 'fiszek' : 'pytań';
-            
-            let contentHtml = `
-                <div style="margin-bottom: 24px;">
-                    <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
-                        <strong>${quiz.title}</strong><br>
-                        ${itemCount} ${itemType}
-                    </p>
-                </div>
-            `;
-            
-                        if (shortUrl) {
-                            // Pokaż skrócony link (dla dużych quizów)
-                            contentHtml += `
-                                <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                                ✅ Link skrócony (działa w Messenger i WhatsApp):
-                                </p>
-                                <input type="text" value="${shortUrl}" readonly style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--surface);" onclick="this.select()" id="shortUrlInput">
-                                <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Skrócony link skopiowany! 🔗')" style="width: 100%; margin-top: 12px;">
-                                📋 Kopiuj link
-                                </button>
-                                </div>
-                                ${itemCount <= 25 ? `<div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;"> <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;"> 📱 Kod QR (zeskanuj telefonem): </p> <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div> </div>` : ''}
-                                <p style="font-size: 12px; color: var(--success); text-align: center; margin-bottom: 16px;">
-                                ✅ Link pokazuje nazwę strony w podglądzie
-                                </p>
-                                <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
-                                    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                                        📱 Kod QR (zeskanuj telefonem):
-                                    </p>
-                                    <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div>
-                                </div>
-                                <p style="font-size: 12px; color: var(--text-secondary); text-align: center; margin-bottom: 16px;">
-                                    ℹ️ Skrócony link nie pokazuje podglądu, ale zawsze działa
-                                </p>
-                                <details style="margin-top: 16px;">
-                                    <summary style="cursor: pointer; color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
-                                        Pokaż pełny link (ma podgląd, ale może być za długi)
-                                    </summary>
-                                    <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-top: 8px;">
-                                        <input type="text" value="${fullUrl}" readonly 
-                                            style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: monospace; background: var(--surface);" 
-                                            onclick="this.select()">
-                                        <button class="btn btn-small" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Pełny link skopiowany!')" 
-                                            style="width: 100%; margin-top: 8px;">
-                                            📋 Kopiuj pełny link
-                                        </button>
-                                    </div>
-                                </details>
-                            `;
-            
-                            // Generuj QR Code tylko dla quizów ≤25 elementów
-                            if (itemCount <= 25) {
-                                setTimeout(() => {
-                                    const qrDiv = document.getElementById('qrcode');
-                                    if (qrDiv) {
-                                        qrDiv.innerHTML = '';
-                                        new QRCode(qrDiv, {
-                                            text: shortUrl,
-                                            width: 160,
-                                            height: 160,
-                                            colorDark: '#2C3E50',
-                                            colorLight: '#ffffff',
-                                            correctLevel: QRCode.CorrectLevel.M
-                                        });
-                                    }
-                                }, 100);
-                            }            } else {
-                // Pokaż tylko pełny link (dla małych quizów lub gdy API nie działa)
-                const warningHtml = shortUrlError ? `
-                    <p style="color: var(--warning); font-size: 13px; margin-bottom: 12px;">
-                        ⚠️ Nie udało się skrócić linku. W Messengerze kliknij w sam tekst linku, nie w podgląd.
-                    </p>
-                ` : '';
-                
-                contentHtml += `
-                    ${warningHtml}
-                    <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
-                        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                            ${fullUrl.length > 500 ? '📝 Link (może być długi):' : '✅ Link do udostępnienia (z podglądem):'}
-                        </p>
-                        <input type="text" value="${fullUrl}" readonly 
-                            style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: monospace; background: var(--surface); word-break: break-all;"
-                            onclick="this.select()" id="fullUrlInput">
-                        <button class="btn btn-primary" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Link skopiowany! 🔗')" 
-                            style="width: 100%; margin-top: 12px;">
-                            📋 Kopiuj link
-                        </button>
-                    </div>
-                    ${fullUrl.length < 500 ? `
-                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
-                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                                📱 Kod QR (zeskanuj telefonem):
-                            </p>
-                            <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div>
-                        </div>
-                    ` : ''}
-                    ${fullUrl.length > 500 ? `
-                        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
-                            💡 <strong>Wskazówki:</strong><br>
-                            • W Messengerze: Kliknij w <strong>sam tekst linku</strong>, nie w podgląd<br>
-                            • W WhatsApp: Zaznacz i skopiuj <strong>cały link</strong><br>
-                            • Alternatywnie: Użyj przycisku Eksportuj i wyślij plik
-                        </p>
-                    ` : `
-                        <p style="font-size: 12px; color: var(--success); text-align: center;">
-                            ✅ Ten link pokaże podgląd w Messengerze i WhatsApp
-                        </p>
-                    `}
-                `;
-                
-                // Generuj QR Code dla krótkich linków
-                if (fullUrl.length < 500) {
-                    setTimeout(() => {
-                        const qrDiv = document.getElementById('qrcode');
-                        if (qrDiv) {
-                            qrDiv.innerHTML = '';
-                            new QRCode(qrDiv, {
-                                text: fullUrl,
-                                width: 160,
-                                height: 160,
-                                colorDark: '#2C3E50',
-                                colorLight: '#ffffff',
-                                correctLevel: QRCode.CorrectLevel.M
-                            });
-                        }
-                    }, 100);
-                }
-            }
-            
-            document.getElementById('shareContent').innerHTML = contentHtml;
-            
-        } catch (error) {
+            // Pokaż modal z loadingiem
+            document.getElementById('shareModal').classList.remove('hidden');
             document.getElementById('shareContent').innerHTML = `
-                <p style="color: var(--danger); text-align: center;">
-                    ❌ Błąd: ${error.message}
+                <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 14px; text-align: center;">
+                    <span style="font-size: 32px;">⏳</span><br>
+                    Generowanie linku...
                 </p>
             `;
-        }
-    }
-    
-    function copyToClipboard(text, message) {
-        navigator.clipboard.writeText(text).then(() => {
-            showToast(message, 'success');
-            closeModal('shareModal');
-        }).catch(() => {
-            showToast('Nie udało się skopiować', 'error');
-        });
-    }        
-        function checkSharedQuiz() {
-        const hash = window.location.hash;
-        
-        if (hash.startsWith('#q=')) {
-            const compressed = hash.substring(3);
             
-            try {
-                // Spróbuj nowy format (Base64)
-                let jsonString = null;
-                
-                const base64 = compressed
-                    .replace(/-/g, '+')
-                    .replace(/_/g, '/');
-                
-                jsonString = LZString.decompressFromBase64(base64);
-                
-                // Fallback do starego formatu (EncodedURIComponent)
-                if (!jsonString) {
-                    jsonString = LZString.decompressFromEncodedURIComponent(compressed);
-                }
-                
-                if (!jsonString) {
-                    throw new Error('Nie udało się zdekompresować danych');
-                }
-                
-                const compactData = JSON.parse(jsonString);
-                
-                // Przekształć z ultra-kompresji: [title, tags, type, answerCount, items]
-                const quizData = {
-                    title: compactData[0],
-                    tags: compactData[1] || [],
-                    type: compactData[2] === 1 ? 'flashcard' : 'quiz',
-                    answerCount: compactData[3] || 4
-                };
-                
-                if (compactData[2] === 1) {
-                    // Flashcards: [front, back, category?]
-                    quizData.cards = compactData[4].map(c => ({
-                        front: c[0],
-                        back: c[1],
-                        ...(c[2] && { category: c[2] })
-                    }));
-                } else {
-                    // Questions: [question, correct, [wrong...], group?, type?]
-                    quizData.questions = compactData[4].map(q => ({
-                        question: q[0],
-                        correct: q[1],
-                        wrong: q[2],
-                        ...(q[3] && { group: q[3] }),
-                        ...(q[4] && { type: q[4] })
-                    }));
-                }
-                
-                // Sprawdź czy już istnieje
-                const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-                const exists = quizzes.find(q => 
-                    q.title === quizData.title && 
-                    q.type === quizData.type &&
-                    JSON.stringify(q.questions || q.cards) === JSON.stringify(quizData.questions || quizData.cards)
-                );
-                
-                if (exists) {
-                    showToast('Quiz już istnieje w Twojej bibliotece!', 'info');
-                    
-                    if (quizData.type === 'flashcard') {
-                        showFlashcardScreen(exists.id);
-                    } else {
-                        showPreQuizScreen(exists.id);
-                    }
-                } else {
-                    const newQuiz = {
-                        ...quizData,
-                        id: Date.now().toString(),
-                        createdAt: new Date().toISOString()
-                    };
-                    
-                    quizzes.push(newQuiz);
-                    localStorage.setItem('quizzes', JSON.stringify(quizzes));
-                    
-                    showToast('Quiz został dodany! 🎉', 'success');
-                    
-                    if (quizData.type === 'flashcard') {
-                        showFlashcardScreen(newQuiz.id);
-                    } else {
-                        showPreQuizScreen(newQuiz.id);
-                    }
-                }
-                
-                // Wyczyść hash
-                history.replaceState(null, null, window.location.pathname);
-                
-            } catch (error) {
-                showToast('Błąd wczytywania udostępnionego quizu: ' + error.message, 'error');
-                showHomeScreen();
-            }
-        } else {
-            showHomeScreen();
-        }
-    }        
-            // ==================== IMPORT/EXPORT ====================
-            function copyPrompt() {
-                const prompt = document.getElementById('aiPrompt').textContent;
-                navigator.clipboard.writeText(prompt).then(() => {
-                    showToast('Prompt skopiowany do schowka!', 'success');
+            // Przygotuj dane do udostępnienia (ultra-kompresja)
+            const shareData = [
+                quiz.title,                           // [0] title
+                quiz.tags && quiz.tags.length ? quiz.tags : null,  // [1] tags (null jeśli puste)
+                quiz.type === 'flashcard' ? 1 : 0,   // [2] type (1=flashcard, 0=quiz)
+                quiz.answerCount || 4                 // [3] answerCount
+            ];
+            
+            if (quiz.type === 'flashcard') {
+                // [4] cards as array of arrays: [front, back, category?]
+                shareData[4] = quiz.cards.map(card => {
+                    const arr = [card.front, card.back];
+                    if (card.category) arr[2] = card.category;
+                    return arr;
+                });
+            } else {
+                // [4] questions as array of arrays: [question, correct, [wrong1,wrong2,...], group?, type?]
+                shareData[4] = quiz.questions.map(q => {
+                    const arr = [q.question, q.correct, q.wrong];
+                    if (q.group) arr[3] = q.group;
+                    if (q.type) arr[4] = q.type;
+                    return arr;
                 });
             }
+            
+            try {
+                // Ultra-kompresja: JSON.stringify + LZ-String Base64
+                const jsonString = JSON.stringify(shareData);
+                const compressed = LZString.compressToBase64(jsonString)
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .replace(/=/g, '');
+                
+                // Utwórz pełny link
+                const baseUrl = 'https://tymoeks.github.io/quizapp/';
+                const fullUrl = `${baseUrl}#q=${compressed}`;
+                
+                let shortUrl = null;
+                let shortUrlError = false;
+                
+                // Spróbuj skrócić link przez is.gd (dla linków >500 znaków)
+                if (fullUrl.length > 500) {
+                    try {
+                        const response = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`);
+                        const data = await response.json();
+                        
+                        if (data.shorturl) {
+                            shortUrl = data.shorturl;
+                        } else if (data.errormessage) {
+                            shortUrlError = true;
+                            console.error('is.gd error:', data.errormessage);
+                        }
+                    } catch (error) {
+                        shortUrlError = true;
+                        console.error('is.gd API error:', error);
+                    }
+                }
+                
+                // Pokaż wyniki w modalu
+                const itemCount = quiz.type === 'flashcard' ? quiz.cards.length : quiz.questions.length;
+                const itemType = quiz.type === 'flashcard' ? 'fiszek' : 'pytań';
+                
+                let contentHtml = `
+                    <div style="margin-bottom: 24px;">
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
+                            <strong>${quiz.title}</strong><br>
+                            ${itemCount} ${itemType}
+                        </p>
+                    </div>
+                `;
+                
+                if (shortUrl) {
+                    // Pokaż skrócony link (dla dużych quizów)
+                    contentHtml += `
+                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                                ✅ Link skrócony (działa w Messenger i WhatsApp):
+                            </p>
+                            <input type="text" value="${shortUrl}" readonly 
+                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--surface);"
+                                onclick="this.select()" id="shortUrlInput">
+                            <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Skrócony link skopiowany! 🔗')" 
+                                style="width: 100%; margin-top: 12px;">
+                                📋 Kopiuj link
+                            </button>
+                        </div>
+                        ${itemCount <= 25 ? `
+                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                                    📱 Kod QR (zeskanuj telefonem):
+                                </p>
+                                <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div>
+                            </div>
+                        ` : ''}
+                        <p style="font-size: 12px; color: var(--success); text-align: center; margin-bottom: 16px;">
+                            ✅ Link pokazuje nazwę strony w podglądzie
+                        </p>
+                        <details style="margin-top: 16px;">
+                            <summary style="cursor: pointer; color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
+                                Pokaż pełny link (zaawansowane)
+                            </summary>
+                            <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-top: 8px;">
+                                <input type="text" value="${fullUrl}" readonly 
+                                    style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: monospace; background: var(--surface);"
+                                    onclick="this.select()">
+                                <button class="btn btn-small" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Pełny link skopiowany!')" 
+                                    style="width: 100%; margin-top: 8px;">
+                                    📋 Kopiuj pełny link
+                                </button>
+                            </div>
+                        </details>
+                    `;
+                    
+                    // Generuj QR Code tylko dla quizów ≤25 elementów
+                    if (itemCount <= 25) {
+                        setTimeout(() => {
+                            const qrDiv = document.getElementById('qrcode');
+                            if (qrDiv) {
+                                qrDiv.innerHTML = '';
+                                new QRCode(qrDiv, {
+                                    text: shortUrl,
+                                    width: 160,
+                                    height: 160,
+                                    colorDark: '#2C3E50',
+                                    colorLight: '#ffffff',
+                                    correctLevel: QRCode.CorrectLevel.M
+                                });
+                            }
+                        }, 100);
+                    }
+                } else {
+                    // Pokaż tylko pełny link (dla małych quizów lub gdy API nie działa)
+                    const warningHtml = shortUrlError ? `
+                        <p style="color: var(--warning); font-size: 13px; margin-bottom: 12px;">
+                            ⚠️ Nie udało się skrócić linku. W Messengerze kliknij w sam tekst linku, nie w podgląd.
+                        </p>
+                    ` : '';
+                    
+                    contentHtml += `
+                        ${warningHtml}
+                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                                ${fullUrl.length > 500 ? '📝 Link (może być długi):' : '✅ Link do udostępnienia (z podglądem):'}
+                            </p>
+                            <input type="text" value="${fullUrl}" readonly 
+                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: monospace; background: var(--surface); word-break: break-all;"
+                                onclick="this.select()" id="fullUrlInput">
+                            <button class="btn btn-primary" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Link skopiowany! 🔗')" 
+                                style="width: 100%; margin-top: 12px;">
+                                📋 Kopiuj link
+                            </button>
+                        </div>
+                        ${fullUrl.length < 500 ? `
+                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                                    📱 Kod QR (zeskanuj telefonem):
+                                </p>
+                                <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div>
+                            </div>
+                        ` : ''}
+                        ${fullUrl.length > 500 ? `
+                            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+                                💡 <strong>Wskazówki:</strong><br>
+                                • W Messengerze: Kliknij w <strong>sam tekst linku</strong>, nie w podgląd<br>
+                                • W WhatsApp: Zaznacz i skopiuj <strong>cały link</strong><br>
+                                • Alternatywnie: Użyj przycisku Eksportuj i wyślij plik
+                            </p>
+                        ` : `
+                            <p style="font-size: 12px; color: var(--success); text-align: center;">
+                                ✅ Ten link pokaże podgląd w Messengerze i WhatsApp
+                            </p>
+                        `}
+                    `;
+                    
+                    // Generuj QR Code dla krótkich linków
+                    if (fullUrl.length < 500) {
+                        setTimeout(() => {
+                            const qrDiv = document.getElementById('qrcode');
+                            if (qrDiv) {
+                                qrDiv.innerHTML = '';
+                                new QRCode(qrDiv, {
+                                    text: fullUrl,
+                                    width: 160,
+                                    height: 160,
+                                    colorDark: '#2C3E50',
+                                    colorLight: '#ffffff',
+                                    correctLevel: QRCode.CorrectLevel.M
+                                });
+                            }
+                        }, 100);
+                    }
+                }
+                
+                document.getElementById('shareContent').innerHTML = contentHtml;
+                
+            } catch (error) {
+                document.getElementById('shareContent').innerHTML = `
+                    <p style="color: var(--danger); text-align: center;">
+                        ❌ Błąd: ${error.message}
+                    </p>
+                `;
+            }
+        }
+        
+        function copyToClipboard(text, message) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(message, 'success');
+                closeModal('shareModal');
+            }).catch(() => {
+                showToast('Nie udało się skopiować', 'error');
+            });
+        }
+
+        function checkSharedQuiz() {
+            const hash = window.location.hash;
+            
+            if (hash.startsWith('#q=')) {
+                const compressed = hash.substring(3);
+                
+                try {
+                    // Spróbuj nowy format (Base64)
+                    let jsonString = null;
+                    
+                    const base64 = compressed
+                        .replace(/-/g, '+')
+                        .replace(/_/g, '/');
+                    
+                    jsonString = LZString.decompressFromBase64(base64);
+                    
+                    // Fallback do starego formatu (EncodedURIComponent)
+                    if (!jsonString) {
+                        jsonString = LZString.decompressFromEncodedURIComponent(compressed);
+                    }
+                    
+                    if (!jsonString) {
+                        throw new Error('Nie udało się zdekompresować danych');
+                    }
+                    
+                    const compactData = JSON.parse(jsonString);
+                    
+                    // Przekształć z ultra-kompresji: [title, tags, type, answerCount, items]
+                    const quizData = {
+                        title: compactData[0],
+                        tags: compactData[1] || [],
+                        type: compactData[2] === 1 ? 'flashcard' : 'quiz',
+                        answerCount: compactData[3] || 4
+                    };
+                    
+                    if (compactData[2] === 1) {
+                        // Flashcards: [front, back, category?]
+                        quizData.cards = compactData[4].map(c => ({
+                            front: c[0],
+                            back: c[1],
+                            ...(c[2] && { category: c[2] })
+                        }));
+                    } else {
+                        // Questions: [question, correct, [wrong...], group?, type?]
+                        quizData.questions = compactData[4].map(q => ({
+                            question: q[0],
+                            correct: q[1],
+                            wrong: q[2],
+                            ...(q[3] && { group: q[3] }),
+                            ...(q[4] && { type: q[4] })
+                        }));
+                    }
+                    
+                    // Sprawdź czy już istnieje
+                    const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                    const exists = quizzes.find(q => 
+                        q.title === quizData.title && 
+                        q.type === quizData.type &&
+                        JSON.stringify(q.questions || q.cards) === JSON.stringify(quizData.questions || quizData.cards)
+                    );
+                    
+                    if (exists) {
+                        showToast('Quiz już istnieje w Twojej bibliotece!', 'info');
+                        
+                        if (quizData.type === 'flashcard') {
+                            showFlashcardScreen(exists.id);
+                        } else {
+                            showPreQuizScreen(exists.id);
+                        }
+                    } else {
+                        const newQuiz = {
+                            ...quizData,
+                            id: Date.now().toString(),
+                            createdAt: new Date().toISOString()
+                        };
+                        
+                        quizzes.push(newQuiz);
+                        localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                        
+                        showToast('Quiz został dodany! 🎉', 'success');
+                        
+                        if (quizData.type === 'flashcard') {
+                            showFlashcardScreen(newQuiz.id);
+                        } else {
+                            showPreQuizScreen(newQuiz.id);
+                        }
+                    }
+                    
+                    // Wyczyść hash
+                    history.replaceState(null, null, window.location.pathname);
+                    
+                } catch (error) {
+                    showToast('Błąd wczytywania udostępnionego quizu: ' + error.message, 'error');
+                    showHomeScreen();
+                }
+            } else {
+                showHomeScreen();
+            }
+        }
+
+        // ==================== IMPORT/EXPORT ====================
+        function copyPrompt() {
+            const prompt = document.getElementById('aiPrompt').textContent;
+            navigator.clipboard.writeText(prompt).then(() => {
+                showToast('Prompt skopiowany do schowka!', 'success');
+            });
+        }
+
         function showImportModal() {
             document.getElementById('importModal').classList.remove('hidden');
         }
@@ -3442,80 +3785,80 @@ Przykład:
         }
 
         function importQuiz() {
-        const jsonText = document.getElementById('importJson').value;
-        const mergeMode = true; // Zawsze włączony merge mode
-        
-        try {
-            const data = JSON.parse(jsonText);
+            const jsonText = document.getElementById('importJson').value;
+            const mergeMode = true; // Zawsze włączony merge mode
             
-            if (Array.isArray(data)) {
-                const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-                let addedCount = 0;
-                let skippedCount = 0;
+            try {
+                const data = JSON.parse(jsonText);
                 
-                data.forEach(quiz => {
+                if (Array.isArray(data)) {
+                    const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                    let addedCount = 0;
+                    let skippedCount = 0;
+                    
+                    data.forEach(quiz => {
+                        // Sprawdź czy quiz już istnieje
+                        const exists = quizzes.find(q => 
+                            q.title === quiz.title && 
+                            q.type === quiz.type &&
+                            JSON.stringify(q.questions || q.cards) === JSON.stringify(quiz.questions || quiz.cards)
+                        );
+                        
+                        if (exists) {
+                            skippedCount++;
+                            return;
+                        }
+                        
+                        quiz.id = Date.now().toString() + Math.random();
+                        quiz.createdAt = new Date().toISOString();
+                        quizzes.push(quiz);
+                        addedCount++;
+                    });
+                    
+                    localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                    
+                    if (skippedCount > 0) {
+                        showToast(`Zaimportowano ${addedCount} quizów, pominięto ${skippedCount} duplikatów`, 'success');
+                    } else {
+                        showToast(`Zaimportowano ${addedCount} quizów!`, 'success');
+                    }
+                } else {
+                    const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                    
                     // Sprawdź czy quiz już istnieje
                     const exists = quizzes.find(q => 
-                        q.title === quiz.title && 
-                        q.type === quiz.type &&
-                        JSON.stringify(q.questions || q.cards) === JSON.stringify(quiz.questions || quiz.cards)
+                        q.title === data.title && 
+                        q.type === data.type &&
+                        JSON.stringify(q.questions || q.cards) === JSON.stringify(data.questions || data.cards)
                     );
                     
                     if (exists) {
-                        skippedCount++;
+                        showToast('Quiz już istnieje w bibliotece', 'info');
+                        closeModal('importModal');
+                        document.getElementById('importJson').value = '';
+                        document.getElementById('importFile').value = '';
                         return;
                     }
                     
-                    quiz.id = Date.now().toString() + Math.random();
-                    quiz.createdAt = new Date().toISOString();
+                    const quiz = {
+                        ...data,
+                        id: Date.now().toString(),
+                        createdAt: new Date().toISOString()
+                    };
+                    
                     quizzes.push(quiz);
-                    addedCount++;
-                });
-                
-                localStorage.setItem('quizzes', JSON.stringify(quizzes));
-                
-                if (skippedCount > 0) {
-                    showToast(`Zaimportowano ${addedCount} quizów, pominięto ${skippedCount} duplikatów`, 'success');
-                } else {
-                    showToast(`Zaimportowano ${addedCount} quizów!`, 'success');
-                }
-            } else {
-                const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-                
-                // Sprawdź czy quiz już istnieje
-                const exists = quizzes.find(q => 
-                    q.title === data.title && 
-                    q.type === data.type &&
-                    JSON.stringify(q.questions || q.cards) === JSON.stringify(data.questions || data.cards)
-                );
-                
-                if (exists) {
-                    showToast('Quiz już istnieje w bibliotece', 'info');
-                    closeModal('importModal');
-                    document.getElementById('importJson').value = '';
-                    document.getElementById('importFile').value = '';
-                    return;
+                    localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                    showToast('Quiz zaimportowany!', 'success');
                 }
                 
-                const quiz = {
-                    ...data,
-                    id: Date.now().toString(),
-                    createdAt: new Date().toISOString()
-                };
-                
-                quizzes.push(quiz);
-                localStorage.setItem('quizzes', JSON.stringify(quizzes));
-                showToast('Quiz zaimportowany!', 'success');
+                closeModal('importModal');
+                document.getElementById('importJson').value = '';
+                document.getElementById('importFile').value = '';
+                loadQuizzes();
+            } catch (error) {
+                showToast('Błąd importu: ' + error.message, 'error');
             }
-            
-            closeModal('importModal');
-            document.getElementById('importJson').value = '';
-            document.getElementById('importFile').value = '';
-            loadQuizzes();
-        } catch (error) {
-            showToast('Błąd importu: ' + error.message, 'error');
         }
-    }
 
         function exportQuiz(quizId) {
             const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
@@ -3739,70 +4082,68 @@ Przykład:
         }
 
         // ==================== TOAST SYSTEM ====================
-        let toastTimeout = null;
-
-    function showToast(message, type = 'info') {
-        const newToast = { message, type };
-        
-        if (activeToast) {
-            // Jeśli jest aktywne powiadomienie
-            queuedToast = newToast; // Nadpisz kolejkę
+        function showToast(message, type = 'info') {
+            const newToast = { message, type };
             
-            // Przyspiesz ukrycie aktywnego powiadomienia (0.5s)
-            if (toastTimeout) clearTimeout(toastTimeout);
-            hideActiveToast(500, 500);
-        } else {
-            // Brak aktywnego powiadomienia - wyświetl od razu
-            displayToast(newToast);
+            if (activeToast) {
+                // Jeśli jest aktywne powiadomienie
+                queuedToast = newToast; // Nadpisz kolejkę
+                
+                // Przyspiesz ukrycie aktywnego powiadomienia (0.5s)
+                if (toastTimeout) clearTimeout(toastTimeout);
+                hideActiveToast(500, 500);
+            } else {
+                // Brak aktywnego powiadomienia - wyświetl od razu
+                displayToast(newToast);
+            }
         }
-    }
 
-    function displayToast(toastData) {
-        const toast = document.createElement('div');
-        toast.className = `toast ${toastData.type}`;
-        toast.textContent = toastData.message;
-        document.body.appendChild(toast);
-        
-        activeToast = toast;
-        
-        // Pokaż z animacją
-        setTimeout(() => toast.classList.add('toast-show'), 10);
-        
-        // Auto-hide - 3 sekundy jeśli brak kolejki, 0.5s jeśli jest kolejka
-        const delay = queuedToast ? 500 : 3000;
-        toastTimeout = setTimeout(() => hideActiveToast(300, delay), delay);
-    }
+        function displayToast(toastData) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${toastData.type}`;
+            toast.textContent = toastData.message;
+            document.body.appendChild(toast);
+            
+            activeToast = toast;
+            
+            // Pokaż z animacją
+            setTimeout(() => toast.classList.add('toast-show'), 10);
+            
+            // Auto-hide - 3 sekundy jeśli brak kolejki, 0.5s jeśli jest kolejka
+            const delay = queuedToast ? 500 : 3000;
+            toastTimeout = setTimeout(() => hideActiveToast(300, delay), delay);
+        }
 
-    function hideActiveToast(animDelay, totalDelay) {
-        if (!activeToast) return;
-        
-        const toast = activeToast;
-        
-        // Jeśli totalDelay jest większy niż animDelay, czekaj przed animacją
-        const waitTime = totalDelay ? totalDelay - animDelay : 0;
-        
-        setTimeout(() => {
-            toast.classList.remove('toast-show');
-            toast.classList.add('toast-hide');
+        function hideActiveToast(animDelay, totalDelay) {
+            if (!activeToast) return;
+            
+            const toast = activeToast;
+            
+            // Jeśli totalDelay jest większy niż animDelay, czekaj przed animacją
+            const waitTime = totalDelay ? totalDelay - animDelay : 0;
             
             setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.remove();
-                }
+                toast.classList.remove('toast-show');
+                toast.classList.add('toast-hide');
                 
-                // Sprawdź czy jest coś w kolejce
-                if (activeToast === toast) {
-                    activeToast = null;
-                    
-                    if (queuedToast) {
-                        const next = queuedToast;
-                        queuedToast = null;
-                        displayToast(next);
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
                     }
-                }
-            }, animDelay);
-        }, waitTime);
-    }
+                    
+                    // Sprawdź czy jest coś w kolejce
+                    if (activeToast === toast) {
+                        activeToast = null;
+                        
+                        if (queuedToast) {
+                            const next = queuedToast;
+                            queuedToast = null;
+                            displayToast(next);
+                        }
+                    }
+                }, animDelay);
+            }, waitTime);
+        }
 
         // ==================== UTILITIES ====================
         function formatDate(dateString) {
