@@ -1,10 +1,26 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-     <meta charset="UTF-8">
+        <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuizApp 2.0 - Twórz i rozwiązuj quizy</title>
-    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>    <style>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tymoeks.github.io/quizapp/">
+    <meta property="og:title" content="QuizApp 2.0 - Quiz udostępniony">
+    <meta property="og:description" content="Ktoś udostępnił Ci quiz! Kliknij aby rozwiązać.">
+    <meta property="og:image" content="https://tymoeks.github.io/quizapp/preview.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://tymoeks.github.io/quizapp/">
+    <meta property="twitter:title" content="QuizApp 2.0 - Quiz udostępniony">
+    <meta property="twitter:description" content="Ktoś udostępnił Ci quiz! Kliknij aby rozwiązać.">
+    <meta property="twitter:image" content="https://tymoeks.github.io/quizapp/preview.png">
+
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>    <style>
         * {
             margin: 0;
             padding: 0;
@@ -3157,33 +3173,61 @@ Przykład:
                 </div>
             `;
             
-            if (shortUrl) {
-                // Pokaż skrócony link (dla dużych quizów)
-                contentHtml += `
-                    <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
-                        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                            ✅ Link skrócony (działa w Messenger i WhatsApp):
-                        </p>
-                        <input type="text" value="${shortUrl}" readonly 
-                            style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--surface);"
-                            onclick="this.select()" id="shortUrlInput">
-                        <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Skrócony link skopiowany! 🔗')" 
-                            style="width: 100%; margin-top: 12px;">
-                            📋 Kopiuj skrócony link
-                        </button>
-                    </div>
-                    <details style="margin-top: 16px;">
-                        <summary style="cursor: pointer; color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
-                            Pokaż pełny link (zaawansowane)
-                        </summary>
-                        <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-top: 8px;">
-                            <input type="text" value="${fullUrl}" readonly 
-                                style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: monospace; background: var(--surface);"
-                                onclick="this.select()">
-                        </div>
-                    </details>
-                `;
-            } else {
+                        if (shortUrl) {
+                            // Pokaż skrócony link (dla dużych quizów)
+                            contentHtml += `
+                                <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                                    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                                        ✅ Link skrócony (działa wszędzie):
+                                    </p>
+                                    <input type="text" value="${shortUrl}" readonly 
+                                        style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--surface);"
+                                        onclick="this.select()" id="shortUrlInput">
+                                    <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Skrócony link skopiowany! 🔗')" 
+                                        style="width: 100%; margin-top: 12px;">
+                                        📋 Kopiuj link
+                                    </button>
+                                </div>
+                                <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
+                                    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                                        📱 Kod QR (zeskanuj telefonem):
+                                    </p>
+                                    <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div>
+                                </div>
+                                <p style="font-size: 12px; color: var(--text-secondary); text-align: center; margin-bottom: 16px;">
+                                    ℹ️ Skrócony link nie pokazuje podglądu, ale zawsze działa
+                                </p>
+                                <details style="margin-top: 16px;">
+                                    <summary style="cursor: pointer; color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
+                                        Pokaż pełny link (ma podgląd, ale może być za długi)
+                                    </summary>
+                                    <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-top: 8px;">
+                                        <input type="text" value="${fullUrl}" readonly 
+                                            style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: monospace; background: var(--surface);" 
+                                            onclick="this.select()">
+                                        <button class="btn btn-small" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Pełny link skopiowany!')" 
+                                            style="width: 100%; margin-top: 8px;">
+                                            📋 Kopiuj pełny link
+                                        </button>
+                                    </div>
+                                </details>
+                            `;
+            
+                            // Generuj QR Code
+                            setTimeout(() => {
+                                const qrDiv = document.getElementById('qrcode');
+                                if (qrDiv) {
+                                    qrDiv.innerHTML = '';
+                                    new QRCode(qrDiv, {
+                                        text: shortUrl,
+                                        width: 160,
+                                        height: 160,
+                                        colorDark: '#2C3E50',
+                                        colorLight: '#ffffff',
+                                        correctLevel: QRCode.CorrectLevel.M
+                                    });
+                                }
+                            }, 100);            } else {
                 // Pokaż tylko pełny link (dla małych quizów lub gdy API nie działa)
                 const warningHtml = shortUrlError ? `
                     <p style="color: var(--warning); font-size: 13px; margin-bottom: 12px;">
@@ -3195,7 +3239,7 @@ Przykład:
                     ${warningHtml}
                     <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
                         <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                            ${fullUrl.length > 500 ? '📝 Link (może być długi):' : '✅ Link do udostępnienia:'}
+                            ${fullUrl.length > 500 ? '📝 Link (może być długi):' : '✅ Link do udostępnienia (z podglądem):'}
                         </p>
                         <input type="text" value="${fullUrl}" readonly 
                             style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: monospace; background: var(--surface); word-break: break-all;"
@@ -3205,6 +3249,14 @@ Przykład:
                             📋 Kopiuj link
                         </button>
                     </div>
+                    ${fullUrl.length < 500 ? `
+                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                                📱 Kod QR (zeskanuj telefonem):
+                            </p>
+                            <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div>
+                        </div>
+                    ` : ''}
                     ${fullUrl.length > 500 ? `
                         <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
                             💡 <strong>Wskazówki:</strong><br>
@@ -3212,8 +3264,30 @@ Przykład:
                             • W WhatsApp: Zaznacz i skopiuj <strong>cały link</strong><br>
                             • Alternatywnie: Użyj przycisku Eksportuj i wyślij plik
                         </p>
-                    ` : ''}
+                    ` : `
+                        <p style="font-size: 12px; color: var(--success); text-align: center;">
+                            ✅ Ten link pokaże podgląd w Messengerze i WhatsApp
+                        </p>
+                    `}
                 `;
+                
+                // Generuj QR Code dla krótkich linków
+                if (fullUrl.length < 500) {
+                    setTimeout(() => {
+                        const qrDiv = document.getElementById('qrcode');
+                        if (qrDiv) {
+                            qrDiv.innerHTML = '';
+                            new QRCode(qrDiv, {
+                                text: fullUrl,
+                                width: 160,
+                                height: 160,
+                                colorDark: '#2C3E50',
+                                colorLight: '#ffffff',
+                                correctLevel: QRCode.CorrectLevel.M
+                            });
+                        }
+                    }, 100);
+                }
             }
             
             document.getElementById('shareContent').innerHTML = contentHtml;
