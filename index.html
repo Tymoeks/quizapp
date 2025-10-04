@@ -47,20 +47,29 @@
             --gradient-dark: linear-gradient(135deg, #ECF0F1 0%, #BDC3C7 100%);
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: var(--background);
-            min-height: 100vh;
-            color: var(--text);
-            line-height: 1.6;
-            position: relative;
-            overflow-x: hidden;
-            transition: background 0.3s ease, color 0.3s ease;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            user-select: none;
+           html {
+        overflow-x: hidden;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        -webkit-overflow-scrolling: touch;
         }
-
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background: var(--background);
+                min-height: 100vh;
+                height: 100%;
+                color: var(--text);
+                line-height: 1.6;
+                position: relative;
+                overflow-x: hidden;
+                overflow-y: auto;
+                transition: background 0.3s ease, color 0.3s ease;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                user-select: none;
+                -webkit-overflow-scrolling: touch;
+            }
         body::before {
             content: '';
             position: fixed;
@@ -109,14 +118,14 @@
             transform: rotate(-20deg);
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            position: relative;
-            z-index: 1;
+           .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        position: relative;
+        z-index: 1;
+        touch-action: pan-y;
         }
-
         .hidden {
             display: none !important;
         }
@@ -236,21 +245,21 @@
         }
 
         /* Buttons */
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: var(--surface-alt);
-            color: var(--text);
-            border: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
+           .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: var(--surface-alt);
+        color: var(--text);
+        border: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+        touch-action: manipulation;
         }
-
         .btn::before {
             content: '';
             position: absolute;
@@ -891,37 +900,37 @@
             align-items: center;
         }
 
-        .flashcard {
-            width: 100%;
-            height: 350px;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
-            cursor: pointer;
+           .flashcard {
+        width: 100%;
+        height: 350px;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+        cursor: pointer;
+        touch-action: manipulation;
         }
-
         .flashcard.flipped {
             transform: rotateY(180deg);
         }
 
-        .flashcard-side {
-            width: 100%;
-            height: 350px;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            border-radius: 16px;
-            box-shadow: 0 8px 24px var(--shadow);
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            padding: 0;
-            text-align: center;
-            background: var(--surface);
-            border: 2px solid var(--border);
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+           .flashcard-side {
+        width: 100%;
+        height: 350px;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px var(--shadow);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 0;
+        text-align: center;
+        background: var(--surface);
+        border: 2px solid var(--border);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
         }
-
         .flashcard-front {
             position: absolute;
             top: 0;
@@ -939,25 +948,25 @@
             border-color: var(--accent);
         }
 
-        .flashcard-content {
-            font-size: 1.5rem;
-            font-weight: 400;
-            color: var(--primary);
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            width: 100%;
-            min-height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 40px;
-            -webkit-touch-callout: none;
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            user-select: text;
+           .flashcard-content {
+        font-size: 1.5rem;
+        font-weight: 400;
+        color: var(--primary);
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        width: 100%;
+        min-height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px;
+        -webkit-touch-callout: none;
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        user-select: text;
+        touch-action: pan-y;
         }
-
         .flashcard-side::-webkit-scrollbar {
             width: 8px;
         }
@@ -1354,76 +1363,198 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .question-card {
-                padding: 32px 24px;
-            }
-
-            .answers-grid {
-                grid-template-columns: 1fr !important;
-            }
-
-            .quiz-list {
-                grid-template-columns: 1fr;
-            }
-
-            .stats {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .results-screen .stats {
-                flex-direction: row !important;
-                flex-wrap: wrap;
-            }
-            
-            .results-screen .stats > div {
-                min-width: 30%;
-            }
-
-            .search-bar {
-                flex-direction: column;
-            }
-
-            .search-input {
-                width: 100%;
-            }
-
-            .theme-toggle {
-                top: 10px;
-                right: 10px;
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
-
-            .modal-content {
-                padding: 24px;
-            }
+        .container {
+            padding: 20px 15px;
         }
+
+        h1 {
+            font-size: 1.75rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+        }
+
+        .header {
+            margin-bottom: 40px;
+            padding: 20px 0;
+        }
+
+        .header p {
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            gap: 8px;
+        }
+
+        .question-card {
+            padding: 24px 16px;
+        }
+
+        .question-card h2 {
+            font-size: 1.25rem;
+        }
+
+        .answers-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        .answer-btn {
+            min-height: 60px;
+            padding: 16px 20px;
+            font-size: 15px;
+        }
+
+        .quiz-list {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .quiz-item {
+            padding: 20px;
+            padding-left: 52px;
+            padding-bottom: 55px;
+        }
+
+        .stats {
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px;
+        }
+        
+        .results-screen .stats {
+            flex-direction: row !important;
+            flex-wrap: wrap;
+        }
+        
+        .results-screen .stats > div {
+            min-width: 30%;
+        }
+
+        .search-bar {
+            flex-direction: column;
+            padding: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+        }
+
+        .filter-group {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .filter-btn {
+            flex: 1;
+        }
+
+        .theme-toggle {
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+        }
+
+        .modal-content {
+            padding: 24px 16px;
+            margin: 10px;
+        }
+
+        .card {
+            padding: 24px 16px;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            font-size: 16px;
+            min-height: 48px;
+            touch-action: manipulation;
+        }
+
+        .btn-small {
+            padding: 10px 16px;
+            min-height: 40px;
+        }
+
+        .flashcard {
+            height: 300px;
+        }
+
+        .flashcard-side {
+            height: 300px;
+        }
+
+        .flashcard-content {
+            font-size: 1.25rem;
+            padding: 30px 20px;
+        }
+
+        .flashcard-btn {
+            font-size: 13px;
+            padding: 14px 16px;
+            min-height: 48px;
+        }
+
+        .score-display {
+            font-size: 2.5rem;
+        }
+
+        .type-selection {
+            grid-template-columns: 1fr;
+        }
+
+        .type-option {
+            padding: 24px;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .button-group.center {
+            flex-direction: column;
+        }
+
+        .button-group .btn {
+            width: 100%;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            font-size: 16px;
+        }
+
+        .toast {
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            max-width: none;
+        }
+    }
 
         /* Keyboard Shortcuts Hint */
-        .keyboard-hint {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            box-shadow: 0 2px 8px var(--shadow);
-            z-index: 100;
+           .keyboard-hint {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        box-shadow: 0 2px 8px var(--shadow);
+        z-index: 100;
         }
-
+            @media (max-width: 768px) {
+                .keyboard-hint {
+                    display: none;
+                }
+            }
         .kbd {
             background: var(--surface-alt);
             border: 1px solid var(--border);
@@ -2655,31 +2786,35 @@ Przykład:
         }
 
         function displayFlashcard() {
-            if (currentCardIndex >= cards.length) {
-                endFlashcards();
-                return;
-            }
-
-            const card = cards[currentCardIndex];
-
-            document.getElementById('flashcard').classList.remove('flipped');
-            document.getElementById('flashcardActions').style.display = 'none';
-            isCardFlipped = false;
-
-            const frontSide = document.querySelector('.flashcard-front');
-            const backSide = document.querySelector('.flashcard-back');
-            if (frontSide) frontSide.scrollTop = 0;
-            if (backSide) backSide.scrollTop = 0;
-            
-            document.getElementById('flashcardFront').textContent = card.front;
-
-            setTimeout(() => {
-                document.getElementById('flashcardBack').textContent = card.back;
-                if (backSide) backSide.scrollTop = 0;
-            }, 300);
-
-            updateFlashcardProgress();
+        if (currentCardIndex >= cards.length) {
+            endFlashcards();
+            return;
         }
+
+        const card = cards[currentCardIndex];
+        const flashcardEl = document.getElementById('flashcard');
+        const wasFlipped = flashcardEl.classList.contains('flipped');
+
+        flashcardEl.classList.remove('flipped');
+        document.getElementById('flashcardActions').style.display = 'none';
+        isCardFlipped = false;
+
+        const frontSide = document.querySelector('.flashcard-front');
+        const backSide = document.querySelector('.flashcard-back');
+        if (frontSide) frontSide.scrollTop = 0;
+        if (backSide) backSide.scrollTop = 0;
+        
+        document.getElementById('flashcardFront').textContent = card.front;
+
+        // Aktualizuj back tylko po zakończeniu animacji obrotu (jeśli była obrócona)
+        const delay = wasFlipped ? 300 : 0;
+        setTimeout(() => {
+            document.getElementById('flashcardBack').textContent = card.back;
+            if (backSide) backSide.scrollTop = 0;
+        }, delay);
+
+        updateFlashcardProgress();
+    }
 
         function flipCard() {
             if (!isCardFlipped && !isTransitioning) {
@@ -3190,40 +3325,49 @@ Przykład:
         }
 
         // ==================== TOAST SYSTEM ====================
-        function showToast(message, type = 'info') {
-            const newToast = { message, type };
-            
-            if (activeToast) {
-                // Jeśli jest aktywne powiadomienie
-                queuedToast = newToast; // Nadpisz kolejkę
-                
-                // Przyspiesz ukrycie aktywnego powiadomienia
-                hideActiveToast(500);
-            } else {
-                // Brak aktywnego powiadomienia - wyświetl od razu
-                displayToast(newToast);
-            }
-        }
+        let toastTimeout = null;
 
-        function displayToast(toastData) {
-            const toast = document.createElement('div');
-            toast.className = `toast ${toastData.type}`;
-            toast.textContent = toastData.message;
-            document.body.appendChild(toast);
+    function showToast(message, type = 'info') {
+        const newToast = { message, type };
+        
+        if (activeToast) {
+            // Jeśli jest aktywne powiadomienie
+            queuedToast = newToast; // Nadpisz kolejkę
             
-            activeToast = toast;
-            
-            // Pokaż z animacją
-            setTimeout(() => toast.classList.add('toast-show'), 10);
-            
-            // Auto-hide po 3 sekundach
-            setTimeout(() => hideActiveToast(300), 3000);
+            // Przyspiesz ukrycie aktywnego powiadomienia (0.5s)
+            if (toastTimeout) clearTimeout(toastTimeout);
+            hideActiveToast(500, 500);
+        } else {
+            // Brak aktywnego powiadomienia - wyświetl od razu
+            displayToast(newToast);
         }
+    }
 
-        function hideActiveToast(hideDelay) {
-            if (!activeToast) return;
-            
-            const toast = activeToast;
+    function displayToast(toastData) {
+        const toast = document.createElement('div');
+        toast.className = `toast ${toastData.type}`;
+        toast.textContent = toastData.message;
+        document.body.appendChild(toast);
+        
+        activeToast = toast;
+        
+        // Pokaż z animacją
+        setTimeout(() => toast.classList.add('toast-show'), 10);
+        
+        // Auto-hide - 3 sekundy jeśli brak kolejki, 0.5s jeśli jest kolejka
+        const delay = queuedToast ? 500 : 3000;
+        toastTimeout = setTimeout(() => hideActiveToast(300, delay), delay);
+    }
+
+    function hideActiveToast(animDelay, totalDelay) {
+        if (!activeToast) return;
+        
+        const toast = activeToast;
+        
+        // Jeśli totalDelay jest większy niż animDelay, czekaj przed animacją
+        const waitTime = totalDelay ? totalDelay - animDelay : 0;
+        
+        setTimeout(() => {
             toast.classList.remove('toast-show');
             toast.classList.add('toast-hide');
             
@@ -3242,8 +3386,9 @@ Przykład:
                         displayToast(next);
                     }
                 }
-            }, hideDelay);
-        }
+            }, animDelay);
+        }, waitTime);
+    }
 
         // ==================== UTILITIES ====================
         function formatDate(dateString) {
