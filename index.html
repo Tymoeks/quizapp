@@ -3106,34 +3106,38 @@ Przykład:
             </p>
         `;
         
-        // Przygotuj dane do udostępnienia (maksymalnie skompresowane)
-        const shareData = {
-            t: quiz.title,
-            g: quiz.tags || [],
-            y: quiz.type,
-            a: quiz.answerCount
-        };
+        // Przygotuj dane do udostępnienia (ultra-kompresja)
+        const shareData = [
+            quiz.title,                           // [0] title
+            quiz.tags && quiz.tags.length ? quiz.tags : null,  // [1] tags (null jeśli puste)
+            quiz.type === 'flashcard' ? 1 : 0,   // [2] type (1=flashcard, 0=quiz)
+            quiz.answerCount || 4                 // [3] answerCount
+        ];
         
         if (quiz.type === 'flashcard') {
-            shareData.c = quiz.cards.map(card => ({
-                f: card.front,
-                b: card.back,
-                ...(card.category && { g: card.category })
-            }));
+            // [4] cards as array of arrays: [front, back, category?]
+            shareData[4] = quiz.cards.map(card => {
+                const arr = [card.front, card.back];
+                if (card.category) arr[2] = card.category;
+                return arr;
+            });
         } else {
-            shareData.q = quiz.questions.map(q => ({
-                q: q.question,
-                c: q.correct,
-                w: q.wrong,
-                ...(q.group && { g: q.group }),
-                ...(q.type && { t: q.type })
-            }));
+            // [4] questions as array of arrays: [question, correct, [wrong1,wrong2,...], group?, type?]
+            shareData[4] = quiz.questions.map(q => {
+                const arr = [q.question, q.correct, q.wrong];
+                if (q.group) arr[3] = q.group;
+                if (q.type) arr[4] = q.type;
+                return arr;
+            });
         }
         
         try {
-            // Kompresuj używając LZ-String
+            // Ultra-kompresja: JSON.stringify + LZ-String Base64
             const jsonString = JSON.stringify(shareData);
-            const compressed = LZString.compressToEncodedURIComponent(jsonString);
+            const compressed = LZString.compressToBase64(jsonString)
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
             
             // Utwórz pełny link
             const baseUrl = 'https://tymoeks.github.io/quizapp/';
@@ -3177,17 +3181,18 @@ Przykład:
                             // Pokaż skrócony link (dla dużych quizów)
                             contentHtml += `
                                 <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                                    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                                        ✅ Link skrócony (działa wszędzie):
-                                    </p>
-                                    <input type="text" value="${shortUrl}" readonly 
-                                        style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--surface);"
-                                        onclick="this.select()" id="shortUrlInput">
-                                    <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Skrócony link skopiowany! 🔗')" 
-                                        style="width: 100%; margin-top: 12px;">
-                                        📋 Kopiuj link
-                                    </button>
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                                ✅ Link skrócony (działa w Messenger i WhatsApp):
+                                </p>
+                                <input type="text" value="${shortUrl}" readonly style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--surface);" onclick="this.select()" id="shortUrlInput">
+                                <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Skrócony link skopiowany! 🔗')" style="width: 100%; margin-top: 12px;">
+                                📋 Kopiuj link
+                                </button>
                                 </div>
+                                ${itemCount <= 25 ? `<div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;"> <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;"> 📱 Kod QR (zeskanuj telefonem): </p> <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div> </div>` : ''}
+                                <p style="font-size: 12px; color: var(--success); text-align: center; margin-bottom: 16px;">
+                                ✅ Link pokazuje nazwę strony w podglądzie
+                                </p>
                                 <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
                                     <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
                                         📱 Kod QR (zeskanuj telefonem):
@@ -3213,21 +3218,23 @@ Przykład:
                                 </details>
                             `;
             
-                            // Generuj QR Code
-                            setTimeout(() => {
-                                const qrDiv = document.getElementById('qrcode');
-                                if (qrDiv) {
-                                    qrDiv.innerHTML = '';
-                                    new QRCode(qrDiv, {
-                                        text: shortUrl,
-                                        width: 160,
-                                        height: 160,
-                                        colorDark: '#2C3E50',
-                                        colorLight: '#ffffff',
-                                        correctLevel: QRCode.CorrectLevel.M
-                                    });
-                                }
-                            }, 100);            } else {
+                            // Generuj QR Code tylko dla quizów ≤25 elementów
+                            if (itemCount <= 25) {
+                                setTimeout(() => {
+                                    const qrDiv = document.getElementById('qrcode');
+                                    if (qrDiv) {
+                                        qrDiv.innerHTML = '';
+                                        new QRCode(qrDiv, {
+                                            text: shortUrl,
+                                            width: 160,
+                                            height: 160,
+                                            colorDark: '#2C3E50',
+                                            colorLight: '#ffffff',
+                                            correctLevel: QRCode.CorrectLevel.M
+                                        });
+                                    }
+                                }, 100);
+                            }            } else {
                 // Pokaż tylko pełny link (dla małych quizów lub gdy API nie działa)
                 const warningHtml = shortUrlError ? `
                     <p style="color: var(--warning); font-size: 13px; margin-bottom: 12px;">
@@ -3316,8 +3323,19 @@ Przykład:
             const compressed = hash.substring(3);
             
             try {
-                // Dekompresuj używając LZ-String
-                const jsonString = LZString.decompressFromEncodedURIComponent(compressed);
+                // Spróbuj nowy format (Base64)
+                let jsonString = null;
+                
+                const base64 = compressed
+                    .replace(/-/g, '+')
+                    .replace(/_/g, '/');
+                
+                jsonString = LZString.decompressFromBase64(base64);
+                
+                // Fallback do starego formatu (EncodedURIComponent)
+                if (!jsonString) {
+                    jsonString = LZString.decompressFromEncodedURIComponent(compressed);
+                }
                 
                 if (!jsonString) {
                     throw new Error('Nie udało się zdekompresować danych');
@@ -3325,27 +3343,29 @@ Przykład:
                 
                 const compactData = JSON.parse(jsonString);
                 
-                // Przekształć ze skompresowanego formatu
+                // Przekształć z ultra-kompresji: [title, tags, type, answerCount, items]
                 const quizData = {
-                    title: compactData.t,
-                    tags: compactData.g || [],
-                    type: compactData.y,
-                    answerCount: compactData.a
+                    title: compactData[0],
+                    tags: compactData[1] || [],
+                    type: compactData[2] === 1 ? 'flashcard' : 'quiz',
+                    answerCount: compactData[3] || 4
                 };
                 
-                if (compactData.y === 'flashcard') {
-                    quizData.cards = compactData.c.map(c => ({
-                        front: c.f,
-                        back: c.b,
-                        ...(c.g && { category: c.g })
+                if (compactData[2] === 1) {
+                    // Flashcards: [front, back, category?]
+                    quizData.cards = compactData[4].map(c => ({
+                        front: c[0],
+                        back: c[1],
+                        ...(c[2] && { category: c[2] })
                     }));
                 } else {
-                    quizData.questions = compactData.q.map(q => ({
-                        question: q.q,
-                        correct: q.c,
-                        wrong: q.w,
-                        ...(q.g && { group: q.g }),
-                        ...(q.t && { type: q.t })
+                    // Questions: [question, correct, [wrong...], group?, type?]
+                    quizData.questions = compactData[4].map(q => ({
+                        question: q[0],
+                        correct: q[1],
+                        wrong: q[2],
+                        ...(q[3] && { group: q[3] }),
+                        ...(q[4] && { type: q[4] })
                     }));
                 }
                 
