@@ -291,12 +291,14 @@
             border-radius: 50%;
             background: rgba(0, 0, 0, 0.1);
             transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s;
+            transition: width 0.6s ease, height 0.6s ease;
+            pointer-events: none;
         }
 
-        .btn:hover::before {
-            width: 300px;
-            height: 300px;
+        .btn:active::before {
+            width: 500px;
+            height: 500px;
+            transition: width 0s, height 0s;
         }
 
         .btn:hover {
@@ -1411,6 +1413,14 @@
             font-size: 11px;
         }
 
+        .mobile-only {
+            display: none;
+        }
+
+        .desktop-only {
+            display: inline;
+        }
+
         input[type="checkbox"] {
             width: 18px;
             height: 18px;
@@ -1421,6 +1431,14 @@
         /* Responsive */
         @media (max-width: 768px) {
             .keyboard-hint {
+                display: none;
+            }
+
+            .mobile-only {
+                display: inline;
+            }
+
+            .desktop-only {
                 display: none;
             }
 
@@ -1602,8 +1620,8 @@
 </head>
 <body>
     <!-- Theme Toggle -->
-    <div class="theme-toggle" onclick="toggleTheme()" title="Przełącz motyw">
-        <span id="themeIcon">🌙</span>
+    <div class="theme-toggle" onclick="toggleTheme()" title="Przełącz motyw" role="button" aria-label="Przełącz motyw ciemny/jasny" tabindex="0">
+        <span id="themeIcon" aria-hidden="true">🌙</span>
     </div>
 
     <!-- Background Decorations -->
@@ -1625,7 +1643,7 @@
         <!-- Home Screen -->
         <div id="homeScreen" class="screen animate-fadeIn">
             <div class="search-bar">
-                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Szukaj quizów..." oninput="filterQuizzes()">
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Szukaj quizów..." oninput="filterQuizzes()" aria-label="Wyszukaj quizy">
                 <div class="filter-group">
                     <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">Wszystkie</button>
                     <button class="filter-btn" data-filter="quiz" onclick="setFilter('quiz')">📊 Quizy</button>
@@ -1757,7 +1775,7 @@
                         </label>
                     </div>
                     <div class="setting-row">
-                        <label>Pokazuj litery odpowiedzi (A, B, C, D)</label>
+                        <label>Pokazuj litery odpowiedzi</label>
                         <label class="toggle">
                             <input type="checkbox" id="showLetters" checked>
                             <span class="slider"></span>
@@ -1784,7 +1802,7 @@
         <!-- Quiz Screen -->
         <div id="quizScreen" class="screen hidden">
             <div class="quiz-container">
-                <div class="progress-bar">
+                <div class="progress-bar" role="progressbar" aria-label="Postęp quizu">
                     <div class="progress-fill" id="progressBar"></div>
                 </div>
                 
@@ -1865,7 +1883,7 @@
         <!-- Flashcard Screen -->
         <div id="flashcardScreen" class="screen hidden">
             <div class="flashcard-container">
-                <div class="progress-bar" style="margin-bottom: 32px;">
+                <div class="progress-bar" style="margin-bottom: 32px;" role="progressbar" aria-label="Postęp fiszek">
                     <div class="progress-fill" id="flashcardProgress"></div>
                 </div>
                 
@@ -1886,7 +1904,8 @@
                     </div>
                     
                     <p style="text-align: center; margin-top: 16px; color: var(--text-secondary); font-size: 14px;">
-                        Kliknij kartę lub naciśnij <kbd class="kbd">Spacja</kbd> aby zobaczyć odpowiedź
+                        <span class="desktop-only">Kliknij kartę lub naciśnij <kbd class="kbd">Spacja</kbd> aby zobaczyć odpowiedź</span>
+                        <span class="mobile-only">Naciśnij na kartę aby zobaczyć odpowiedź</span>
                     </p>
 
                     <div class="flashcard-actions" id="flashcardActions" style="display: none;">
@@ -2088,6 +2107,15 @@
         function updateThemeIcon(theme) {
             document.getElementById('themeIcon').textContent = theme === 'dark' ? '☀️' : '🌙';
         }
+        
+        // Keyboard support for theme toggle
+        document.addEventListener('keydown', (e) => {
+            const themeToggle = document.querySelector('.theme-toggle');
+            if (document.activeElement === themeToggle && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                toggleTheme();
+            }
+        });
 
         // ==================== NAVIGATION ====================
         function hideAllScreens() {
@@ -2270,7 +2298,14 @@ Przykład:
 
         // ==================== QUIZ MANAGEMENT ====================
         function loadQuizzes() {
-            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            let quizzes = [];
+            try {
+                quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            } catch (error) {
+                console.error('Error loading quizzes:', error);
+                showToast('Błąd wczytywania quizów', 'error');
+                quizzes = [];
+            }
             const quizList = document.getElementById('quizList');
             const searchQuery = document.getElementById('searchInput').value.toLowerCase();
             
@@ -2350,9 +2385,14 @@ Przykład:
         }
 
         function saveQuiz() {
-            const jsonText = document.getElementById('quizJson').value;
+            const jsonText = document.getElementById('quizJson').value.trim();
             const titleInput = document.getElementById('quizTitle').value.trim();
             const answerCount = parseInt(document.getElementById('answerCount').value);
+            
+            if (!jsonText) {
+                showToast('Błąd: Wklej JSON quizu', 'error');
+                return;
+            }
             
             try {
                 const quizData = JSON.parse(jsonText);
@@ -2388,7 +2428,17 @@ Przykład:
                 
                 const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
                 quizzes.push(quiz);
-                localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                
+                try {
+                    localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                } catch (error) {
+                    if (error.name === 'QuotaExceededError') {
+                        showToast('Błąd: Brak miejsca w localStorage. Usuń stare quizy.', 'error');
+                    } else {
+                        showToast('Błąd zapisu: ' + error.message, 'error');
+                    }
+                    throw error;
+                }
                 
                 showToast('Quiz został zapisany!', 'success');
                 showHomeScreen();
@@ -2398,8 +2448,13 @@ Przykład:
         }
 
         function updateQuiz() {
-            const jsonText = document.getElementById('editQuizJson').value;
+            const jsonText = document.getElementById('editQuizJson').value.trim();
             const title = document.getElementById('editQuizTitle').value.trim();
+            
+            if (!jsonText) {
+                showToast('Błąd: JSON nie może być pusty', 'error');
+                return;
+            }
             
             try {
                 const updatedData = JSON.parse(jsonText);
@@ -2430,7 +2485,16 @@ Przykład:
                         updatedAt: new Date().toISOString()
                     };
                     
-                    localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                    try {
+                        localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                    } catch (error) {
+                        if (error.name === 'QuotaExceededError') {
+                            showToast('Błąd: Brak miejsca w localStorage. Usuń stare quizy.', 'error');
+                        } else {
+                            showToast('Błąd zapisu: ' + error.message, 'error');
+                        }
+                        throw error;
+                    }
                     showToast('Quiz został zaktualizowany!', 'success');
                     showHomeScreen();
                 }
@@ -2533,234 +2597,6 @@ Przykład:
         }
 
         // ==================== SHARING ====================
-        async function shareQuiz(quizId) {
-            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-            const quiz = quizzes.find(q => q.id === quizId);
-            
-            if (!quiz) {
-                showToast('Quiz nie znaleziony', 'error');
-                return;
-            }
-            
-            document.getElementById('shareModal').classList.remove('hidden');
-            document.getElementById('shareContent').innerHTML = `
-                <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 14px; text-align: center;">
-                    <span style="font-size: 32px;">⏳</span><br>
-                    Generowanie linku...
-                </p>
-            `;
-            
-            // Ultra-kompresja: Array format
-            const shareData = [
-                quiz.title,
-                quiz.tags && quiz.tags.length ? quiz.tags : null,
-                quiz.type === 'flashcard' ? 1 : 0,
-                quiz.answerCount || 4
-            ];
-            
-            if (quiz.type === 'flashcard') {
-                shareData[4] = quiz.cards.map(card => {
-                    const arr = [card.front, card.back];
-                    if (card.category) arr[2] = card.category;
-                    return arr;
-                });
-            } else {
-                shareData[4] = quiz.questions.map(q => {
-                    const arr = [q.question, q.correct, q.wrong];
-                    if (q.group) arr[3] = q.group;
-                    if (q.type) arr[4] = q.type;
-                    return arr;
-                });
-            }
-            
-            try {
-                const jsonString = JSON.stringify(shareData);
-                const compressed = LZString.compressToBase64(jsonString)
-                    .replace(/\+/g, '-')
-                    .replace(/\//g, '_')
-                    .replace(/=/g, '');
-                
-                const baseUrl = 'https://tymoeks.github.io/quizapp/';
-                const fullUrl = `${baseUrl}#q=${compressed}`;
-                
-                let shortUrl = null;
-                let shortUrlError = false;
-                
-                const itemCount = quiz.type === 'flashcard' ? quiz.cards.length : quiz.questions.length;
-                
-                if (fullUrl.length > 500) {
-                    try {
-                        const response = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`);
-                        const data = await response.json();
-                        
-                        if (data.shorturl) {
-                            shortUrl = data.shorturl;
-                        } else if (data.errormessage) {
-                            shortUrlError = true;
-                            console.error('is.gd error:', data.errormessage);
-                        }
-                    } catch (error) {
-                        shortUrlError = true;
-                        console.error('is.gd API error:', error);
-                    }
-                }
-                
-                const itemType = quiz.type === 'flashcard' ? 'fiszek' : 'pytań';
-                
-                let contentHtml = `
-                    <div style="margin-bottom: 24px;">
-                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
-                            <strong>${quiz.title}</strong><br>
-                            ${itemCount} ${itemType}
-                        </p>
-                    </div>
-                `;
-                
-                if (shortUrl) {
-                    contentHtml += `
-                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                                ✅ Link skrócony (działa w Messenger i WhatsApp):
-                            </p>
-                            <input type="text" value="${shortUrl}" readonly 
-                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--surface);"
-                                onclick="this.select()" id="shortUrlInput">
-                            <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Skrócony link skopiowany! 🔗')" 
-                                style="width: 100%; margin-top: 12px;">
-                                📋 Kopiuj link
-                            </button>
-                        </div>
-                    `;
-                    
-                    if (itemCount <= 25) {
-                        contentHtml += `
-                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
-                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                                    📱 Kod QR (zeskanuj telefonem):
-                                </p>
-                                <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div>
-                            </div>
-                        `;
-                    }
-                    
-                    contentHtml += `
-                        <p style="font-size: 12px; color: var(--success); text-align: center; margin-bottom: 16px;">
-                            ✅ Link pokazuje nazwę strony w podglądzie
-                        </p>
-                        <details style="margin-top: 16px;">
-                            <summary style="cursor: pointer; color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
-                                Pokaż pełny link (zaawansowane)
-                            </summary>
-                            <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-top: 8px;">
-                                <input type="text" value="${fullUrl}" readonly 
-                                    style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: monospace; background: var(--surface);"
-                                    onclick="this.select()">
-                                <button class="btn btn-small" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Pełny link skopiowany!')" 
-                                    style="width: 100%; margin-top: 8px;">
-                                    📋 Kopiuj pełny link
-                                </button>
-                            </div>
-                        </details>
-                    `;
-                    
-                    if (itemCount <= 25) {
-                        setTimeout(() => {
-                            const qrDiv = document.getElementById('qrcode');
-                            if (qrDiv) {
-                                qrDiv.innerHTML = '';
-                                new QRCode(qrDiv, {
-                                    text: shortUrl,
-                                    width: 160,
-                                    height: 160,
-                                    colorDark: '#2C3E50',
-                                    colorLight: '#ffffff',
-                                    correctLevel: QRCode.CorrectLevel.M
-                                });
-                            }
-                        }, 100);
-                    }
-                } else {
-                    const warningHtml = shortUrlError ? `
-                        <p style="color: var(--warning); font-size: 13px; margin-bottom: 12px;">
-                            ⚠️ Nie udało się skrócić linku. W Messengerze kliknij w sam tekst linku, nie w podgląd.
-                        </p>
-                    ` : '';
-                    
-                    contentHtml += `
-                        ${warningHtml}
-                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
-                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                                ${fullUrl.length > 500 ? '📝 Link (może być długi):' : '✅ Link do udostępnienia (z podglądem):'}
-                            </p>
-                            <input type="text" value="${fullUrl}" readonly 
-                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: monospace; background: var(--surface); word-break: break-all;"
-                                onclick="this.select()" id="fullUrlInput">
-                            <button class="btn btn-primary" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Link skopiowany! 🔗')" 
-                                style="width: 100%; margin-top: 12px;">
-                                📋 Kopiuj link
-                            </button>
-                        </div>
-                    `;
-                    
-                    if (fullUrl.length < 500) {
-                        contentHtml += `
-                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
-                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                                    📱 Kod QR (zeskanuj telefonem):
-                                </p>
-                                <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div>
-                            </div>
-                            <p style="font-size: 12px; color: var(--success); text-align: center;">
-                                ✅ Ten link pokaże podgląd w Messengerze i WhatsApp
-                            </p>
-                        `;
-                        
-                        setTimeout(() => {
-                            const qrDiv = document.getElementById('qrcode');
-                            if (qrDiv) {
-                                qrDiv.innerHTML = '';
-                                new QRCode(qrDiv, {
-                                    text: fullUrl,
-                                    width: 160,
-                                    height: 160,
-                                    colorDark: '#2C3E50',
-                                    colorLight: '#ffffff',
-                                    correctLevel: QRCode.CorrectLevel.M
-                                });
-                            }
-                        }, 100);
-                    } else {
-                        contentHtml += `
-                            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
-                                💡 <strong>Wskazówki:</strong><br>
-                                • W Messengerze: Kliknij w <strong>sam tekst linku</strong>, nie w podgląd<br>
-                                • W WhatsApp: Zaznacz i skopiuj <strong>cały link</strong><br>
-                                • Alternatywnie: Użyj przycisku Eksportuj i wyślij plik
-                            </p>
-                        `;
-                    }
-                }
-                
-                document.getElementById('shareContent').innerHTML = contentHtml;
-                
-            } catch (error) {
-                document.getElementById('shareContent').innerHTML = `
-                    <p style="color: var(--danger); text-align: center;">
-                        ❌ Błąd: ${error.message}
-                    </p>
-                `;
-            }
-        }
-        
-        function copyToClipboard(text, message) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast(message, 'success');
-                closeModal('shareModal');
-            }).catch(() => {
-                showToast('Nie udało się skopiować', 'error');
-            });
-        }
-
         function checkSharedQuiz() {
             const hash = window.location.hash;
             
@@ -2852,6 +2688,234 @@ Przykład:
             } else {
                 showHomeScreen();
             }
+        }
+
+        async function shareQuiz(quizId) {
+            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const quiz = quizzes.find(q => q.id === quizId);
+            
+            if (!quiz) {
+                showToast('Quiz nie znaleziony', 'error');
+                return;
+            }
+            
+            document.getElementById('shareModal').classList.remove('hidden');
+            document.getElementById('shareContent').innerHTML = `
+                <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 14px; text-align: center;">
+                    <span style="font-size: 32px;">⏳</span><br>
+                    Generowanie linku...
+                </p>
+            `;
+            
+            const shareData = [
+                quiz.title,
+                quiz.tags && quiz.tags.length ? quiz.tags : null,
+                quiz.type === 'flashcard' ? 1 : 0,
+                quiz.answerCount || 4
+            ];
+            
+            if (quiz.type === 'flashcard') {
+                shareData[4] = quiz.cards.map(card => {
+                    const arr = [card.front, card.back];
+                    if (card.category) arr[2] = card.category;
+                    return arr;
+                });
+            } else {
+                shareData[4] = quiz.questions.map(q => {
+                    const arr = [q.question, q.correct, q.wrong];
+                    if (q.group) arr[3] = q.group;
+                    if (q.type) arr[4] = q.type;
+                    return arr;
+                });
+            }
+            
+            try {
+                const jsonString = JSON.stringify(shareData);
+                const compressed = LZString.compressToBase64(jsonString)
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .replace(/=/g, '');
+                
+                const baseUrl = 'https://tymoeks.github.io/quizapp/';
+                const fullUrl = `${baseUrl}#q=${compressed}`;
+                
+                let shortUrl = null;
+                let shortUrlError = false;
+                
+                const itemCount = quiz.type === 'flashcard' ? quiz.cards.length : quiz.questions.length;
+                
+                console.log(`[Share] URL length: ${fullUrl.length} characters`);
+                if (fullUrl.length > 500 && fullUrl.length < 2000) {
+                    try {
+                        const response = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`);
+                        const data = await response.json();
+                        
+                        if (data.shorturl) {
+                            shortUrl = data.shorturl;
+                        } else if (data.errormessage) {
+                            shortUrlError = true;
+                            console.error('is.gd error:', data.errormessage);
+                        }
+                    } catch (error) {
+                        shortUrlError = true;
+                        console.error('is.gd API error:', error);
+                    }
+                }
+                
+                const itemType = quiz.type === 'flashcard' ? 'fiszek' : 'pytań';
+                
+                let contentHtml = `
+                    <div style="margin-bottom: 24px;">
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
+                            <strong>${quiz.title}</strong><br>
+                            ${itemCount} ${itemType}
+                        </p>
+                    </div>
+                `;
+                
+                if (shortUrl) {
+                    contentHtml += `
+                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                                ✅ Link skrócony (działa w Messenger i WhatsApp):
+                            </p>
+                            <input type="text" value="${shortUrl}" readonly 
+                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--surface);"
+                                onclick="this.select()" id="shortUrlInput">
+                            <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Skrócony link skopiowany! 🔗')" 
+                                style="width: 100%; margin-top: 12px;">
+                                📋 Kopiuj link
+                            </button>
+                        </div>
+                    `;
+                    
+                    if (itemCount <= 25) {
+                        contentHtml += `
+                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                                    📱 Kod QR (zeskanuj telefonem):
+                                </p>
+                                <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px;"></div>
+                            </div>
+                        `;
+                    }
+                    
+                    contentHtml += `
+                        <p style="font-size: 12px; color: var(--success); text-align: center; margin-bottom: 16px;">
+                            ✅ Link pokazuje nazwę strony w podglądzie
+                        </p>
+                        <details style="margin-top: 16px;">
+                            <summary style="cursor: pointer; color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
+                                Pokaż pełny link (zaawansowane)
+                            </summary>
+                            <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-top: 8px;">
+                                <input type="text" value="${fullUrl}" readonly 
+                                    style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: monospace; background: var(--surface);"
+                                    onclick="this.select()">
+                                <button class="btn btn-small" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Pełny link skopiowany!')" 
+                                    style="width: 100%; margin-top: 8px;">
+                                    📋 Kopiuj pełny link
+                                </button>
+                            </div>
+                        </details>
+                    `;
+                    
+                    if (itemCount <= 25) {
+                        setTimeout(() => {
+                            const qrDiv = document.getElementById('qrcode');
+                            if (qrDiv) {
+                                qrDiv.innerHTML = '';
+                                new QRCode(qrDiv, {
+                                    text: shortUrl,
+                                    width: 160,
+                                    height: 160,
+                                    colorDark: '#2C3E50',
+                                    colorLight: '#ffffff',
+                                    correctLevel: QRCode.CorrectLevel.M
+                                });
+                            }
+                        }, 100);
+                    }
+                } else {
+                    const warningHtml = shortUrlError ? `
+                        <p style="color: var(--warning); font-size: 13px; margin-bottom: 12px;">
+                            ⚠️ Nie udało się skrócić linku. W Messengerze kliknij w sam tekst linku, nie w podgląd.
+                        </p>
+                    ` : '';
+                    
+                    contentHtml += `
+                        ${warningHtml}
+                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                                ${fullUrl.length > 500 ? '📝 Link (może być długi):' : '✅ Link do udostępnienia (z podglądem):'}
+                            </p>
+                            <input type="text" value="${fullUrl}" readonly 
+                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: monospace; background: var(--surface); word-break: break-all;"
+                                onclick="this.select()" id="fullUrlInput">
+                            <button class="btn btn-primary" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Link skopiowany! 🔗')" 
+                                style="width: 100%; margin-top: 12px;">
+                                📋 Kopiuj link
+                            </button>
+                        </div>
+                    `;
+                    
+                    if (fullUrl.length < 500) {
+                        contentHtml += `
+                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                                    📱 Kod QR (zeskanuj telefonem):
+                                </p>
+                                <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px;"></div>
+                            </div>
+                            <p style="font-size: 12px; color: var(--success); text-align: center;">
+                                ✅ Ten link pokaże podgląd w Messengerze i WhatsApp
+                            </p>
+                        `;
+                        
+                        setTimeout(() => {
+                            const qrDiv = document.getElementById('qrcode');
+                            if (qrDiv) {
+                                qrDiv.innerHTML = '';
+                                new QRCode(qrDiv, {
+                                    text: fullUrl,
+                                    width: 160,
+                                    height: 160,
+                                    colorDark: '#2C3E50',
+                                    colorLight: '#ffffff',
+                                    correctLevel: QRCode.CorrectLevel.M
+                                });
+                            }
+                        }, 100);
+                    } else {
+                        contentHtml += `
+                            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+                                💡 <strong>Wskazówki:</strong><br>
+                                • W Messengerze: Kliknij w <strong>sam tekst linku</strong>, nie w podgląd<br>
+                                • W WhatsApp: Zaznacz i skopiuj <strong>cały link</strong><br>
+                                • Alternatywnie: Użyj przycisku Eksportuj i wyślij plik
+                            </p>
+                        `;
+                    }
+                }
+                
+                document.getElementById('shareContent').innerHTML = contentHtml;
+                
+            } catch (error) {
+                document.getElementById('shareContent').innerHTML = `
+                    <p style="color: var(--danger); text-align: center;">
+                        ❌ Błąd: ${error.message}
+                    </p>
+                `;
+            }
+        }
+        
+        function copyToClipboard(text, message) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(message, 'success');
+                closeModal('shareModal');
+            }).catch(() => {
+                showToast('Nie udało się skopiować', 'error');
+            });
         }
 
         // ==================== QUIZ GAMEPLAY ====================
@@ -3274,7 +3338,7 @@ Przykład:
 
         function restartFlashcards() {
             const difficultCards = [];
-                        for (let i = 0; i < cardRatings.length; i++) {
+            for (let i = 0; i < cardRatings.length; i++) {
                 if (cardRatings[i] === 'medium' || cardRatings[i] === 'hard') {
                     difficultCards.push(currentFlashcards.cards[i]);
                 }
@@ -3426,237 +3490,6 @@ Przykład:
         }
 
         // ==================== SHARING ====================
-        async function shareQuiz(quizId) {
-            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-            const quiz = quizzes.find(q => q.id === quizId);
-            
-            if (!quiz) {
-                showToast('Quiz nie znaleziony', 'error');
-                return;
-            }
-            
-            // Pokaż modal z loadingiem
-            document.getElementById('shareModal').classList.remove('hidden');
-            document.getElementById('shareContent').innerHTML = `
-                <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 14px; text-align: center;">
-                    <span style="font-size: 32px;">⏳</span><br>
-                    Generowanie linku...
-                </p>
-            `;
-            
-            // Przygotuj dane do udostępnienia (ultra-kompresja)
-            const shareData = [
-                quiz.title,                           // [0] title
-                quiz.tags && quiz.tags.length ? quiz.tags : null,  // [1] tags (null jeśli puste)
-                quiz.type === 'flashcard' ? 1 : 0,   // [2] type (1=flashcard, 0=quiz)
-                quiz.answerCount || 4                 // [3] answerCount
-            ];
-            
-            if (quiz.type === 'flashcard') {
-                // [4] cards as array of arrays: [front, back, category?]
-                shareData[4] = quiz.cards.map(card => {
-                    const arr = [card.front, card.back];
-                    if (card.category) arr[2] = card.category;
-                    return arr;
-                });
-            } else {
-                // [4] questions as array of arrays: [question, correct, [wrong1,wrong2,...], group?, type?]
-                shareData[4] = quiz.questions.map(q => {
-                    const arr = [q.question, q.correct, q.wrong];
-                    if (q.group) arr[3] = q.group;
-                    if (q.type) arr[4] = q.type;
-                    return arr;
-                });
-            }
-            
-            try {
-                // Ultra-kompresja: JSON.stringify + LZ-String Base64
-                const jsonString = JSON.stringify(shareData);
-                const compressed = LZString.compressToBase64(jsonString)
-                    .replace(/\+/g, '-')
-                    .replace(/\//g, '_')
-                    .replace(/=/g, '');
-                
-                // Utwórz pełny link
-                const baseUrl = 'https://tymoeks.github.io/quizapp/';
-                const fullUrl = `${baseUrl}#q=${compressed}`;
-                
-                let shortUrl = null;
-                let shortUrlError = false;
-                
-                // Spróbuj skrócić link przez is.gd (dla linków >500 znaków)
-                if (fullUrl.length > 500) {
-                    try {
-                        const response = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`);
-                        const data = await response.json();
-                        
-                        if (data.shorturl) {
-                            shortUrl = data.shorturl;
-                        } else if (data.errormessage) {
-                            shortUrlError = true;
-                            console.error('is.gd error:', data.errormessage);
-                        }
-                    } catch (error) {
-                        shortUrlError = true;
-                        console.error('is.gd API error:', error);
-                    }
-                }
-                
-                // Pokaż wyniki w modalu
-                const itemCount = quiz.type === 'flashcard' ? quiz.cards.length : quiz.questions.length;
-                const itemType = quiz.type === 'flashcard' ? 'fiszek' : 'pytań';
-                
-                let contentHtml = `
-                    <div style="margin-bottom: 24px;">
-                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
-                            <strong>${quiz.title}</strong><br>
-                            ${itemCount} ${itemType}
-                        </p>
-                    </div>
-                `;
-                
-                if (shortUrl) {
-                    // Pokaż skrócony link (dla dużych quizów)
-                    contentHtml += `
-                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                                ✅ Link skrócony (działa w Messenger i WhatsApp):
-                            </p>
-                            <input type="text" value="${shortUrl}" readonly 
-                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--surface);"
-                                onclick="this.select()" id="shortUrlInput">
-                            <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Skrócony link skopiowany! 🔗')" 
-                                style="width: 100%; margin-top: 12px;">
-                                📋 Kopiuj link
-                            </button>
-                        </div>
-                        ${itemCount <= 25 ? `
-                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
-                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                                    📱 Kod QR (zeskanuj telefonem):
-                                </p>
-                                <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div>
-                            </div>
-                        ` : ''}
-                        <p style="font-size: 12px; color: var(--success); text-align: center; margin-bottom: 16px;">
-                            ✅ Link pokazuje nazwę strony w podglądzie
-                        </p>
-                        <details style="margin-top: 16px;">
-                            <summary style="cursor: pointer; color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
-                                Pokaż pełny link (zaawansowane)
-                            </summary>
-                            <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-top: 8px;">
-                                <input type="text" value="${fullUrl}" readonly 
-                                    style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: monospace; background: var(--surface);"
-                                    onclick="this.select()">
-                                <button class="btn btn-small" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Pełny link skopiowany!')" 
-                                    style="width: 100%; margin-top: 8px;">
-                                    📋 Kopiuj pełny link
-                                </button>
-                            </div>
-                        </details>
-                    `;
-                    
-                    // Generuj QR Code tylko dla quizów ≤25 elementów
-                    if (itemCount <= 25) {
-                        setTimeout(() => {
-                            const qrDiv = document.getElementById('qrcode');
-                            if (qrDiv) {
-                                qrDiv.innerHTML = '';
-                                new QRCode(qrDiv, {
-                                    text: shortUrl,
-                                    width: 160,
-                                    height: 160,
-                                    colorDark: '#2C3E50',
-                                    colorLight: '#ffffff',
-                                    correctLevel: QRCode.CorrectLevel.M
-                                });
-                            }
-                        }, 100);
-                    }
-                } else {
-                    // Pokaż tylko pełny link (dla małych quizów lub gdy API nie działa)
-                    const warningHtml = shortUrlError ? `
-                        <p style="color: var(--warning); font-size: 13px; margin-bottom: 12px;">
-                            ⚠️ Nie udało się skrócić linku. W Messengerze kliknij w sam tekst linku, nie w podgląd.
-                        </p>
-                    ` : '';
-                    
-                    contentHtml += `
-                        ${warningHtml}
-                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
-                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                                ${fullUrl.length > 500 ? '📝 Link (może być długi):' : '✅ Link do udostępnienia (z podglądem):'}
-                            </p>
-                            <input type="text" value="${fullUrl}" readonly 
-                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: monospace; background: var(--surface); word-break: break-all;"
-                                onclick="this.select()" id="fullUrlInput">
-                            <button class="btn btn-primary" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Link skopiowany! 🔗')" 
-                                style="width: 100%; margin-top: 12px;">
-                                📋 Kopiuj link
-                            </button>
-                        </div>
-                        ${fullUrl.length < 500 ? `
-                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
-                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                                    📱 Kod QR (zeskanuj telefonem):
-                                </p>
-                                <div id="qrcode" style="display: inline-block; padding: 12px; background: white; border-radius: 8px;"></div>
-                            </div>
-                        ` : ''}
-                        ${fullUrl.length > 500 ? `
-                            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
-                                💡 <strong>Wskazówki:</strong><br>
-                                • W Messengerze: Kliknij w <strong>sam tekst linku</strong>, nie w podgląd<br>
-                                • W WhatsApp: Zaznacz i skopiuj <strong>cały link</strong><br>
-                                • Alternatywnie: Użyj przycisku Eksportuj i wyślij plik
-                            </p>
-                        ` : `
-                            <p style="font-size: 12px; color: var(--success); text-align: center;">
-                                ✅ Ten link pokaże podgląd w Messengerze i WhatsApp
-                            </p>
-                        `}
-                    `;
-                    
-                    // Generuj QR Code dla krótkich linków
-                    if (fullUrl.length < 500) {
-                        setTimeout(() => {
-                            const qrDiv = document.getElementById('qrcode');
-                            if (qrDiv) {
-                                qrDiv.innerHTML = '';
-                                new QRCode(qrDiv, {
-                                    text: fullUrl,
-                                    width: 160,
-                                    height: 160,
-                                    colorDark: '#2C3E50',
-                                    colorLight: '#ffffff',
-                                    correctLevel: QRCode.CorrectLevel.M
-                                });
-                            }
-                        }, 100);
-                    }
-                }
-                
-                document.getElementById('shareContent').innerHTML = contentHtml;
-                
-            } catch (error) {
-                document.getElementById('shareContent').innerHTML = `
-                    <p style="color: var(--danger); text-align: center;">
-                        ❌ Błąd: ${error.message}
-                    </p>
-                `;
-            }
-        }
-        
-        function copyToClipboard(text, message) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast(message, 'success');
-                closeModal('shareModal');
-            }).catch(() => {
-                showToast('Nie udało się skopiować', 'error');
-            });
-        }
-
         function checkSharedQuiz() {
             const hash = window.location.hash;
             
@@ -3664,7 +3497,6 @@ Przykład:
                 const compressed = hash.substring(3);
                 
                 try {
-                    // Spróbuj nowy format (Base64)
                     let jsonString = null;
                     
                     const base64 = compressed
@@ -3673,7 +3505,6 @@ Przykład:
                     
                     jsonString = LZString.decompressFromBase64(base64);
                     
-                    // Fallback do starego formatu (EncodedURIComponent)
                     if (!jsonString) {
                         jsonString = LZString.decompressFromEncodedURIComponent(compressed);
                     }
@@ -3684,7 +3515,6 @@ Przykład:
                     
                     const compactData = JSON.parse(jsonString);
                     
-                    // Przekształć z ultra-kompresji: [title, tags, type, answerCount, items]
                     const quizData = {
                         title: compactData[0],
                         tags: compactData[1] || [],
@@ -3693,14 +3523,12 @@ Przykład:
                     };
                     
                     if (compactData[2] === 1) {
-                        // Flashcards: [front, back, category?]
                         quizData.cards = compactData[4].map(c => ({
                             front: c[0],
                             back: c[1],
                             ...(c[2] && { category: c[2] })
                         }));
                     } else {
-                        // Questions: [question, correct, [wrong...], group?, type?]
                         quizData.questions = compactData[4].map(q => ({
                             question: q[0],
                             correct: q[1],
@@ -3710,7 +3538,6 @@ Przykład:
                         }));
                     }
                     
-                    // Sprawdź czy już istnieje
                     const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
                     const exists = quizzes.find(q => 
                         q.title === quizData.title && 
@@ -3745,7 +3572,6 @@ Przykład:
                         }
                     }
                     
-                    // Wyczyść hash
                     history.replaceState(null, null, window.location.pathname);
                     
                 } catch (error) {
@@ -3755,6 +3581,234 @@ Przykład:
             } else {
                 showHomeScreen();
             }
+        }
+
+        async function shareQuiz(quizId) {
+            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const quiz = quizzes.find(q => q.id === quizId);
+            
+            if (!quiz) {
+                showToast('Quiz nie znaleziony', 'error');
+                return;
+            }
+            
+            document.getElementById('shareModal').classList.remove('hidden');
+            document.getElementById('shareContent').innerHTML = `
+                <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 14px; text-align: center;">
+                    <span style="font-size: 32px;">⏳</span><br>
+                    Generowanie linku...
+                </p>
+            `;
+            
+            const shareData = [
+                quiz.title,
+                quiz.tags && quiz.tags.length ? quiz.tags : null,
+                quiz.type === 'flashcard' ? 1 : 0,
+                quiz.answerCount || 4
+            ];
+            
+            if (quiz.type === 'flashcard') {
+                shareData[4] = quiz.cards.map(card => {
+                    const arr = [card.front, card.back];
+                    if (card.category) arr[2] = card.category;
+                    return arr;
+                });
+            } else {
+                shareData[4] = quiz.questions.map(q => {
+                    const arr = [q.question, q.correct, q.wrong];
+                    if (q.group) arr[3] = q.group;
+                    if (q.type) arr[4] = q.type;
+                    return arr;
+                });
+            }
+            
+            try {
+                const jsonString = JSON.stringify(shareData);
+                const compressed = LZString.compressToBase64(jsonString)
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .replace(/=/g, '');
+                
+                const baseUrl = 'https://tymoeks.github.io/quizapp/';
+                const fullUrl = `${baseUrl}#q=${compressed}`;
+                
+                let shortUrl = null;
+                let shortUrlError = false;
+                
+                const itemCount = quiz.type === 'flashcard' ? quiz.cards.length : quiz.questions.length;
+                
+                console.log(`[Share] URL length: ${fullUrl.length} characters`);
+                if (fullUrl.length > 500 && fullUrl.length < 2000) {
+                    try {
+                        const response = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`);
+                        const data = await response.json();
+                        
+                        if (data.shorturl) {
+                            shortUrl = data.shorturl;
+                        } else if (data.errormessage) {
+                            shortUrlError = true;
+                            console.error('is.gd error:', data.errormessage);
+                        }
+                    } catch (error) {
+                        shortUrlError = true;
+                        console.error('is.gd API error:', error);
+                    }
+                }
+                
+                const itemType = quiz.type === 'flashcard' ? 'fiszek' : 'pytań';
+                
+                let contentHtml = `
+                    <div style="margin-bottom: 24px;">
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
+                            <strong>${quiz.title}</strong><br>
+                            ${itemCount} ${itemType}
+                        </p>
+                    </div>
+                `;
+                
+                if (shortUrl) {
+                    contentHtml += `
+                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                                ✅ Link skrócony (działa w Messenger i WhatsApp):
+                            </p>
+                            <input type="text" value="${shortUrl}" readonly 
+                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--surface);"
+                                onclick="this.select()" id="shortUrlInput">
+                            <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Skrócony link skopiowany! 🔗')" 
+                                style="width: 100%; margin-top: 12px;">
+                                📋 Kopiuj link
+                            </button>
+                        </div>
+                    `;
+                    
+                    if (itemCount <= 25) {
+                        contentHtml += `
+                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                                    📱 Kod QR (zeskanuj telefonem):
+                                </p>
+                                <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px;"></div>
+                            </div>
+                        `;
+                    }
+                    
+                    contentHtml += `
+                        <p style="font-size: 12px; color: var(--success); text-align: center; margin-bottom: 16px;">
+                            ✅ Link pokazuje nazwę strony w podglądzie
+                        </p>
+                        <details style="margin-top: 16px;">
+                            <summary style="cursor: pointer; color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
+                                Pokaż pełny link (zaawansowane)
+                            </summary>
+                            <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-top: 8px;">
+                                <input type="text" value="${fullUrl}" readonly 
+                                    style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: monospace; background: var(--surface);"
+                                    onclick="this.select()">
+                                <button class="btn btn-small" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Pełny link skopiowany!')" 
+                                    style="width: 100%; margin-top: 8px;">
+                                    📋 Kopiuj pełny link
+                                </button>
+                            </div>
+                        </details>
+                    `;
+                    
+                    if (itemCount <= 25) {
+                        setTimeout(() => {
+                            const qrDiv = document.getElementById('qrcode');
+                            if (qrDiv) {
+                                qrDiv.innerHTML = '';
+                                new QRCode(qrDiv, {
+                                    text: shortUrl,
+                                    width: 160,
+                                    height: 160,
+                                    colorDark: '#2C3E50',
+                                    colorLight: '#ffffff',
+                                    correctLevel: QRCode.CorrectLevel.M
+                                });
+                            }
+                        }, 100);
+                    }
+                } else {
+                    const warningHtml = shortUrlError ? `
+                        <p style="color: var(--warning); font-size: 13px; margin-bottom: 12px;">
+                            ⚠️ Nie udało się skrócić linku. W Messengerze kliknij w sam tekst linku, nie w podgląd.
+                        </p>
+                    ` : '';
+                    
+                    contentHtml += `
+                        ${warningHtml}
+                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                                ${fullUrl.length > 500 ? '📝 Link (może być długi):' : '✅ Link do udostępnienia (z podglądem):'}
+                            </p>
+                            <input type="text" value="${fullUrl}" readonly 
+                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: monospace; background: var(--surface); word-break: break-all;"
+                                onclick="this.select()" id="fullUrlInput">
+                            <button class="btn btn-primary" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Link skopiowany! 🔗')" 
+                                style="width: 100%; margin-top: 12px;">
+                                📋 Kopiuj link
+                            </button>
+                        </div>
+                    `;
+                    
+                    if (fullUrl.length < 500) {
+                        contentHtml += `
+                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                                    📱 Kod QR (zeskanuj telefonem):
+                                </p>
+                                <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px;"></div>
+                            </div>
+                            <p style="font-size: 12px; color: var(--success); text-align: center;">
+                                ✅ Ten link pokaże podgląd w Messengerze i WhatsApp
+                            </p>
+                        `;
+                        
+                        setTimeout(() => {
+                            const qrDiv = document.getElementById('qrcode');
+                            if (qrDiv) {
+                                qrDiv.innerHTML = '';
+                                new QRCode(qrDiv, {
+                                    text: fullUrl,
+                                    width: 160,
+                                    height: 160,
+                                    colorDark: '#2C3E50',
+                                    colorLight: '#ffffff',
+                                    correctLevel: QRCode.CorrectLevel.M
+                                });
+                            }
+                        }, 100);
+                    } else {
+                        contentHtml += `
+                            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+                                💡 <strong>Wskazówki:</strong><br>
+                                • W Messengerze: Kliknij w <strong>sam tekst linku</strong>, nie w podgląd<br>
+                                • W WhatsApp: Zaznacz i skopiuj <strong>cały link</strong><br>
+                                • Alternatywnie: Użyj przycisku Eksportuj i wyślij plik
+                            </p>
+                        `;
+                    }
+                }
+                
+                document.getElementById('shareContent').innerHTML = contentHtml;
+                
+            } catch (error) {
+                document.getElementById('shareContent').innerHTML = `
+                    <p style="color: var(--danger); text-align: center;">
+                        ❌ Błąd: ${error.message}
+                    </p>
+                `;
+            }
+        }
+        
+        function copyToClipboard(text, message) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(message, 'success');
+                closeModal('shareModal');
+            }).catch(() => {
+                showToast('Nie udało się skopiować', 'error');
+            });
         }
 
         // ==================== IMPORT/EXPORT ====================
@@ -3786,7 +3840,7 @@ Przykład:
 
         function importQuiz() {
             const jsonText = document.getElementById('importJson').value;
-            const mergeMode = true; // Zawsze włączony merge mode
+            const mergeMode = true;
             
             try {
                 const data = JSON.parse(jsonText);
@@ -3797,7 +3851,6 @@ Przykład:
                     let skippedCount = 0;
                     
                     data.forEach(quiz => {
-                        // Sprawdź czy quiz już istnieje
                         const exists = quizzes.find(q => 
                             q.title === quiz.title && 
                             q.type === quiz.type &&
@@ -3825,7 +3878,6 @@ Przykład:
                 } else {
                     const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
                     
-                    // Sprawdź czy quiz już istnieje
                     const exists = quizzes.find(q => 
                         q.title === data.title && 
                         q.type === data.type &&
@@ -3882,10 +3934,12 @@ Przykład:
             const a = document.createElement('a');
             a.href = url;
             a.download = `${quiz.title.replace(/[^a-z0-9]/gi, '_')}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
             
-            showToast('Quiz wyeksportowany!', 'success');
+            setTimeout(() => {
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Quiz wyeksportowany!', 'success');
+            }, 100);
         }
 
         function exportAllData() {
@@ -4079,6 +4133,16 @@ Przykład:
                     }
                 }
             });
+            
+            const themeToggle = document.querySelector('.theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleTheme();
+                    }
+                });
+            }
         }
 
         // ==================== TOAST SYSTEM ====================
@@ -4086,14 +4150,11 @@ Przykład:
             const newToast = { message, type };
             
             if (activeToast) {
-                // Jeśli jest aktywne powiadomienie
-                queuedToast = newToast; // Nadpisz kolejkę
+                queuedToast = newToast;
                 
-                // Przyspiesz ukrycie aktywnego powiadomienia (0.5s)
                 if (toastTimeout) clearTimeout(toastTimeout);
                 hideActiveToast(500, 500);
             } else {
-                // Brak aktywnego powiadomienia - wyświetl od razu
                 displayToast(newToast);
             }
         }
@@ -4106,10 +4167,8 @@ Przykład:
             
             activeToast = toast;
             
-            // Pokaż z animacją
             setTimeout(() => toast.classList.add('toast-show'), 10);
             
-            // Auto-hide - 3 sekundy jeśli brak kolejki, 0.5s jeśli jest kolejka
             const delay = queuedToast ? 500 : 3000;
             toastTimeout = setTimeout(() => hideActiveToast(300, delay), delay);
         }
@@ -4119,7 +4178,6 @@ Przykład:
             
             const toast = activeToast;
             
-            // Jeśli totalDelay jest większy niż animDelay, czekaj przed animacją
             const waitTime = totalDelay ? totalDelay - animDelay : 0;
             
             setTimeout(() => {
@@ -4131,7 +4189,6 @@ Przykład:
                         toast.remove();
                     }
                     
-                    // Sprawdź czy jest coś w kolejce
                     if (activeToast === toast) {
                         activeToast = null;
                         
