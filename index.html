@@ -3775,7 +3775,7 @@ Przykład:
                     document.getElementById('flashcardFront').textContent = cards[currentCardIndex].front;
                 }
 
-                // flashcardEl.classList.remove('flipped');
+                flashcardEl.classList.remove('flipped');
                 isCardFlipped = false;
 
                 setTimeout(() => {
@@ -3795,7 +3795,7 @@ Przykład:
                     document.getElementById('flashcardBack').textContent = cards[currentCardIndex].back;
                 }
 
-                flashcardEl.classList.add('spinning');
+                //flashcardEl.classList.add('spinning');
                 
                 setTimeout(() => {
                     if (currentCardIndex < cards.length) {
@@ -4863,4 +4863,5 @@ const nextY = nextD ? 100 - ((nextD.avg - minScore) / (maxScore - minScore || 1)
     </script>
 </body>
 </html>
+
 
