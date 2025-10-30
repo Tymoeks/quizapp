@@ -3,21 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizApp 2.0 - Twórz i rozwiązuj quizy</title>
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tymoeks.github.io/quizapp/">
-    <meta property="og:title" content="QuizApp 2.0 - Quiz udostępniony">
-    <meta property="og:description" content="Ktoś udostępnił Ci quiz! Kliknij aby rozwiązać.">
-    <meta property="og:image" content="https://tymoeks.github.io/quizapp/preview.png">
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://tymoeks.github.io/quizapp/">
-    <meta property="twitter:title" content="QuizApp 2.0 - Quiz udostępniony">
-    <meta property="twitter:description" content="Ktoś udostępnił Ci quiz! Kliknij aby rozwiązać.">
-    <meta property="twitter:image" content="https://tymoeks.github.io/quizapp/preview.png">
+    <title>QuizApp 2.5 - Twórz i rozwiązuj quizy i fiszki</title>
     
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
@@ -424,23 +410,23 @@
             overflow: hidden;
         }
 
-.quiz-item.selection-mode {
-    padding-left: 80px;
-}
+        .quiz-item.selection-mode {
+            padding-left: 80px;
+        }
 
-.quiz-item.selected {
-    border-color: var(--accent);
-    background: var(--surface-alt);
-}
+        .quiz-item.selected {
+            border-color: var(--accent);
+            background: var(--surface-alt);
+        }
 
-.quiz-checkbox {
-    position: absolute;
-    top: 24px;
-    left: 16px;
-    width: 24px;
-    height: 24px;
-    z-index: 10;
-}
+        .quiz-checkbox {
+            position: absolute;
+            top: 24px;
+            left: 16px;
+            width: 24px;
+            height: 24px;
+            z-index: 10;
+        }
 
         .quiz-item::before {
             content: '';
@@ -954,11 +940,6 @@
         }
 
         .flashcard.flipped {
-            transform: rotateY(180deg);
-        }
-
-        .flashcard.spinning {
-            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
             transform: rotateY(180deg);
         }
 
@@ -1654,12 +1635,11 @@
 
     <div class="container">
         <div class="header">
-            <h1>QuizApp 2.0</h1>
+            <h1>QuizApp 2.5</h1>
             <p>Profesjonalna platforma do tworzenia i rozwiązywania quizów</p>
             <div class="header-actions">
                 <button class="btn btn-accent btn-small" onclick="showImportModal()">📥 Import</button>
                 <button class="btn btn-small" onclick="showBackupModal()">💾 Backup</button>
-                <button class="btn btn-small" onclick="showStatsModal()">📊 Statystyki</button>
             </div>
         </div>
 
@@ -1673,18 +1653,18 @@
                     <button class="filter-btn" data-filter="flashcard" onclick="setFilter('flashcard')">🎴 Fiszki</button>
                 </div>
             </div>
-    <div id="batchActions" class="search-bar" style="display: none; background: var(--surface-alt);">
-        <span id="selectedCount" style="font-weight: 500;">0 zaznaczonych</span>
-        <div class="filter-group">
-            <button class="btn btn-small btn-danger" onclick="batchDelete()">🗑️ Usuń</button>
-            <button class="btn btn-small" onclick="batchExport()">📤 Eksportuj</button>
-            <button class="btn btn-small" onclick="clearSelection()">✕ Anuluj</button>
-        </div>
-    </div>
+            <div id="batchActions" class="search-bar" style="display: none; background: var(--surface-alt);">
+                <span id="selectedCount" style="font-weight: 500;">0 zaznaczonych</span>
+                <div class="filter-group">
+                    <button class="btn btn-small btn-danger" onclick="batchDelete()">🗑️ Usuń</button>
+                    <button class="btn btn-small" onclick="batchExport()">📤 Eksportuj</button>
+                    <button class="btn btn-small" onclick="clearSelection()">✕ Anuluj</button>
+                </div>
+            </div>
             <div class="quiz-list" id="quizList"></div>
             <div style="text-align: center; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
                 <button class="btn btn-primary" onclick="showChooseTypeScreen()">➕ Utwórz nowy</button>
-        <button class="btn" onclick="toggleSelectionMode()" id="selectionModeBtn">☑️ Zaznacz wiele</button>
+                <button class="btn" onclick="toggleSelectionMode()" id="selectionModeBtn">☑️ Zaznacz wiele</button>
             </div>
         </div>
 
@@ -1785,7 +1765,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Pre-Quiz Screen -->
         <div id="preQuizScreen" class="screen hidden">
             <div class="card card-white animate-fadeIn">
@@ -2048,18 +2027,6 @@
         </div>
     </div>
 
-    <!-- Stats Modal -->
-    <div id="statsModal" class="modal hidden" onclick="closeModal('statsModal')">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h2>📊 Statystyki</h2>
-                <button class="modal-close" onclick="closeModal('statsModal')">×</button>
-            </div>
-            <div id="statsContent"></div>
-            <div id="progressChart" style="margin-top: 32px;"></div>
-        </div>
-    </div>
-
     <!-- Share Modal -->
     <div id="shareModal" class="modal hidden" onclick="closeModal('shareModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
@@ -2068,7 +2035,8 @@
                 <button class="modal-close" onclick="closeModal('shareModal')">×</button>
             </div>
             <div id="shareContent">
-                <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 14px;">
+                <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 14px; text-align: center;">
+                    <span style="font-size: 32px;">⏳</span><br>
                     Generowanie linku...
                 </p>
             </div>
@@ -2111,26 +2079,229 @@
         let isCardFlipped = false;
         let isTransitioning = false;
         let cardRatings = [];
-        let isSpinning = false;
 
         // Toast queue system
         let activeToast = null;
         let queuedToast = null;
         let toastTimeout = null;
 
+        // Debounce timer
+        let searchDebounceTimer = null;
+
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
+            validateAndCleanData();
             checkSharedQuiz();
             setupKeyboardShortcuts();
         });
+
+        // ==================== DATA VALIDATION ====================
+        function validateQuizFormat(quiz) {
+            try {
+                // Sprawdź wymagane pola
+                if (!quiz.title || typeof quiz.title !== 'string') return false;
+                if (!quiz.data || typeof quiz.data !== 'string') return false;
+                
+                const data = quiz.data;
+                
+                // Sprawdź czy zaczyna się od {0 (quiz) lub {1 (flashcard)
+                if (!data.startsWith('{0') && !data.startsWith('{1')) return false;
+                
+                // Sprawdź czy kończy się na }
+                if (!data.endsWith('}')) return false;
+                
+                // Sprawdź długość
+                if (data.length < 5) return false;
+                
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function validateAndCleanData() {
+            try {
+                const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                const validQuizzes = [];
+                let removedCount = 0;
+
+                quizzes.forEach(quiz => {
+                    if (validateQuizFormat(quiz)) {
+                        validQuizzes.push(quiz);
+                    } else {
+                        removedCount++;
+                        console.warn('Usunięto nieprawidłowy quiz:', quiz.title || 'Bez tytułu');
+                    }
+                });
+
+                if (removedCount > 0) {
+                    localStorage.setItem('quizzes', JSON.stringify(validQuizzes));
+                    showToast(`Usunięto ${removedCount} nieprawidłowych quizów`, 'info');
+                }
+            } catch (error) {
+                console.error('Błąd walidacji danych:', error);
+            }
+        }
+
+        // ==================== FORMAT CONVERSION ====================
+        function decodeFromNewFormat(data) {
+            if (!data.data || typeof data.data !== 'string') {
+                throw new Error('Brak pola data w nowym formacie');
+            }
+            
+            const content = data.data;
+            
+            if (content.startsWith('{1')) {
+                // Fiszki
+                const cardsData = content.substring(2, content.length - 1);
+                const parts = cardsData.split('|');
+                const cards = [];
+                
+                for (let i = 0; i < parts.length; i += 3) {
+                    if (parts[i]) {
+                        const card = {
+                            front: parts[i],
+                            back: parts[i + 2] || ''
+                        };
+                        if (parts[i + 1]) {
+                            card.category = parts[i + 1];
+                        }
+                        cards.push(card);
+                    }
+                }
+                
+                return {
+                    title: data.title,
+                    tags: data.tags || [],
+                    type: 'flashcard',
+                    data: content,
+                    cards: cards
+                };
+            } else if (content.startsWith('{0')) {
+                // Quiz
+                const questionsData = content.substring(2, content.length - 1);
+                const questions = [];
+                let i = 0;
+                
+                while (i < questionsData.length) {
+                    const qType = questionsData[i];
+                    i++;
+                    
+                    const parts = [];
+                    let current = '';
+                    
+                    while (i < questionsData.length && questionsData[i] !== '0' && questionsData[i] !== '1') {
+                        if (questionsData[i] === '|') {
+                            parts.push(current);
+                            current = '';
+                        } else {
+                            current += questionsData[i];
+                        }
+                        i++;
+                    }
+                    
+                    if (parts.length > 0) {
+                        const question = {
+                            question: parts[0],
+                            group: parts[1] || undefined,
+                            correct: parts[2]
+                        };
+                        
+                        if (qType === '1') {
+                            question.type = 'tf';
+                            question.wrong = [parts[3]];
+                        } else {
+                            question.wrong = parts.slice(3);
+                        }
+                        
+                        questions.push(question);
+                    }
+                }
+                
+                return {
+                    title: data.title,
+                    tags: data.tags || [],
+                    type: 'quiz',
+                    answerCount: data.answerCount || 4,
+                    data: content,
+                    questions: questions
+                };
+            }
+            
+            throw new Error('Nieznany format danych');
+        }
+
+        function encodeToNewFormat(quiz) {
+            // Jeśli już ma pole data, użyj go
+            if (quiz.data && typeof quiz.data === 'string') {
+                return {
+                    title: quiz.title,
+                    tags: quiz.tags || [],
+                    answerCount: quiz.answerCount || 4,
+                    type: quiz.type,
+                    data: quiz.data
+                };
+            }
+            
+            // Jeśli nie ma, zakoduj z questions/cards
+            let data = '';
+            
+            if (quiz.type === 'flashcard') {
+                data = '{1';
+                quiz.cards.forEach(card => {
+                    data += card.front + '|';
+                    data += (card.category || '') + '|';
+                    data += card.back + '|';
+                });
+                data += '}';
+            } else {
+                data = '{0';
+                quiz.questions.forEach(q => {
+                    if (q.type === 'tf') {
+                        data += '1' + q.question + '|';
+                        data += (q.group || '') + '|';
+                        data += q.correct + '|';
+                        data += q.wrong[0] + '|';
+                    } else {
+                        data += '0' + q.question + '|';
+                        data += (q.group || '') + '|';
+                        data += q.correct + '|';
+                        data += q.wrong.join('|') + '|';
+                    }
+                });
+                data += '}';
+            }
+            
+            return {
+                title: quiz.title,
+                tags: quiz.tags || [],
+                answerCount: quiz.answerCount || 4,
+                type: quiz.type,
+                data: data
+            };
+        }
+
+        // ==================== LOCAL STORAGE PROTECTION ====================
+        function safeLocalStorageSet(key, value) {
+            try {
+                localStorage.setItem(key, value);
+                return true;
+            } catch (error) {
+                if (error.name === 'QuotaExceededError') {
+                    showToast('Błąd: Brak miejsca w localStorage. Usuń stare quizy.', 'error');
+                } else {
+                    showToast('Błąd zapisu: ' + error.message, 'error');
+                }
+                return false;
+            }
+        }
 
         // ==================== THEME ====================
         function initTheme() {
             let savedTheme = localStorage.getItem('theme');
             
             if (!savedTheme) {
-                // Auto-detect from system preference
                 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                     savedTheme = 'dark';
                 } else {
@@ -2141,7 +2312,6 @@
             document.documentElement.setAttribute('data-theme', savedTheme);
             updateThemeIcon(savedTheme);
             
-            // Listen for system theme changes
             if (window.matchMedia) {
                 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
                     if (!localStorage.getItem('theme')) {
@@ -2165,15 +2335,6 @@
         function updateThemeIcon(theme) {
             document.getElementById('themeIcon').textContent = theme === 'dark' ? '☀️' : '🌙';
         }
-        
-        // Keyboard support for theme toggle
-        document.addEventListener('keydown', (e) => {
-            const themeToggle = document.querySelector('.theme-toggle');
-            if (document.activeElement === themeToggle && (e.key === 'Enter' || e.key === ' ')) {
-                e.preventDefault();
-                toggleTheme();
-            }
-        });
 
         // ==================== NAVIGATION ====================
         function hideAllScreens() {
@@ -2283,13 +2444,13 @@ Przykład:
                 editTags = quiz.tags || [];
                 renderEditTags();
                 
-                const jsonData = {...quiz};
-                delete jsonData.title;
-                delete jsonData.tags;
-                delete jsonData.id;
-                delete jsonData.createdAt;
-                delete jsonData.updatedAt;
-                delete jsonData.answerCount;
+                const jsonData = {
+                    title: quiz.title,
+                    tags: quiz.tags,
+                    type: quiz.type,
+                    answerCount: quiz.answerCount,
+                    data: quiz.data
+                };
                 
                 document.getElementById('editQuizJson').value = JSON.stringify(jsonData, null, 2);
             }
@@ -2427,7 +2588,11 @@ Przykład:
         }
 
         function filterQuizzes() {
-            loadQuizzes();
+            // Debounce - opóźnij wyszukiwanie o 300ms
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                loadQuizzes();
+            }, 300);
         }
 
         function setFilter(filter) {
@@ -2437,7 +2602,6 @@ Przykład:
             });
             loadQuizzes();
         }
-
         function saveQuiz() {
             const jsonText = document.getElementById('quizJson').value.trim();
             const titleInput = document.getElementById('quizTitle').value.trim();
@@ -2451,53 +2615,44 @@ Przykład:
             try {
                 const quizData = JSON.parse(jsonText);
 
-                // Wykryj format i przekonwertuj jeśli nowy
-                if (quizData.data && typeof quizData.data === 'string') {
-                    const decoded = decodeFromNewFormat(quizData);
-                    Object.assign(quizData, decoded);
+                // Waliduj format
+                if (!validateQuizFormat(quizData)) {
+                    throw new Error('Nieprawidłowy format JSON');
                 }
 
-                if (window.currentCreateType === 'flashcard') {
-                    if (!quizData.cards || !Array.isArray(quizData.cards)) {
-                        throw new Error('Nieprawidłowa struktura JSON dla fiszek');
-                    }
-                    quizData.type = 'flashcard';
-                } else {
-                    if (!quizData.questions || !Array.isArray(quizData.questions)) {
-                        throw new Error('Nieprawidłowa struktura JSON dla quizu');
-                    }
-                    quizData.type = 'quiz';
-                }
+                // Dekoduj dane
+                const decoded = decodeFromNewFormat(quizData);
                 
-                const finalTitle = titleInput || quizData.title;
+                const finalTitle = titleInput || decoded.title;
                 if (!finalTitle) {
                     throw new Error('Brak tytułu quizu');
                 }
                 
-                const jsonTags = quizData.tags || [];
+                const jsonTags = decoded.tags || [];
                 const allTags = [...new Set([...currentTags, ...jsonTags])];
                 
                 const quiz = {
-                    ...quizData,
                     title: finalTitle,
                     tags: allTags,
+                    type: decoded.type,
+                    data: decoded.data,
+                    answerCount: window.currentCreateType === 'flashcard' ? 4 : answerCount,
                     id: Date.now().toString(),
-                    answerCount: answerCount,
                     createdAt: new Date().toISOString()
                 };
+
+                // Dodaj zdekodowane dane dla łatwego dostępu
+                if (decoded.type === 'flashcard') {
+                    quiz.cards = decoded.cards;
+                } else {
+                    quiz.questions = decoded.questions;
+                }
                 
                 const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
                 quizzes.push(quiz);
                 
-                try {
-                    localStorage.setItem('quizzes', JSON.stringify(quizzes));
-                } catch (error) {
-                    if (error.name === 'QuotaExceededError') {
-                        showToast('Błąd: Brak miejsca w localStorage. Usuń stare quizy.', 'error');
-                    } else {
-                        showToast('Błąd zapisu: ' + error.message, 'error');
-                    }
-                    throw error;
+                if (!safeLocalStorageSet('quizzes', JSON.stringify(quizzes))) {
+                    return;
                 }
                 
                 showToast('Quiz został zapisany!', 'success');
@@ -2570,11 +2725,7 @@ Przykład:
             
             const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
             const selected = quizzes.filter(q => selectedQuizzes.has(q.id)).map(q => {
-                const exportData = {...q};
-                delete exportData.id;
-                delete exportData.createdAt;
-                delete exportData.updatedAt;
-                return exportData;
+                return encodeToNewFormat(q);
             });
             
             const blob = new Blob([JSON.stringify(selected, null, 2)], {
@@ -2603,48 +2754,47 @@ Przykład:
             try {
                 const updatedData = JSON.parse(jsonText);
 
-                // Wykryj format i przekonwertuj jeśli nowy
-                if (updatedData.data && typeof updatedData.data === 'string') {
-                    const decoded = decodeFromNewFormat(updatedData);
-                    Object.assign(updatedData, decoded);
+                // Waliduj format
+                if (!validateQuizFormat(updatedData)) {
+                    throw new Error('Nieprawidłowy format JSON');
                 }
+
+                // Dekoduj dane
+                const decoded = decodeFromNewFormat(updatedData);
                 
                 if (!title) {
                     throw new Error('Brak tytułu');
-                }
-                
-                if (!updatedData.questions && !updatedData.cards) {
-                    throw new Error('Nieprawidłowa struktura JSON');
                 }
                 
                 const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
                 const index = quizzes.findIndex(q => q.id === currentEditingQuizId);
                 
                 if (index !== -1) {
-                    const jsonTags = updatedData.tags || [];
+                    const jsonTags = decoded.tags || [];
                     const allTags = [...new Set([...editTags, ...jsonTags])];
                     
                     quizzes[index] = {
-                        ...updatedData,
                         title: title,
                         tags: allTags,
-                        id: currentEditingQuizId,
+                        type: decoded.type,
+                        data: decoded.data,
                         answerCount: quizzes[index].answerCount,
-                        type: quizzes[index].type,
+                        id: currentEditingQuizId,
                         createdAt: quizzes[index].createdAt,
                         updatedAt: new Date().toISOString()
                     };
-                    
-                    try {
-                        localStorage.setItem('quizzes', JSON.stringify(quizzes));
-                    } catch (error) {
-                        if (error.name === 'QuotaExceededError') {
-                            showToast('Błąd: Brak miejsca w localStorage. Usuń stare quizy.', 'error');
-                        } else {
-                            showToast('Błąd zapisu: ' + error.message, 'error');
-                        }
-                        throw error;
+
+                    // Dodaj zdekodowane dane
+                    if (decoded.type === 'flashcard') {
+                        quizzes[index].cards = decoded.cards;
+                    } else {
+                        quizzes[index].questions = decoded.questions;
                     }
+                    
+                    if (!safeLocalStorageSet('quizzes', JSON.stringify(quizzes))) {
+                        return;
+                    }
+                    
                     showToast('Quiz został zaktualizowany!', 'success');
                     showHomeScreen();
                 }
@@ -2746,417 +2896,97 @@ Przykład:
             renderEditTags();
         }
 
-                // ==================== SHARING ====================
+        // ==================== SHARING ====================
+        function checkSharedQuiz() {
+            const hash = window.location.hash;
+            
+            if (hash.startsWith('#q=')) {
+                const compressed = hash.substring(3);
+                
+                try {
+                    let jsonString = null;
+                    
+                    const base64 = compressed
+                        .replace(/-/g, '+')
+                        .replace(/_/g, '/');
+                    
+                    jsonString = LZString.decompressFromBase64(base64);
+                    
+                    if (!jsonString) {
+                        jsonString = LZString.decompressFromEncodedURIComponent(compressed);
+                    }
+                    
+                    if (!jsonString) {
+                        throw new Error('Nie udało się zdekompresować danych');
+                    }
+                    
+                    const quizData = JSON.parse(jsonString);
 
-                function decodeFromNewFormat(data) {
-
-                    if (!data.data) {
-
-                        throw new Error('Brak pola data w nowym formacie');
-
+                    // Waliduj format
+                    if (!validateQuizFormat(quizData)) {
+                        throw new Error('Nieprawidłowy format udostępnionego quizu');
                     }
 
+                    // Dekoduj dane
+                    const decoded = decodeFromNewFormat(quizData);
                     
-
-                    const content = data.data;
-
+                    const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                    const exists = quizzes.find(q => 
+                        q.title === decoded.title && 
+                        q.type === decoded.type &&
+                        q.data === decoded.data
+                    );
                     
-
-                    if (content.startsWith('{1')) {
-
-                        // Fiszki
-
-                        const cardsData = content.substring(2, content.length - 1);
-
-                        const parts = cardsData.split('|');
-
-                        const cards = [];
-
+                    if (exists) {
+                        showToast('Quiz już istnieje w Twojej bibliotece!', 'info');
                         
-
-                        for (let i = 0; i < parts.length; i += 3) {
-
-                            if (parts[i]) {
-
-                                const card = {
-
-                                    front: parts[i],
-
-                                    back: parts[i + 2]
-
-                                };
-
-                                if (parts[i + 1]) {
-
-                                    card.category = parts[i + 1];
-
-                                }
-
-                                cards.push(card);
-
-                            }
-
+                        if (decoded.type === 'flashcard') {
+                            showFlashcardScreen(exists.id);
+                        } else {
+                            showPreQuizScreen(exists.id);
                         }
-
-                        
-
-                        return {
-
-                            title: data.title,
-
-                            tags: data.tags || [],
-
-                            type: 'flashcard',
-
-                            cards: cards
-
+                    } else {
+                        const newQuiz = {
+                            title: decoded.title,
+                            tags: decoded.tags,
+                            type: decoded.type,
+                            data: decoded.data,
+                            answerCount: decoded.answerCount || 4,
+                            id: Date.now().toString(),
+                            createdAt: new Date().toISOString()
                         };
 
-                    } else if (content.startsWith('{0')) {
-
-                        // Quiz
-
-                        const questionsData = content.substring(2, content.length - 1);
-
-                        const questions = [];
-
-                        let i = 0;
-
-                        
-
-                        while (i < questionsData.length) {
-
-                            const qType = questionsData[i];
-
-                            i++;
-
-                            
-
-                            const parts = [];
-
-                            let current = '';
-
-                            
-
-                            while (i < questionsData.length && questionsData[i] !== '0' && questionsData[i] !== '1') {
-
-                                if (questionsData[i] === '|') {
-
-                                    parts.push(current);
-
-                                    current = '';
-
-                                } else {
-
-                                    current += questionsData[i];
-
-                                }
-
-                                i++;
-
-                            }
-
-                            
-
-                            if (parts.length > 0) {
-
-                                const question = {
-
-                                    question: parts[0],
-
-                                    group: parts[1] || undefined,
-
-                                    correct: parts[2]
-
-                                };
-
-                                
-
-                                if (qType === '1') {
-
-                                    question.type = 'tf';
-
-                                    question.wrong = [parts[3]];
-
-                                } else {
-
-                                    question.wrong = parts.slice(3);
-
-                                }
-
-                                
-
-                                questions.push(question);
-
-                            }
-
+                        // Dodaj zdekodowane dane
+                        if (decoded.type === 'flashcard') {
+                            newQuiz.cards = decoded.cards;
+                        } else {
+                            newQuiz.questions = decoded.questions;
                         }
-
                         
-
-                        return {
-
-                            title: data.title,
-
-                            tags: data.tags || [],
-
-                            type: 'quiz',
-
-                            answerCount: data.answerCount || 4,
-
-                            questions: questions
-
-                        };
-
-                    }
-
-                    
-
-                    throw new Error('Nieznany format danych');
-
-                }
-
-        
-
-                function checkSharedQuiz() {
-
-                    const hash = window.location.hash;
-
-                    
-
-                    if (hash.startsWith('#q=')) {
-
-                        const compressed = hash.substring(3);
-
-                        
-
-                        try {
-
-                            let jsonString = null;
-
-                            
-
-                            const base64 = compressed
-
-                                .replace(/-/g, '+')
-
-                                .replace(/_/g, '/');
-
-                            
-
-                            jsonString = LZString.decompressFromBase64(base64);
-
-                            
-
-                            if (!jsonString) {
-
-                                jsonString = LZString.decompressFromEncodedURIComponent(compressed);
-
-                            }
-
-                            
-
-                            if (!jsonString) {
-
-                                throw new Error('Nie udało się zdekompresować danych');
-
-                            }
-
-                            
-
-                            const parsedData = JSON.parse(jsonString);
-
-                            let quizData;
-
-        
-
-                            // Wykryj format
-
-                            if (parsedData.data && typeof parsedData.data === 'string') {
-
-                                // Nowy format
-
-                                quizData = decodeFromNewFormat(parsedData);
-
-                            } else if (Array.isArray(parsedData)) {
-
-                                // Stary format - array
-
-                                quizData = {
-
-                                    title: parsedData[0],
-
-                                    tags: parsedData[1] || [],
-
-                                    type: parsedData[2] === 1 ? 'flashcard' : 'quiz',
-
-                                    answerCount: parsedData[3] || 4
-
-                                };
-
-                                
-
-                                if (parsedData[2] === 1) {
-
-                                    quizData.cards = parsedData[4].map(c => ({
-
-                                        front: c[0],
-
-                                        back: c[1],
-
-                                        ...(c[2] && { category: c[2] })
-
-                                    }));
-
-                                } else {
-
-                                    quizData.questions = parsedData[4].map(q => ({
-
-                                        question: q[0],
-
-                                        correct: q[1],
-
-                                        wrong: q[2],
-
-                                        ...(q[3] && { group: q[3] }),
-
-                                        ...(q[4] && { type: q[4] })
-
-                                    }));
-
-                                }
-
-                            } else {
-
-                                throw new Error('Nieznany format danych');
-
-                            }
-
-                            
-
-                            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-
-                            const exists = quizzes.find(q => 
-
-                                q.title === quizData.title && 
-
-                                q.type === quizData.type &&
-
-                                JSON.stringify(q.questions || q.cards) === JSON.stringify(quizData.questions || quizData.cards)
-
-                            );
-
-                            
-
-                            if (exists) {
-
-                                showToast('Quiz już istnieje w Twojej bibliotece!', 'info');
-
-                                
-
-                                if (quizData.type === 'flashcard') {
-
-                                    showFlashcardScreen(exists.id);
-
-                                } else {
-
-                                    showPreQuizScreen(exists.id);
-
-                                }
-
-                            } else {
-
-                                const newQuiz = {
-
-                                    ...quizData,
-
-                                    id: Date.now().toString(),
-
-                                    createdAt: new Date().toISOString()
-
-                                };
-
-                                
-
-                                quizzes.push(newQuiz);
-
-                                localStorage.setItem('quizzes', JSON.stringify(quizzes));
-
-                                
-
-                                showToast('Quiz został dodany! 🎉', 'success');
-
-                                
-
-                                if (quizData.type === 'flashcard') {
-
-                                    showFlashcardScreen(newQuiz.id);
-
-                                } else {
-
-                                    showPreQuizScreen(newQuiz.id);
-
-                                }
-
-                            }
-
-                            
-
-                            history.replaceState(null, null, window.location.pathname);
-
-                            
-
-                        } catch (error) {
-
-                            showToast('Błąd wczytywania udostępnionego quizu: ' + error.message, 'error');
-
+                        quizzes.push(newQuiz);
+                        if (!safeLocalStorageSet('quizzes', JSON.stringify(quizzes))) {
                             showHomeScreen();
-
+                            return;
                         }
-
-                    } else {
-
-                        showHomeScreen();
-
+                        
+                        showToast('Quiz został dodany! 🎉', 'success');
+                        
+                        if (decoded.type === 'flashcard') {
+                            showFlashcardScreen(newQuiz.id);
+                        } else {
+                            showPreQuizScreen(newQuiz.id);
+                        }
                     }
+                    
+                    history.replaceState(null, null, window.location.pathname);
+                    
+                } catch (error) {
+                    showToast('Błąd wczytywania udostępnionego quizu: ' + error.message, 'error');
+                    showHomeScreen();
                 }
-
-        function encodeToNewFormat(quiz) {
-            let data = '';
-            
-            if (quiz.type === 'flashcard') {
-                data = '{1';
-                quiz.cards.forEach(card => {
-                    data += card.front + '|';
-                    data += (card.category || '') + '|';
-                    data += card.back + '|';
-                });
-                data += '}';
             } else {
-                data = '{0';
-                quiz.questions.forEach(q => {
-                    if (q.type === 'tf') {
-                        data += '1' + q.question + '|';
-                        data += (q.group || '') + '|';
-                        data += q.correct + '|';
-                        data += q.wrong[0] + '|';
-                    } else {
-                        data += '0' + q.question + '|';
-                        data += (q.group || '') + '|';
-                        data += q.correct + '|';
-                        data += q.wrong.join('|') + '|';
-                    }
-                });
-                data += '}';
+                showHomeScreen();
             }
-            
-            return {
-                title: quiz.title,
-                tags: quiz.tags || [],
-                answerCount: quiz.answerCount || 4,
-                type: quiz.type,
-                data: data
-            };
         }
 
         async function shareQuiz(quizId) {
@@ -3185,15 +3015,14 @@ Przykład:
                     .replace(/\//g, '_')
                     .replace(/=/g, '');
                 
-                const baseUrl = 'https://tymoeks.github.io/quizapp/';
+                const baseUrl = window.location.origin + window.location.pathname;
                 const fullUrl = `${baseUrl}#q=${compressed}`;
                 
                 let shortUrl = null;
-                let shortUrlError = false;
                 
                 const itemCount = quiz.type === 'flashcard' ? quiz.cards.length : quiz.questions.length;
                 
-                console.log(`[Share] URL length: ${fullUrl.length} characters`);
+                // Próbuj skrócić link jeśli jest dłuższy niż 500 znaków
                 if (fullUrl.length > 500 && fullUrl.length < 2000) {
                     try {
                         const response = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`);
@@ -3201,12 +3030,8 @@ Przykład:
                         
                         if (data.shorturl) {
                             shortUrl = data.shorturl;
-                        } else if (data.errormessage) {
-                            shortUrlError = true;
-                            console.error('is.gd error:', data.errormessage);
                         }
                     } catch (error) {
-                        shortUrlError = true;
                         console.error('is.gd API error:', error);
                     }
                 }
@@ -3226,12 +3051,12 @@ Przykład:
                     contentHtml += `
                         <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
                             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                                ✅ Link skrócony (działa w Messenger i WhatsApp):
+                                Link skrócony:
                             </p>
                             <input type="text" value="${shortUrl}" readonly 
                                 style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--surface);"
                                 onclick="this.select()" id="shortUrlInput">
-                            <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Skrócony link skopiowany! 🔗')" 
+                            <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Link skopiowany! 🔗')" 
                                 style="width: 100%; margin-top: 12px;">
                                 📋 Kopiuj link
                             </button>
@@ -3242,7 +3067,7 @@ Przykład:
                         contentHtml += `
                             <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
                                 <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                                    📱 Kod QR (zeskanuj telefonem):
+                                    Kod QR:
                                 </p>
                                 <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px; box-sizing: border-box; line-height: 0;"></div>
                             </div>
@@ -3250,12 +3075,9 @@ Przykład:
                     }
                     
                     contentHtml += `
-                        <p style="font-size: 12px; color: var(--success); text-align: center; margin-bottom: 16px;">
-                            ✅ Link pokazuje nazwę strony w podglądzie
-                        </p>
                         <details style="margin-top: 16px;">
                             <summary style="cursor: pointer; color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
-                                Pokaż pełny link (zaawansowane)
+                                Pokaż pełny link
                             </summary>
                             <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-top: 8px;">
                                 <input type="text" value="${fullUrl}" readonly 
@@ -3286,17 +3108,10 @@ Przykład:
                         }, 100);
                     }
                 } else {
-                    const warningHtml = shortUrlError ? `
-                        <p style="color: var(--warning); font-size: 13px; margin-bottom: 12px;">
-                            ⚠️ Nie udało się skrócić linku. W Messengerze kliknij w sam tekst linku, nie w podgląd.
-                        </p>
-                    ` : '';
-                    
                     contentHtml += `
-                        ${warningHtml}
                         <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
                             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                                ${fullUrl.length > 500 ? '📝 Link (może być długi):' : '✅ Link do udostępnienia (z podglądem):'}
+                                Link do udostępnienia:
                             </p>
                             <input type="text" value="${fullUrl}" readonly 
                                 style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: monospace; background: var(--surface); word-break: break-all;"
@@ -3312,13 +3127,10 @@ Przykład:
                         contentHtml += `
                             <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
                                 <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                                    📱 Kod QR (zeskanuj telefonem):
+                                    Kod QR:
                                 </p>
                                 <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px; box-sizing: border-box; line-height: 0;"></div>
                             </div>
-                            <p style="font-size: 12px; color: var(--success); text-align: center;">
-                                ✅ Ten link pokaże podgląd w Messengerze i WhatsApp
-                            </p>
                         `;
                         
                         setTimeout(() => {
@@ -3335,15 +3147,6 @@ Przykład:
                                 });
                             }
                         }, 100);
-                    } else {
-                        contentHtml += `
-                            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
-                                💡 <strong>Wskazówki:</strong><br>
-                                • W Messengerze: Kliknij w <strong>sam tekst linku</strong>, nie w podgląd<br>
-                                • W WhatsApp: Zaznacz i skopiuj <strong>cały link</strong><br>
-                                • Alternatywnie: Użyj przycisku Eksportuj i wyślij plik
-                            </p>
-                        `;
                     }
                 }
                 
@@ -3438,7 +3241,6 @@ Przykład:
             updateProgress();
             questionStartTime = Date.now();
         }
-
         function selectAnswer(selected, correct) {
             selected = decodeHtml(selected);
             correct = decodeHtml(correct);
@@ -3702,7 +3504,6 @@ Przykład:
 
             const card = cards[currentCardIndex];
             const flashcardEl = document.getElementById('flashcard');
-            const wasFlipped = flashcardEl.classList.contains('flipped');
 
             flashcardEl.classList.remove('flipped');
             document.getElementById('flashcardActions').style.display = 'none';
@@ -3714,18 +3515,13 @@ Przykład:
             if (backSide) backSide.scrollTop = 0;
             
             document.getElementById('flashcardFront').textContent = card.front;
-
-            const delay = wasFlipped ? 300 : 0;
-            setTimeout(() => {
-                document.getElementById('flashcardBack').textContent = card.back;
-                if (backSide) backSide.scrollTop = 0;
-            }, delay);
+            document.getElementById('flashcardBack').textContent = card.back;
 
             updateFlashcardProgress();
         }
 
         function flipCard() {
-            if (!isTransitioning && !isSpinning) {
+            if (!isTransitioning) {
                 const flashcardEl = document.getElementById('flashcard');
                 if (!isCardFlipped) {
                     flashcardEl.classList.add('flipped');
@@ -3739,6 +3535,7 @@ Przykład:
                 } else {
                     flashcardEl.classList.remove('flipped');
                     isCardFlipped = false;
+                    document.getElementById('flashcardActions').style.display = 'none';
                     
                     setTimeout(() => {
                         const frontSide = document.querySelector('.flashcard-front');
@@ -3749,10 +3546,9 @@ Przykład:
         }
 
         function rateCard(difficulty) {
-            if (isTransitioning || isSpinning) return;
+            if (isTransitioning) return;
 
             isTransitioning = true;
-            isSpinning = true;
             flashcardStats[difficulty]++;
             cardRatings[currentCardIndex] = difficulty;
 
@@ -3765,49 +3561,39 @@ Przykład:
             currentCardIndex++;
 
             if (isCardFlipped) {
-                // Ocena z tyłu - obrót 180°
-                if (currentCardIndex < cards.length) {
-                    document.getElementById('flashcardFront').textContent = cards[currentCardIndex].front;
-                }
-
+                // Ocena z tyłu - obrót 180° do przodu
                 flashcardEl.classList.remove('flipped');
                 isCardFlipped = false;
 
                 setTimeout(() => {
-                    if (currentCardIndex < cards.length) {
-                        const backSide = document.querySelector('.flashcard-back');
-                        if (backSide) backSide.scrollTop = 0;
-                        document.getElementById('flashcardBack').textContent = cards[currentCardIndex].back;
-                    }
-                    
                     isTransitioning = false;
-                    isSpinning = false;
                     displayFlashcard();
                 }, 600);
             } else {
-                // Ocena z przodu - obrót 360°
-// Ocena z przodu - obrót 180°
-if (currentCardIndex < cards.length) {
-    document.getElementById('flashcardBack').textContent = cards[currentCardIndex].back;
-}
+                // Ocena z przodu - obrót 180° (pokaż tył następnej karty, potem przód)
+                const frontContent = document.getElementById('flashcardFront');
+                const backContent = document.getElementById('flashcardBack');
+                
+                // W połowie animacji (300ms) zmień zawartość
+                setTimeout(() => {
+                    if (currentCardIndex < cards.length) {
+                        frontContent.textContent = cards[currentCardIndex].front;
+                        backContent.textContent = cards[currentCardIndex].back;
+                    }
+                }, 300);
 
-flashcardEl.classList.add('spinning');
-
-setTimeout(() => {
-    // W połowie obrotu (300ms) zamieniamy zawartość
-    if (currentCardIndex < cards.length) {
-        document.getElementById('flashcardFront').textContent = cards[currentCardIndex].front;
-        const frontSide = document.querySelector('.flashcard-front');
-        if (frontSide) frontSide.scrollTop = 0;
-    }
-}, 300); // Połowa z 600ms
-
-setTimeout(() => {
-    flashcardEl.classList.remove('spinning');
-    isTransitioning = false;
-    isSpinning = false;
-    displayFlashcard();
-}, 600); // 600ms animacji + 50ms margin
+                // Wykonaj obrót
+                flashcardEl.classList.add('flipped');
+                
+                setTimeout(() => {
+                    // Obróć z powrotem do przodu
+                    flashcardEl.classList.remove('flipped');
+                    
+                    setTimeout(() => {
+                        isTransitioning = false;
+                        displayFlashcard();
+                    }, 600);
+                }, 600);
             }
         }
 
@@ -3869,6 +3655,7 @@ setTimeout(() => {
                 hideAllScreens();
                 document.getElementById('flashcardScreen').classList.remove('hidden');
                 displayFlashcard();
+                startTimer('flashcardTimer');
             } else {
                 showToast('Nie ma trudnych fiszek do powtórzenia!', 'info');
                 showHomeScreen();
@@ -3998,328 +3785,6 @@ setTimeout(() => {
             `;
         }
 
-        // ==================== SHARING ====================
-        function checkSharedQuiz() {
-            const hash = window.location.hash;
-            
-            if (hash.startsWith('#q=')) {
-                const compressed = hash.substring(3);
-                
-                try {
-                    let jsonString = null;
-                    
-                    const base64 = compressed
-                        .replace(/-/g, '+')
-                        .replace(/_/g, '/');
-                    
-                    jsonString = LZString.decompressFromBase64(base64);
-                    
-                    if (!jsonString) {
-                        jsonString = LZString.decompressFromEncodedURIComponent(compressed);
-                    }
-                    
-                    if (!jsonString) {
-                        throw new Error('Nie udało się zdekompresować danych');
-                    }
-                    
-                    const compactData = JSON.parse(jsonString);
-                    
-                    const quizData = {
-                        title: compactData[0],
-                        tags: compactData[1] || [],
-                        type: compactData[2] === 1 ? 'flashcard' : 'quiz',
-                        answerCount: compactData[3] || 4
-                    };
-                    
-                    if (compactData[2] === 1) {
-                        quizData.cards = compactData[4].map(c => ({
-                            front: c[0],
-                            back: c[1],
-                            ...(c[2] && { category: c[2] })
-                        }));
-                    } else {
-                        quizData.questions = compactData[4].map(q => ({
-                            question: q[0],
-                            correct: q[1],
-                            wrong: q[2],
-                            ...(q[3] && { group: q[3] }),
-                            ...(q[4] && { type: q[4] })
-                        }));
-                    }
-                    
-                    const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-                    const exists = quizzes.find(q => 
-                        q.title === quizData.title && 
-                        q.type === quizData.type &&
-                        JSON.stringify(q.questions || q.cards) === JSON.stringify(quizData.questions || quizData.cards)
-                    );
-                    
-                    if (exists) {
-                        showToast('Quiz już istnieje w Twojej bibliotece!', 'info');
-                        
-                        if (quizData.type === 'flashcard') {
-                            showFlashcardScreen(exists.id);
-                        } else {
-                            showPreQuizScreen(exists.id);
-                        }
-                    } else {
-                        const newQuiz = {
-                            ...quizData,
-                            id: Date.now().toString(),
-                            createdAt: new Date().toISOString()
-                        };
-                        
-                        quizzes.push(newQuiz);
-                        localStorage.setItem('quizzes', JSON.stringify(quizzes));
-                        
-                        showToast('Quiz został dodany! 🎉', 'success');
-                        
-                        if (quizData.type === 'flashcard') {
-                            showFlashcardScreen(newQuiz.id);
-                        } else {
-                            showPreQuizScreen(newQuiz.id);
-                        }
-                    }
-                    
-                    history.replaceState(null, null, window.location.pathname);
-                    
-                } catch (error) {
-                    showToast('Błąd wczytywania udostępnionego quizu: ' + error.message, 'error');
-                    showHomeScreen();
-                }
-            } else {
-                showHomeScreen();
-            }
-        }
-
-        async function shareQuiz(quizId) {
-            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-            const quiz = quizzes.find(q => q.id === quizId);
-            
-            if (!quiz) {
-                showToast('Quiz nie znaleziony', 'error');
-                return;
-            }
-            
-            document.getElementById('shareModal').classList.remove('hidden');
-            document.getElementById('shareContent').innerHTML = `
-                <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 14px; text-align: center;">
-                    <span style="font-size: 32px;">⏳</span><br>
-                    Generowanie linku...
-                </p>
-            `;
-            
-            const shareData = [
-                quiz.title,
-                quiz.tags && quiz.tags.length ? quiz.tags : null,
-                quiz.type === 'flashcard' ? 1 : 0,
-                quiz.answerCount || 4
-            ];
-            
-            if (quiz.type === 'flashcard') {
-                shareData[4] = quiz.cards.map(card => {
-                    const arr = [card.front, card.back];
-                    if (card.category) arr[2] = card.category;
-                    return arr;
-                });
-            } else {
-                shareData[4] = quiz.questions.map(q => {
-                    const arr = [q.question, q.correct, q.wrong];
-                    if (q.group) arr[3] = q.group;
-                    if (q.type) arr[4] = q.type;
-                    return arr;
-                });
-            }
-            
-            try {
-                const jsonString = JSON.stringify(shareData);
-                const compressed = LZString.compressToBase64(jsonString)
-                    .replace(/\+/g, '-')
-                    .replace(/\//g, '_')
-                    .replace(/=/g, '');
-                
-                const baseUrl = 'https://tymoeks.github.io/quizapp/';
-                const fullUrl = `${baseUrl}#q=${compressed}`;
-                
-                let shortUrl = null;
-                let shortUrlError = false;
-                
-                const itemCount = quiz.type === 'flashcard' ? quiz.cards.length : quiz.questions.length;
-                
-                console.log(`[Share] URL length: ${fullUrl.length} characters`);
-                if (fullUrl.length > 500 && fullUrl.length < 2000) {
-                    try {
-                        const response = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`);
-                        const data = await response.json();
-                        
-                        if (data.shorturl) {
-                            shortUrl = data.shorturl;
-                        } else if (data.errormessage) {
-                            shortUrlError = true;
-                            console.error('is.gd error:', data.errormessage);
-                        }
-                    } catch (error) {
-                        shortUrlError = true;
-                        console.error('is.gd API error:', error);
-                    }
-                }
-                
-                const itemType = quiz.type === 'flashcard' ? 'fiszek' : 'pytań';
-                
-                let contentHtml = `
-                    <div style="margin-bottom: 24px;">
-                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
-                            <strong>${quiz.title}</strong><br>
-                            ${itemCount} ${itemType}
-                        </p>
-                    </div>
-                `;
-                
-                if (shortUrl) {
-                    contentHtml += `
-                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                                ✅ Link skrócony (działa w Messenger i WhatsApp):
-                            </p>
-                            <input type="text" value="${shortUrl}" readonly 
-                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--surface);"
-                                onclick="this.select()" id="shortUrlInput">
-                            <button class="btn btn-primary" onclick="copyToClipboard('${shortUrl}', 'Skrócony link skopiowany! 🔗')" 
-                                style="width: 100%; margin-top: 12px;">
-                                📋 Kopiuj link
-                            </button>
-                        </div>
-                    `;
-                    
-                    if (itemCount <= 25) {
-                        contentHtml += `
-                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
-                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                                    📱 Kod QR (zeskanuj telefonem):
-                                </p>
-                                <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px;"></div>
-                            </div>
-                        `;
-                    }
-                    
-                    contentHtml += `
-                        <p style="font-size: 12px; color: var(--success); text-align: center; margin-bottom: 16px;">
-                            ✅ Link pokazuje nazwę strony w podglądzie
-                        </p>
-                        <details style="margin-top: 16px;">
-                            <summary style="cursor: pointer; color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
-                                Pokaż pełny link (zaawansowane)
-                            </summary>
-                            <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-top: 8px;">
-                                <input type="text" value="${fullUrl}" readonly 
-                                    style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: monospace; background: var(--surface);"
-                                    onclick="this.select()">
-                                <button class="btn btn-small" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Pełny link skopiowany!')" 
-                                    style="width: 100%; margin-top: 8px;">
-                                    📋 Kopiuj pełny link
-                                </button>
-                            </div>
-                        </details>
-                    `;
-                    
-                    if (itemCount <= 25) {
-                        setTimeout(() => {
-                            const qrDiv = document.getElementById('qrcode');
-                            if (qrDiv) {
-                                qrDiv.innerHTML = '';
-                                new QRCode(qrDiv, {
-                                    text: shortUrl,
-                                    width: 160,
-                                    height: 160,
-                                    colorDark: '#2C3E50',
-                                    colorLight: '#ffffff',
-                                    correctLevel: QRCode.CorrectLevel.M
-                                });
-                            }
-                        }, 100);
-                    }
-                } else {
-                    const warningHtml = shortUrlError ? `
-                        <p style="color: var(--warning); font-size: 13px; margin-bottom: 12px;">
-                            ⚠️ Nie udało się skrócić linku. W Messengerze kliknij w sam tekst linku, nie w podgląd.
-                        </p>
-                    ` : '';
-                    
-                    contentHtml += `
-                        ${warningHtml}
-                        <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
-                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-                                ${fullUrl.length > 500 ? '📝 Link (może być długi):' : '✅ Link do udostępnienia (z podglądem):'}
-                            </p>
-                            <input type="text" value="${fullUrl}" readonly 
-                                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: monospace; background: var(--surface); word-break: break-all;"
-                                onclick="this.select()" id="fullUrlInput">
-                            <button class="btn btn-primary" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Link skopiowany! 🔗')" 
-                                style="width: 100%; margin-top: 12px;">
-                                📋 Kopiuj link
-                            </button>
-                        </div>
-                    `;
-                    
-                    if (fullUrl.length < 500) {
-                        contentHtml += `
-                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 12px; text-align: center;">
-                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                                    📱 Kod QR (zeskanuj telefonem):
-                                </p>
-                                <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px;"></div>
-                            </div>
-                            <p style="font-size: 12px; color: var(--success); text-align: center;">
-                                ✅ Ten link pokaże podgląd w Messengerze i WhatsApp
-                            </p>
-                        `;
-                        
-                        setTimeout(() => {
-                            const qrDiv = document.getElementById('qrcode');
-                            if (qrDiv) {
-                                qrDiv.innerHTML = '';
-                                new QRCode(qrDiv, {
-                                    text: fullUrl,
-                                    width: 160,
-                                    height: 160,
-                                    colorDark: '#2C3E50',
-                                    colorLight: '#ffffff',
-                                    correctLevel: QRCode.CorrectLevel.M
-                                });
-                            }
-                        }, 100);
-                    } else {
-                        contentHtml += `
-                            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
-                                💡 <strong>Wskazówki:</strong><br>
-                                • W Messengerze: Kliknij w <strong>sam tekst linku</strong>, nie w podgląd<br>
-                                • W WhatsApp: Zaznacz i skopiuj <strong>cały link</strong><br>
-                                • Alternatywnie: Użyj przycisku Eksportuj i wyślij plik
-                            </p>
-                        `;
-                    }
-                }
-                
-                document.getElementById('shareContent').innerHTML = contentHtml;
-                
-            } catch (error) {
-                document.getElementById('shareContent').innerHTML = `
-                    <p style="color: var(--danger); text-align: center;">
-                        ❌ Błąd: ${error.message}
-                    </p>
-                `;
-            }
-        }
-        
-        function copyToClipboard(text, message) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast(message, 'success');
-                closeModal('shareModal');
-            }).catch(() => {
-                showToast('Nie udało się skopiować', 'error');
-            });
-        }
-
         // ==================== IMPORT/EXPORT ====================
         function copyPrompt() {
             const prompt = document.getElementById('aiPrompt').textContent;
@@ -4349,7 +3814,6 @@ setTimeout(() => {
 
         function importQuiz() {
             const jsonText = document.getElementById('importJson').value;
-            const mergeMode = true;
             
             try {
                 const data = JSON.parse(jsonText);
@@ -4358,18 +3822,22 @@ setTimeout(() => {
                     const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
                     let addedCount = 0;
                     let skippedCount = 0;
+                    let invalidCount = 0;
                     
                     data.forEach(quiz => {
-                        // Wykryj i przekonwertuj format
-                        if (quiz.data && typeof quiz.data === 'string') {
-                            const decoded = decodeFromNewFormat(quiz);
-                            Object.assign(quiz, decoded);
+                        // Waliduj format
+                        if (!validateQuizFormat(quiz)) {
+                            invalidCount++;
+                            return;
                         }
+
+                        // Dekoduj dane
+                        const decoded = decodeFromNewFormat(quiz);
                         
                         const exists = quizzes.find(q => 
-                            q.title === quiz.title && 
-                            q.type === quiz.type &&
-                            JSON.stringify(q.questions || q.cards) === JSON.stringify(quiz.questions || quiz.cards)
+                            q.title === decoded.title && 
+                            q.type === decoded.type &&
+                            q.data === decoded.data
                         );
                         
                         if (exists) {
@@ -4377,32 +3845,53 @@ setTimeout(() => {
                             return;
                         }
                         
-                        quiz.id = Date.now().toString() + Math.random();
-                        quiz.createdAt = new Date().toISOString();
-                        quizzes.push(quiz);
+                        const newQuiz = {
+                            title: decoded.title,
+                            tags: decoded.tags,
+                            type: decoded.type,
+                            data: decoded.data,
+                            answerCount: decoded.answerCount || 4,
+                            id: Date.now().toString() + Math.random(),
+                            createdAt: new Date().toISOString()
+                        };
+
+                        // Dodaj zdekodowane dane
+                        if (decoded.type === 'flashcard') {
+                            newQuiz.cards = decoded.cards;
+                        } else {
+                            newQuiz.questions = decoded.questions;
+                        }
+
+                        quizzes.push(newQuiz);
                         addedCount++;
                     });
                     
-                    localStorage.setItem('quizzes', JSON.stringify(quizzes));
-                    
-                    if (skippedCount > 0) {
-                        showToast(`Zaimportowano ${addedCount} quizów, pominięto ${skippedCount} duplikatów`, 'success');
-                    } else {
-                        showToast(`Zaimportowano ${addedCount} quizów!`, 'success');
+                    if (!safeLocalStorageSet('quizzes', JSON.stringify(quizzes))) {
+                        closeModal('importModal');
+                        document.getElementById('importJson').value = '';
+                        document.getElementById('importFile').value = '';
+                        return;
                     }
+                    
+                    let message = `Zaimportowano ${addedCount} quizów`;
+                    if (skippedCount > 0) message += `, pominięto ${skippedCount} duplikatów`;
+                    if (invalidCount > 0) message += `, odrzucono ${invalidCount} nieprawidłowych`;
+                    showToast(message, 'success');
                 } else {
+                    // Waliduj format
+                    if (!validateQuizFormat(data)) {
+                        throw new Error('Nieprawidłowy format JSON');
+                    }
+
+                    // Dekoduj dane
+                    const decoded = decodeFromNewFormat(data);
+                    
                     const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
                     
-                    // Wykryj i przekonwertuj format
-                    if (data.data && typeof data.data === 'string') {
-                        const decoded = decodeFromNewFormat(data);
-                        Object.assign(data, decoded);
-                    }
-                    
                     const exists = quizzes.find(q => 
-                        q.title === data.title && 
-                        q.type === data.type &&
-                        JSON.stringify(q.questions || q.cards) === JSON.stringify(data.questions || data.cards)
+                        q.title === decoded.title && 
+                        q.type === decoded.type &&
+                        q.data === decoded.data
                     );
                     
                     if (exists) {
@@ -4414,13 +3903,29 @@ setTimeout(() => {
                     }
                     
                     const quiz = {
-                        ...data,
+                        title: decoded.title,
+                        tags: decoded.tags,
+                        type: decoded.type,
+                        data: decoded.data,
+                        answerCount: decoded.answerCount || 4,
                         id: Date.now().toString(),
                         createdAt: new Date().toISOString()
                     };
+
+                    // Dodaj zdekodowane dane
+                    if (decoded.type === 'flashcard') {
+                        quiz.cards = decoded.cards;
+                    } else {
+                        quiz.questions = decoded.questions;
+                    }
                     
                     quizzes.push(quiz);
-                    localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                    if (!safeLocalStorageSet('quizzes', JSON.stringify(quizzes))) {
+                        closeModal('importModal');
+                        document.getElementById('importJson').value = '';
+                        document.getElementById('importFile').value = '';
+                        return;
+                    }
                     showToast('Quiz zaimportowany!', 'success');
                 }
                 
@@ -4442,10 +3947,7 @@ setTimeout(() => {
                 return;
             }
             
-            const exportData = {...quiz};
-            delete exportData.id;
-            delete exportData.createdAt;
-            delete exportData.updatedAt;
+            const exportData = encodeToNewFormat(quiz);
             
             const blob = new Blob([JSON.stringify(exportData, null, 2)], {
                 type: 'application/json'
@@ -4468,10 +3970,13 @@ setTimeout(() => {
             const history = JSON.parse(localStorage.getItem('quizHistory') || '{}');
             const flashcardHistory = JSON.parse(localStorage.getItem('flashcardHistory') || '{}');
             
+            // Eksportuj quizy w nowym formacie
+            const exportQuizzes = quizzes.map(q => encodeToNewFormat(q));
+            
             const backup = {
                 version: '2.0',
                 exportDate: new Date().toISOString(),
-                quizzes: quizzes,
+                quizzes: exportQuizzes,
                 history: history,
                 flashcardHistory: flashcardHistory
             };
@@ -4505,7 +4010,50 @@ setTimeout(() => {
                     const backup = JSON.parse(e.target.result);
                     
                     if (backup.quizzes) {
-                        localStorage.setItem('quizzes', JSON.stringify(backup.quizzes));
+                        // Waliduj i dekoduj quizy
+                        const validQuizzes = [];
+                        let invalidCount = 0;
+
+                        backup.quizzes.forEach(quiz => {
+                            if (validateQuizFormat(quiz)) {
+                                try {
+                                    const decoded = decodeFromNewFormat(quiz);
+                                    const restoredQuiz = {
+                                        title: decoded.title,
+                                        tags: decoded.tags,
+                                        type: decoded.type,
+                                        data: decoded.data,
+                                        answerCount: decoded.answerCount || 4,
+                                        id: Date.now().toString() + Math.random(),
+                                        createdAt: new Date().toISOString()
+                                    };
+
+                                    // Dodaj zdekodowane dane
+                                    if (decoded.type === 'flashcard') {
+                                        restoredQuiz.cards = decoded.cards;
+                                    } else {
+                                        restoredQuiz.questions = decoded.questions;
+                                    }
+
+                                    validQuizzes.push(restoredQuiz);
+                                } catch (err) {
+                                    invalidCount++;
+                                }
+                            } else {
+                                invalidCount++;
+                            }
+                        });
+
+                        if (!safeLocalStorageSet('quizzes', JSON.stringify(validQuizzes))) {
+                            event.target.value = '';
+                            return;
+                        }
+
+                        if (invalidCount > 0) {
+                            showToast(`Przywrócono dane (odrzucono ${invalidCount} nieprawidłowych quizów)`, 'success');
+                        } else {
+                            showToast('Dane przywrócone!', 'success');
+                        }
                     }
                     if (backup.history) {
                         localStorage.setItem('quizHistory', JSON.stringify(backup.history));
@@ -4514,7 +4062,6 @@ setTimeout(() => {
                         localStorage.setItem('flashcardHistory', JSON.stringify(backup.flashcardHistory));
                     }
                     
-                    showToast('Dane przywrócone!', 'success');
                     closeModal('backupModal');
                     loadQuizzes();
                 } catch (error) {
@@ -4538,88 +4085,6 @@ setTimeout(() => {
             document.getElementById('dataSize').textContent = `${totalSize.toFixed(2)} KB`;
             document.getElementById('quizCount').textContent = JSON.parse(quizzes).length;
         }
-
-        function showStatsModal() {
-            const modal = document.getElementById('statsModal');
-            modal.classList.remove('hidden');
-            
-            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-            const history = JSON.parse(localStorage.getItem('quizHistory') || '{}');
-            const flashcardHistory = JSON.parse(localStorage.getItem('flashcardHistory') || '{}');
-            
-            let totalQuizAttempts = 0;
-            let totalQuizScore = 0;
-            let totalFlashcardSessions = 0;
-            
-            Object.values(history).forEach(h => {
-                const normalAttempts = h.filter(attempt => !attempt.isLearningMode);
-                totalQuizAttempts += normalAttempts.length;
-                normalAttempts.forEach(attempt => {
-                    totalQuizScore += attempt.percentage;
-                });
-            });
-            
-            Object.values(flashcardHistory).forEach(h => {
-                totalFlashcardSessions += h.length;
-            });
-            
-            const avgScore = totalQuizAttempts > 0 ? 
-                (totalQuizScore / totalQuizAttempts).toFixed(1) : 0;
-            
-            const quizCount = quizzes.filter(q => q.type !== 'flashcard').length;
-            const flashcardCount = quizzes.filter(q => q.type === 'flashcard').length;
-            
-            document.getElementById('statsContent').innerHTML = `
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                    <div style="background: var(--surface-alt); padding: 20px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 2.5rem; font-weight: 200; color: var(--accent);">${quizCount}</div>
-                        <div style="color: var(--text-secondary);">Quizów</div>
-                    </div>
-                    <div style="background: var(--surface-alt); padding: 20px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 2.5rem; font-weight: 200; color: var(--accent);">${flashcardCount}</div>
-                        <div style="color: var(--text-secondary);">Zestawów fiszek</div>
-                    </div>
-                    <div style="background: var(--surface-alt); padding: 20px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 2.5rem; font-weight: 200; color: var(--success);">${totalQuizAttempts}</div>
-                        <div style="color: var(--text-secondary);">Podejść do quizów</div>
-                    </div>
-                    <div style="background: var(--surface-alt); padding: 20px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 2.5rem; font-weight: 200; color: var(--warning);">${avgScore}%</div>
-                        <div style="color: var(--text-secondary);">Średni wynik</div>
-                    </div>
-                    <div style="background: var(--surface-alt); padding: 20px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 2.5rem; font-weight: 200; color: var(--accent);">${totalFlashcardSessions}</div>
-                        <div style="color: var(--text-secondary);">Sesji z fiszkami</div>
-                    </div>
-                </div>
-                
-                ${quizzes.length > 0 ? `
-                    <h3 style="margin-top: 32px; margin-bottom: 16px;">Najpopularniejsze quizy</h3>
-                    <div>
-                        ${quizzes
-                            .map(q => {
-                                const qHistory = history[q.id] || [];
-                                const normalAttempts = qHistory.filter(h => !h.isLearningMode);
-                                return {
-                                    ...q,
-                                    attempts: normalAttempts.length
-                                };
-                            })
-                            .sort((a, b) => b.attempts - a.attempts)
-                            .slice(0, 5)
-                            .map(q => `
-                                <div style="background: var(--surface-alt); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-                                    <span>${q.type === 'flashcard' ? '🎴' : '📊'} ${q.title}</span>
-                                    <span style="color: var(--text-secondary);">${q.attempts} ${q.attempts === 1 ? 'podejście' : 'podejść'}</span>
-                                </div>
-                            `).join('')}
-                    </div>
-                ` : ''}
-            `;
-            // Generate progress chart
-            generateProgressChart(history);
-        }
-
         // ==================== KEYBOARD SHORTCUTS ====================
         function setupKeyboardShortcuts() {
             document.addEventListener('keydown', (e) => {
@@ -4646,13 +4111,13 @@ setTimeout(() => {
                         flipCard();
                     } else if (e.key === '1') {
                         const btn = document.querySelector('.btn-hard:not(:disabled)');
-                        if (btn) btn.click();
+                        if (btn && !isTransitioning) btn.click();
                     } else if (e.key === '2') {
                         const btn = document.querySelector('.btn-medium:not(:disabled)');
-                        if (btn) btn.click();
+                        if (btn && !isTransitioning) btn.click();
                     } else if (e.key === '3') {
                         const btn = document.querySelector('.btn-easy:not(:disabled)');
-                        if (btn) btn.click();
+                        if (btn && !isTransitioning) btn.click();
                     }
                 }
             });
@@ -4725,80 +4190,6 @@ setTimeout(() => {
             }, waitTime);
         }
 
-        function generateProgressChart(history) {
-            const chartEl = document.getElementById('progressChart');
-            
-            // Collect all attempts with dates
-            const allAttempts = [];
-            Object.entries(history).forEach(([quizId, attempts]) => {
-                attempts.filter(a => !a.isLearningMode).forEach(attempt => {
-                    allAttempts.push({
-                        date: new Date(attempt.date),
-                        percentage: attempt.percentage
-                    });
-                });
-            });
-            
-            if (allAttempts.length === 0) {
-                chartEl.innerHTML = '';
-                return;
-            }
-            
-            // Sort by date
-            allAttempts.sort((a, b) => a.date - b.date);
-            
-            // Group by day and calculate average
-            const dailyAvg = {};
-            allAttempts.forEach(attempt => {
-                const dateKey = attempt.date.toISOString().split('T')[0];
-                if (!dailyAvg[dateKey]) {
-                    dailyAvg[dateKey] = { sum: 0, count: 0 };
-                }
-                dailyAvg[dateKey].sum += attempt.percentage;
-                dailyAvg[dateKey].count++;
-            });
-            
-            const chartData = Object.entries(dailyAvg)
-                .map(([date, data]) => ({
-                    date: date,
-                    avg: Math.round(data.sum / data.count)
-                }))
-                .slice(-30); // Last 30 days
-            
-            if (chartData.length === 0) {
-                chartEl.innerHTML = '';
-                return;
-            }
-            
-            const maxScore = Math.max(...chartData.map(d => d.avg));
-            const minScore = Math.min(...chartData.map(d => d.avg));
-            
-            chartEl.innerHTML = `
-                <h3 style="margin-bottom: 16px;">Postępy w ostatnich ${chartData.length} dniach</h3>
-                <div style="background: var(--surface-alt); padding: 20px; border-radius: 8px; position: relative; height: 200px;">
-                    <svg width="100%" height="100%"RetryTKontynuujstyle="overflow: visible;">
-${chartData.map((d, i) => {
-const x = (i / (chartData.length - 1)) * 100;
-const y = 100 - ((d.avg - minScore) / (maxScore - minScore || 1)) * 80;
-const nextD = chartData[i + 1];
-const nextX = nextD ? ((i + 1) / (chartData.length - 1)) * 100 : x;
-const nextY = nextD ? 100 - ((nextD.avg - minScore) / (maxScore - minScore || 1)) * 80 : y;
-                return `
-                    ${i < chartData.length - 1 ? `<line x1="${x}%" y1="${y}%" x2="${nextX}%" y2="${nextY}%" 
-                        stroke="var(--accent)" stroke-width="2" />` : ''}
-                    <circle cx="${x}%" cy="${y}%" r="4" fill="var(--accent)" />
-                    <text x="${x}%" y="${y - 5}%" font-size="10" fill="var(--text)" text-anchor="middle">${d.avg}%</text>
-                `;
-            }).join('')}
-        </svg>
-        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--text-secondary);">
-            <span>${chartData[0].date}</span>
-            <span>${chartData[chartData.length - 1].date}</span>
-        </div>
-    </div>
-`;
-        }
-
         // ==================== UTILITIES ====================
         function formatDate(dateString) {
             const date = new Date(dateString);
@@ -4860,8 +4251,3 @@ const nextY = nextD ? 100 - ((nextD.avg - minScore) / (maxScore - minScore || 1)
     </script>
 </body>
 </html>
-
-
-
-
-
