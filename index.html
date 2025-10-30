@@ -424,6 +424,24 @@
             overflow: hidden;
         }
 
+.quiz-item.selection-mode {
+    padding-left: 80px;
+}
+
+.quiz-item.selected {
+    border-color: var(--accent);
+    background: var(--surface-alt);
+}
+
+.quiz-checkbox {
+    position: absolute;
+    top: 24px;
+    left: 16px;
+    width: 24px;
+    height: 24px;
+    z-index: 10;
+}
+
         .quiz-item::before {
             content: '';
             position: absolute;
@@ -937,6 +955,16 @@
 
         .flashcard.flipped {
             transform: rotateY(180deg);
+        }
+
+        .flashcard.spinning {
+            transition: transform 1.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform: rotateY(360deg);
+        }
+
+        .flashcard.spinning {
+            transition: transform 1.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform: rotateY(360deg);
         }
 
         .flashcard-side {
@@ -1650,9 +1678,18 @@
                     <button class="filter-btn" data-filter="flashcard" onclick="setFilter('flashcard')">🎴 Fiszki</button>
                 </div>
             </div>
+    <div id="batchActions" class="search-bar" style="display: none; background: var(--surface-alt);">
+        <span id="selectedCount" style="font-weight: 500;">0 zaznaczonych</span>
+        <div class="filter-group">
+            <button class="btn btn-small btn-danger" onclick="batchDelete()">🗑️ Usuń</button>
+            <button class="btn btn-small" onclick="batchExport()">📤 Eksportuj</button>
+            <button class="btn btn-small" onclick="clearSelection()">✕ Anuluj</button>
+        </div>
+    </div>
             <div class="quiz-list" id="quizList"></div>
-            <div style="text-align: center;">
+            <div style="text-align: center; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
                 <button class="btn btn-primary" onclick="showChooseTypeScreen()">➕ Utwórz nowy</button>
+        <button class="btn" onclick="toggleSelectionMode()" id="selectionModeBtn">☑️ Zaznacz wiele</button>
             </div>
         </div>
 
@@ -2024,6 +2061,7 @@
                 <button class="modal-close" onclick="closeModal('statsModal')">×</button>
             </div>
             <div id="statsContent"></div>
+            <div id="progressChart" style="margin-top: 32px;"></div>
         </div>
     </div>
 
@@ -2067,6 +2105,9 @@
         let currentTags = [];
         let editTags = [];
 
+        let selectionMode = false;
+        let selectedQuizzes = new Set();
+
         // Flashcard state
         let currentFlashcards = null;
         let currentCardIndex = 0;
@@ -2075,6 +2116,7 @@
         let isCardFlipped = false;
         let isTransitioning = false;
         let cardRatings = [];
+        let isSpinning = false;
 
         // Toast queue system
         let activeToast = null;
@@ -2090,9 +2132,30 @@
 
         // ==================== THEME ====================
         function initTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
+            let savedTheme = localStorage.getItem('theme');
+            
+            if (!savedTheme) {
+                // Auto-detect from system preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    savedTheme = 'dark';
+                } else {
+                    savedTheme = 'light';
+                }
+            }
+            
             document.documentElement.setAttribute('data-theme', savedTheme);
             updateThemeIcon(savedTheme);
+            
+            // Listen for system theme changes
+            if (window.matchMedia) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                    if (!localStorage.getItem('theme')) {
+                        const newTheme = e.matches ? 'dark' : 'light';
+                        document.documentElement.setAttribute('data-theme', newTheme);
+                        updateThemeIcon(newTheme);
+                    }
+                });
+            }
         }
 
         function toggleTheme() {
@@ -2144,73 +2207,59 @@
             renderTags();
             
             const prompts = {
-                quiz: `Wygeneruj quiz w formacie JSON na temat [TWÓJ TEMAT].
+                quiz: `Wygeneruj quiz w nowym formacie na temat [TWÓJ TEMAT].
 
 Parametry opcjonalne:
 - Liczba pytań: [np. 10]
 - Liczba pytań prawda/fałsz: [np. 3]
 
-Quiz powinien zawierać:
-- title: tytuł quizu
-- tags: tablica 3 tagów opisujących quiz (np. ["historia", "polska", "edukacja"])
-- Tablicę questions z pytaniami, gdzie każde pytanie ma:
-  - question: treść pytania
-  - correct: poprawna odpowiedź
-  - wrong: tablica 3-4 błędnych odpowiedzi
-  - group: kategoria pytania (np. "osoba", "data", "miejsce")
-  - type: "tf" dla pytań prawda/fałsz (opcjonalne)
+Format:
+{
+  "title": "Tytuł quizu",
+  "tags": ["tag1", "tag2", "tag3"],
+  "answerCount": 4,
+  "data": "{0pytanie ABCD|grupa|poprawna|błędna1|błędna2|błędna3|1pytanie PF|grupa|Prawda|Fałsz|}"
+}
+
+Struktura data:
+- Zaczyna się od {0 (quiz)
+- Każde pytanie ABCD: 0pytanie|grupa|poprawna|błędna1|błędna2|błędna3|
+- Każde pytanie PF: 1pytanie|grupa|Prawda|Fałsz|
+- Jeśli brak grupy: ||
+- Kończy się }
 
 Przykład:
 {
   "title": "Quiz o Polsce",
   "tags": ["historia", "polska", "edukacja"],
-  "questions": [
-    {
-      "question": "Kto był pierwszym królem Polski?",
-      "correct": "Bolesław Chrobry",
-      "wrong": ["Mieszko I", "Kazimierz Wielki", "Władysław Jagiełło"],
-      "group": "osoba"
-    },
-    {
-      "question": "Warszawa jest stolicą Polski",
-      "correct": "Prawda",
-      "wrong": ["Fałsz"],
-      "type": "tf",
-      "group": "geografia"
-    }
-  ]
+  "answerCount": 4,
+  "data": "{00Kto był pierwszym królem Polski?|osoba|Bolesław Chrobry|Mieszko I|Kazimierz Wielki|Władysław Jagiełło|1Warszawa jest stolicą Polski|geografia|Prawda|Fałsz|0Jaka rzeka płynie przez Warszawę?||Wisła|Odra|Warta|Bug|}"
 }`,
-                flashcard: `Wygeneruj fiszki w formacie JSON na temat [TWÓJ TEMAT].
+                flashcard: `Wygeneruj fiszki w nowym formacie na temat [TWÓJ TEMAT].
 
 Parametry opcjonalne:
 - Liczba fiszek: [np. 20]
 
-Fiszki powinny zawierać:
-- title: tytuł zestawu fiszek
-- tags: tablica 3 tagów opisujących zestaw (np. ["angielski", "zwierzęta", "podstawy"])
-- type: "flashcard"
-- Tablicę cards z fiszkami, gdzie każda fiszka ma:
-  - front: przód karty (pytanie/słowo)
-  - back: tył karty (odpowiedź/tłumaczenie)
-  - category: kategoria (opcjonalne)
+Format:
+{
+  "title": "Tytuł zestawu",
+  "tags": ["tag1", "tag2", "tag3"],
+  "type": "flashcard",
+  "data": "{1przód1|kategoria1|tył1|przód2|kategoria2|tył2|}"
+}
+
+Struktura data:
+- Zaczyna się od {1 (fiszki)
+- Każda fiszka: przód|kategoria|tył|
+- Jeśli brak kategorii: ||
+- Kończy się }
 
 Przykład:
 {
   "title": "Angielski - Zwierzęta",
   "tags": ["angielski", "zwierzęta", "podstawy"],
   "type": "flashcard",
-  "cards": [
-    {
-      "front": "dog",
-      "back": "pies",
-      "category": "zwierzęta domowe"
-    },
-    {
-      "front": "cat",
-      "back": "kot",
-      "category": "zwierzęta domowe"
-    }
-  ]
+  "data": "{1dog|zwierzęta domowe|pies|cat|zwierzęta domowe|kot|bird|ptaki|ptak|fish||ryba|}"
 }`
             };
 
@@ -2350,11 +2399,21 @@ Przykład:
                     `<div class="quiz-tags">${quiz.tags.map(tag => 
                         `<span class="tag">${tag}</span>`
                     ).join('')}</div>` : '';
+
+                const isSelected = selectedQuizzes.has(quiz.id);
+                const selectionClass = selectionMode ? 'selection-mode' : '';
+                const selectedClass = isSelected ? 'selected' : '';
+                const checkboxHtml = selectionMode ? 
+                    `<input type="checkbox" class="quiz-checkbox" ${isSelected ? 'checked' : ''} 
+                     onclick="event.stopPropagation(); toggleQuizSelection('${quiz.id}')" 
+                     data-quiz-id="${quiz.id}">` : '';
                 
                 return `
-                    <div class="quiz-item animate-fadeIn" onclick="${clickHandler}('${quiz.id}')">
+                    <div class="quiz-item animate-fadeIn ${selectionClass} ${selectedClass}" 
+                         onclick="${selectionMode ? `toggleQuizSelection('${quiz.id}')` : `${clickHandler}('${quiz.id}')`}">
+                        ${checkboxHtml}
                         <div class="quiz-type-icon">${icon}</div>
-                        <div class="quiz-actions">
+                        <div class="quiz-actions" ${selectionMode ? 'style="display: none;"' : ''}>
                             <button onclick="event.stopPropagation(); shareQuiz('${quiz.id}')" title="Udostępnij">🔗</button>
                             <button onclick="event.stopPropagation(); showEditScreen('${quiz.id}')" title="Edytuj">✏️</button>
                             <button onclick="event.stopPropagation(); confirmDelete('${quiz.id}')" title="Usuń">🗑️</button>
@@ -2396,7 +2455,13 @@ Przykład:
             
             try {
                 const quizData = JSON.parse(jsonText);
-                
+
+                // Wykryj format i przekonwertuj jeśli nowy
+                if (quizData.data && typeof quizData.data === 'string') {
+                    const decoded = decodeFromNewFormat(quizData);
+                    Object.assign(quizData, decoded);
+                }
+
                 if (window.currentCreateType === 'flashcard') {
                     if (!quizData.cards || !Array.isArray(quizData.cards)) {
                         throw new Error('Nieprawidłowa struktura JSON dla fiszek');
@@ -2447,6 +2512,90 @@ Przykład:
             }
         }
 
+        function toggleSelectionMode() {
+            selectionMode = !selectionMode;
+            selectedQuizzes.clear();
+            
+            const btn = document.getElementById('selectionModeBtn');
+            const batchActions = document.getElementById('batchActions');
+            
+            if (selectionMode) {
+                btn.textContent = '✕ Anuluj zaznaczanie';
+                btn.classList.add('btn-danger');
+                batchActions.style.display = 'flex';
+            } else {
+                btn.textContent = '☑️ Zaznacz wiele';
+                btn.classList.remove('btn-danger');
+                batchActions.style.display = 'none';
+            }
+            
+            loadQuizzes();
+        }
+
+        function toggleQuizSelection(quizId) {
+            if (selectedQuizzes.has(quizId)) {
+                selectedQuizzes.delete(quizId);
+            } else {
+                selectedQuizzes.add(quizId);
+            }
+            
+            document.getElementById('selectedCount').textContent = `${selectedQuizzes.size} zaznaczonych`;
+            loadQuizzes();
+        }
+
+        function clearSelection() {
+            toggleSelectionMode();
+        }
+
+        function batchDelete() {
+            if (selectedQuizzes.size === 0) {
+                showToast('Nie zaznaczono żadnych quizów', 'info');
+                return;
+            }
+            
+            if (confirm(`Czy na pewno chcesz usunąć ${selectedQuizzes.size} quizów? Tej operacji nie można cofnąć.`)) {
+                const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                const filtered = quizzes.filter(q => !selectedQuizzes.has(q.id));
+                localStorage.setItem('quizzes', JSON.stringify(filtered));
+                
+                const history = JSON.parse(localStorage.getItem('quizHistory') || '{}');
+                selectedQuizzes.forEach(id => delete history[id]);
+                localStorage.setItem('quizHistory', JSON.stringify(history));
+                
+                showToast(`Usunięto ${selectedQuizzes.size} quizów`, 'success');
+                toggleSelectionMode();
+            }
+        }
+
+        function batchExport() {
+            if (selectedQuizzes.size === 0) {
+                showToast('Nie zaznaczono żadnych quizów', 'info');
+                return;
+            }
+            
+            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const selected = quizzes.filter(q => selectedQuizzes.has(q.id)).map(q => {
+                const exportData = {...q};
+                delete exportData.id;
+                delete exportData.createdAt;
+                delete exportData.updatedAt;
+                return exportData;
+            });
+            
+            const blob = new Blob([JSON.stringify(selected, null, 2)], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `quizapp_selected_${selectedQuizzes.size}_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast(`Wyeksportowano ${selectedQuizzes.size} quizów`, 'success');
+        }
+
         function updateQuiz() {
             const jsonText = document.getElementById('editQuizJson').value.trim();
             const title = document.getElementById('editQuizTitle').value.trim();
@@ -2458,6 +2607,12 @@ Przykład:
             
             try {
                 const updatedData = JSON.parse(jsonText);
+
+                // Wykryj format i przekonwertuj jeśli nowy
+                if (updatedData.data && typeof updatedData.data === 'string') {
+                    const decoded = decodeFromNewFormat(updatedData);
+                    Object.assign(updatedData, decoded);
+                }
                 
                 if (!title) {
                     throw new Error('Brak tytułu');
@@ -2596,98 +2751,417 @@ Przykład:
             renderEditTags();
         }
 
-        // ==================== SHARING ====================
-        function checkSharedQuiz() {
-            const hash = window.location.hash;
-            
-            if (hash.startsWith('#q=')) {
-                const compressed = hash.substring(3);
-                
-                try {
-                    let jsonString = null;
-                    
-                    const base64 = compressed
-                        .replace(/-/g, '+')
-                        .replace(/_/g, '/');
-                    
-                    jsonString = LZString.decompressFromBase64(base64);
-                    
-                    if (!jsonString) {
-                        jsonString = LZString.decompressFromEncodedURIComponent(compressed);
+                // ==================== SHARING ====================
+
+                function decodeFromNewFormat(data) {
+
+                    if (!data.data) {
+
+                        throw new Error('Brak pola data w nowym formacie');
+
                     }
+
                     
-                    if (!jsonString) {
-                        throw new Error('Nie udało się zdekompresować danych');
-                    }
+
+                    const content = data.data;
+
                     
-                    const compactData = JSON.parse(jsonString);
-                    
-                    const quizData = {
-                        title: compactData[0],
-                        tags: compactData[1] || [],
-                        type: compactData[2] === 1 ? 'flashcard' : 'quiz',
-                        answerCount: compactData[3] || 4
-                    };
-                    
-                    if (compactData[2] === 1) {
-                        quizData.cards = compactData[4].map(c => ({
-                            front: c[0],
-                            back: c[1],
-                            ...(c[2] && { category: c[2] })
-                        }));
-                    } else {
-                        quizData.questions = compactData[4].map(q => ({
-                            question: q[0],
-                            correct: q[1],
-                            wrong: q[2],
-                            ...(q[3] && { group: q[3] }),
-                            ...(q[4] && { type: q[4] })
-                        }));
-                    }
-                    
-                    const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-                    const exists = quizzes.find(q => 
-                        q.title === quizData.title && 
-                        q.type === quizData.type &&
-                        JSON.stringify(q.questions || q.cards) === JSON.stringify(quizData.questions || quizData.cards)
-                    );
-                    
-                    if (exists) {
-                        showToast('Quiz już istnieje w Twojej bibliotece!', 'info');
+
+                    if (content.startsWith('{1')) {
+
+                        // Fiszki
+
+                        const cardsData = content.substring(2, content.length - 1);
+
+                        const parts = cardsData.split('|');
+
+                        const cards = [];
+
                         
-                        if (quizData.type === 'flashcard') {
-                            showFlashcardScreen(exists.id);
-                        } else {
-                            showPreQuizScreen(exists.id);
+
+                        for (let i = 0; i < parts.length; i += 3) {
+
+                            if (parts[i]) {
+
+                                const card = {
+
+                                    front: parts[i],
+
+                                    back: parts[i + 2]
+
+                                };
+
+                                if (parts[i + 1]) {
+
+                                    card.category = parts[i + 1];
+
+                                }
+
+                                cards.push(card);
+
+                            }
+
                         }
-                    } else {
-                        const newQuiz = {
-                            ...quizData,
-                            id: Date.now().toString(),
-                            createdAt: new Date().toISOString()
+
+                        
+
+                        return {
+
+                            title: data.title,
+
+                            tags: data.tags || [],
+
+                            type: 'flashcard',
+
+                            cards: cards
+
                         };
+
+                    } else if (content.startsWith('{0')) {
+
+                        // Quiz
+
+                        const questionsData = content.substring(2, content.length - 1);
+
+                        const questions = [];
+
+                        let i = 0;
+
                         
-                        quizzes.push(newQuiz);
-                        localStorage.setItem('quizzes', JSON.stringify(quizzes));
-                        
-                        showToast('Quiz został dodany! 🎉', 'success');
-                        
-                        if (quizData.type === 'flashcard') {
-                            showFlashcardScreen(newQuiz.id);
-                        } else {
-                            showPreQuizScreen(newQuiz.id);
+
+                        while (i < questionsData.length) {
+
+                            const qType = questionsData[i];
+
+                            i++;
+
+                            
+
+                            const parts = [];
+
+                            let current = '';
+
+                            
+
+                            while (i < questionsData.length && questionsData[i] !== '0' && questionsData[i] !== '1') {
+
+                                if (questionsData[i] === '|') {
+
+                                    parts.push(current);
+
+                                    current = '';
+
+                                } else {
+
+                                    current += questionsData[i];
+
+                                }
+
+                                i++;
+
+                            }
+
+                            
+
+                            if (parts.length > 0) {
+
+                                const question = {
+
+                                    question: parts[0],
+
+                                    group: parts[1] || undefined,
+
+                                    correct: parts[2]
+
+                                };
+
+                                
+
+                                if (qType === '1') {
+
+                                    question.type = 'tf';
+
+                                    question.wrong = [parts[3]];
+
+                                } else {
+
+                                    question.wrong = parts.slice(3);
+
+                                }
+
+                                
+
+                                questions.push(question);
+
+                            }
+
                         }
+
+                        
+
+                        return {
+
+                            title: data.title,
+
+                            tags: data.tags || [],
+
+                            type: 'quiz',
+
+                            answerCount: data.answerCount || 4,
+
+                            questions: questions
+
+                        };
+
                     }
+
                     
-                    history.replaceState(null, null, window.location.pathname);
-                    
-                } catch (error) {
-                    showToast('Błąd wczytywania udostępnionego quizu: ' + error.message, 'error');
-                    showHomeScreen();
+
+                    throw new Error('Nieznany format danych');
+
                 }
+
+        
+
+                function checkSharedQuiz() {
+
+                    const hash = window.location.hash;
+
+                    
+
+                    if (hash.startsWith('#q=')) {
+
+                        const compressed = hash.substring(3);
+
+                        
+
+                        try {
+
+                            let jsonString = null;
+
+                            
+
+                            const base64 = compressed
+
+                                .replace(/-/g, '+')
+
+                                .replace(/_/g, '/');
+
+                            
+
+                            jsonString = LZString.decompressFromBase64(base64);
+
+                            
+
+                            if (!jsonString) {
+
+                                jsonString = LZString.decompressFromEncodedURIComponent(compressed);
+
+                            }
+
+                            
+
+                            if (!jsonString) {
+
+                                throw new Error('Nie udało się zdekompresować danych');
+
+                            }
+
+                            
+
+                            const parsedData = JSON.parse(jsonString);
+
+                            let quizData;
+
+        
+
+                            // Wykryj format
+
+                            if (parsedData.data && typeof parsedData.data === 'string') {
+
+                                // Nowy format
+
+                                quizData = decodeFromNewFormat(parsedData);
+
+                            } else if (Array.isArray(parsedData)) {
+
+                                // Stary format - array
+
+                                quizData = {
+
+                                    title: parsedData[0],
+
+                                    tags: parsedData[1] || [],
+
+                                    type: parsedData[2] === 1 ? 'flashcard' : 'quiz',
+
+                                    answerCount: parsedData[3] || 4
+
+                                };
+
+                                
+
+                                if (parsedData[2] === 1) {
+
+                                    quizData.cards = parsedData[4].map(c => ({
+
+                                        front: c[0],
+
+                                        back: c[1],
+
+                                        ...(c[2] && { category: c[2] })
+
+                                    }));
+
+                                } else {
+
+                                    quizData.questions = parsedData[4].map(q => ({
+
+                                        question: q[0],
+
+                                        correct: q[1],
+
+                                        wrong: q[2],
+
+                                        ...(q[3] && { group: q[3] }),
+
+                                        ...(q[4] && { type: q[4] })
+
+                                    }));
+
+                                }
+
+                            } else {
+
+                                throw new Error('Nieznany format danych');
+
+                            }
+
+                            
+
+                            const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+
+                            const exists = quizzes.find(q => 
+
+                                q.title === quizData.title && 
+
+                                q.type === quizData.type &&
+
+                                JSON.stringify(q.questions || q.cards) === JSON.stringify(quizData.questions || quizData.cards)
+
+                            );
+
+                            
+
+                            if (exists) {
+
+                                showToast('Quiz już istnieje w Twojej bibliotece!', 'info');
+
+                                
+
+                                if (quizData.type === 'flashcard') {
+
+                                    showFlashcardScreen(exists.id);
+
+                                } else {
+
+                                    showPreQuizScreen(exists.id);
+
+                                }
+
+                            } else {
+
+                                const newQuiz = {
+
+                                    ...quizData,
+
+                                    id: Date.now().toString(),
+
+                                    createdAt: new Date().toISOString()
+
+                                };
+
+                                
+
+                                quizzes.push(newQuiz);
+
+                                localStorage.setItem('quizzes', JSON.stringify(quizzes));
+
+                                
+
+                                showToast('Quiz został dodany! 🎉', 'success');
+
+                                
+
+                                if (quizData.type === 'flashcard') {
+
+                                    showFlashcardScreen(newQuiz.id);
+
+                                } else {
+
+                                    showPreQuizScreen(newQuiz.id);
+
+                                }
+
+                            }
+
+                            
+
+                            history.replaceState(null, null, window.location.pathname);
+
+                            
+
+                        } catch (error) {
+
+                            showToast('Błąd wczytywania udostępnionego quizu: ' + error.message, 'error');
+
+                            showHomeScreen();
+
+                        }
+
+                    } else {
+
+                        showHomeScreen();
+
+                    }
+                }
+
+        function encodeToNewFormat(quiz) {
+            let data = '';
+            
+            if (quiz.type === 'flashcard') {
+                data = '{1';
+                quiz.cards.forEach(card => {
+                    data += card.front + '|';
+                    data += (card.category || '') + '|';
+                    data += card.back + '|';
+                });
+                data += '}';
             } else {
-                showHomeScreen();
+                data = '{0';
+                quiz.questions.forEach(q => {
+                    if (q.type === 'tf') {
+                        data += '1' + q.question + '|';
+                        data += (q.group || '') + '|';
+                        data += q.correct + '|';
+                        data += q.wrong[0] + '|';
+                    } else {
+                        data += '0' + q.question + '|';
+                        data += (q.group || '') + '|';
+                        data += q.correct + '|';
+                        data += q.wrong.join('|') + '|';
+                    }
+                });
+                data += '}';
             }
+            
+            return {
+                title: quiz.title,
+                tags: quiz.tags || [],
+                answerCount: quiz.answerCount || 4,
+                type: quiz.type,
+                data: data
+            };
         }
 
         async function shareQuiz(quizId) {
@@ -2707,28 +3181,8 @@ Przykład:
                 </p>
             `;
             
-            const shareData = [
-                quiz.title,
-                quiz.tags && quiz.tags.length ? quiz.tags : null,
-                quiz.type === 'flashcard' ? 1 : 0,
-                quiz.answerCount || 4
-            ];
-            
-            if (quiz.type === 'flashcard') {
-                shareData[4] = quiz.cards.map(card => {
-                    const arr = [card.front, card.back];
-                    if (card.category) arr[2] = card.category;
-                    return arr;
-                });
-            } else {
-                shareData[4] = quiz.questions.map(q => {
-                    const arr = [q.question, q.correct, q.wrong];
-                    if (q.group) arr[3] = q.group;
-                    if (q.type) arr[4] = q.type;
-                    return arr;
-                });
-            }
-            
+            const shareData = encodeToNewFormat(quiz);
+
             try {
                 const jsonString = JSON.stringify(shareData);
                 const compressed = LZString.compressToBase64(jsonString)
@@ -2795,7 +3249,7 @@ Przykład:
                                 <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
                                     📱 Kod QR (zeskanuj telefonem):
                                 </p>
-                                <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px;"></div>
+                                <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px; box-sizing: border-box; line-height: 0;"></div>
                             </div>
                         `;
                     }
@@ -2865,7 +3319,7 @@ Przykład:
                                 <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
                                     📱 Kod QR (zeskanuj telefonem):
                                 </p>
-                                <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px;"></div>
+                                <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px; box-sizing: border-box; line-height: 0;"></div>
                             </div>
                             <p style="font-size: 12px; color: var(--success); text-align: center;">
                                 ✅ Ten link pokaże podgląd w Messengerze i WhatsApp
@@ -3017,7 +3471,16 @@ Przykład:
                 
                 earnedPoints = basePoints - Math.min(500, Math.round(timeElapsed * 10));
                 totalPoints += earnedPoints;
-                
+
+                // Usuń z listy błędnych pytań
+                const wrongQuestions = JSON.parse(localStorage.getItem('wrongQuestions') || '{}');
+                if (wrongQuestions[currentQuiz.id]) {
+                    wrongQuestions[currentQuiz.id] = wrongQuestions[currentQuiz.id].filter(q => 
+                        q !== questions[currentQuestionIndex].question
+                    );
+                    localStorage.setItem('wrongQuestions', JSON.stringify(wrongQuestions));
+                }
+
                 if (currentStreak >= 3) {
                     showStreakIndicator();
                 }
@@ -3267,40 +3730,88 @@ Przykład:
         }
 
         function flipCard() {
-            if (!isCardFlipped && !isTransitioning) {
-                document.getElementById('flashcard').classList.add('flipped');
-                document.getElementById('flashcardActions').style.display = 'flex';
-                isCardFlipped = true;
-                
-                setTimeout(() => {
-                    const backSide = document.querySelector('.flashcard-back');
-                    if (backSide) backSide.scrollTop = 0;
-                }, 100);
+            if (!isTransitioning && !isSpinning) {
+                const flashcardEl = document.getElementById('flashcard');
+                if (!isCardFlipped) {
+                    flashcardEl.classList.add('flipped');
+                    isCardFlipped = true;
+                    
+                    setTimeout(() => {
+                        document.getElementById('flashcardActions').style.display = 'flex';
+                        const backSide = document.querySelector('.flashcard-back');
+                        if (backSide) backSide.scrollTop = 0;
+                    }, 600);
+                } else {
+                    flashcardEl.classList.remove('flipped');
+                    isCardFlipped = false;
+                    
+                    setTimeout(() => {
+                        const frontSide = document.querySelector('.flashcard-front');
+                        if (frontSide) frontSide.scrollTop = 0;
+                    }, 600);
+                }
             }
         }
 
         function rateCard(difficulty) {
-            if (isTransitioning) return;
+            if (isTransitioning || isSpinning) return;
 
             isTransitioning = true;
+            isSpinning = true;
             flashcardStats[difficulty]++;
             cardRatings[currentCardIndex] = difficulty;
 
             updateFlashcardStats();
 
-            const buttons = document.querySelectorAll('.flashcard-btn');
-            buttons.forEach(btn => btn.disabled = true);
+            const flashcardEl = document.getElementById('flashcard');
+            const actionsEl = document.getElementById('flashcardActions');
+            actionsEl.style.display = 'none';
 
             currentCardIndex++;
-            setTimeout(() => {
-                displayFlashcard();
+
+            if (isCardFlipped) {
+                // Ocena z tyłu - obrót 180°
+                if (currentCardIndex < cards.length) {
+                    document.getElementById('flashcardFront').textContent = cards[currentCardIndex].front;
+                }
+
+                flashcardEl.classList.remove('flipped');
+                isCardFlipped = false;
 
                 setTimeout(() => {
-                    const buttons = document.querySelectorAll('.flashcard-btn');
-                    buttons.forEach(btn => btn.disabled = false);
+                    if (currentCardIndex < cards.length) {
+                        const backSide = document.querySelector('.flashcard-back');
+                        if (backSide) backSide.scrollTop = 0;
+                        document.getElementById('flashcardBack').textContent = cards[currentCardIndex].back;
+                    }
+                    
                     isTransitioning = false;
-                }, 1000);
-            }, 300);
+                    isSpinning = false;
+                    displayFlashcard();
+                }, 600);
+            } else {
+                // Ocena z przodu - obrót 360°
+                if (currentCardIndex < cards.length) {
+                    document.getElementById('flashcardBack').textContent = cards[currentCardIndex].back;
+                }
+
+                flashcardEl.classList.add('spinning');
+                
+                setTimeout(() => {
+                    if (currentCardIndex < cards.length) {
+                        document.getElementById('flashcardFront').textContent = cards[currentCardIndex].front;
+                        const frontSide = document.querySelector('.flashcard-front');
+                        if (frontSide) frontSide.scrollTop = 0;
+                    }
+                }, 600);
+
+                setTimeout(() => {
+                    flashcardEl.classList.remove('spinning');
+                    isTransitioning = false;
+                    isSpinning = false;
+                    displayFlashcard();
+                }, 1200);
+            }
         }
 
         function updateFlashcardProgress() {
@@ -3317,11 +3828,12 @@ Przykład:
         function endFlashcards() {
             stopTimer();
             const totalTime = (Date.now() - startTime) / 1000;
-            
+            const knownPercent = cards.length > 0 ? Math.round((flashcardStats.easy / cards.length) * 100) : 0;
+
             document.getElementById('flashcardEasyCount').textContent = flashcardStats.easy;
             document.getElementById('flashcardMediumCount').textContent = flashcardStats.medium;
             document.getElementById('flashcardHardCount').textContent = flashcardStats.hard;
-            document.getElementById('flashcardFinalTime').textContent = `Czas: ${formatTime(totalTime)}`;
+            document.getElementById('flashcardFinalTime').textContent = `Czas: ${formatTime(totalTime)} · Znane: ${knownPercent}%`;
             
             saveFlashcardResult(currentFlashcards.id, {
                 easy: flashcardStats.easy,
@@ -3851,6 +4363,12 @@ Przykład:
                     let skippedCount = 0;
                     
                     data.forEach(quiz => {
+                        // Wykryj i przekonwertuj format
+                        if (quiz.data && typeof quiz.data === 'string') {
+                            const decoded = decodeFromNewFormat(quiz);
+                            Object.assign(quiz, decoded);
+                        }
+                        
                         const exists = quizzes.find(q => 
                             q.title === quiz.title && 
                             q.type === quiz.type &&
@@ -3877,6 +4395,12 @@ Przykład:
                     }
                 } else {
                     const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                    
+                    // Wykryj i przekonwertuj format
+                    if (data.data && typeof data.data === 'string') {
+                        const decoded = decodeFromNewFormat(data);
+                        Object.assign(data, decoded);
+                    }
                     
                     const exists = quizzes.find(q => 
                         q.title === data.title && 
@@ -4095,6 +4619,8 @@ Przykład:
                     </div>
                 ` : ''}
             `;
+            // Generate progress chart
+            generateProgressChart(history);
         }
 
         // ==================== KEYBOARD SHORTCUTS ====================
@@ -4200,6 +4726,80 @@ Przykład:
                     }
                 }, animDelay);
             }, waitTime);
+        }
+
+        function generateProgressChart(history) {
+            const chartEl = document.getElementById('progressChart');
+            
+            // Collect all attempts with dates
+            const allAttempts = [];
+            Object.entries(history).forEach(([quizId, attempts]) => {
+                attempts.filter(a => !a.isLearningMode).forEach(attempt => {
+                    allAttempts.push({
+                        date: new Date(attempt.date),
+                        percentage: attempt.percentage
+                    });
+                });
+            });
+            
+            if (allAttempts.length === 0) {
+                chartEl.innerHTML = '';
+                return;
+            }
+            
+            // Sort by date
+            allAttempts.sort((a, b) => a.date - b.date);
+            
+            // Group by day and calculate average
+            const dailyAvg = {};
+            allAttempts.forEach(attempt => {
+                const dateKey = attempt.date.toISOString().split('T')[0];
+                if (!dailyAvg[dateKey]) {
+                    dailyAvg[dateKey] = { sum: 0, count: 0 };
+                }
+                dailyAvg[dateKey].sum += attempt.percentage;
+                dailyAvg[dateKey].count++;
+            });
+            
+            const chartData = Object.entries(dailyAvg)
+                .map(([date, data]) => ({
+                    date: date,
+                    avg: Math.round(data.sum / data.count)
+                }))
+                .slice(-30); // Last 30 days
+            
+            if (chartData.length === 0) {
+                chartEl.innerHTML = '';
+                return;
+            }
+            
+            const maxScore = Math.max(...chartData.map(d => d.avg));
+            const minScore = Math.min(...chartData.map(d => d.avg));
+            
+            chartEl.innerHTML = `
+                <h3 style="margin-bottom: 16px;">Postępy w ostatnich ${chartData.length} dniach</h3>
+                <div style="background: var(--surface-alt); padding: 20px; border-radius: 8px; position: relative; height: 200px;">
+                    <svg width="100%" height="100%"RetryTKontynuujstyle="overflow: visible;">
+${chartData.map((d, i) => {
+const x = (i / (chartData.length - 1)) * 100;
+const y = 100 - ((d.avg - minScore) / (maxScore - minScore || 1)) * 80;
+const nextD = chartData[i + 1];
+const nextX = nextD ? ((i + 1) / (chartData.length - 1)) * 100 : x;
+const nextY = nextD ? 100 - ((nextD.avg - minScore) / (maxScore - minScore || 1)) * 80 : y;
+                return `
+                    ${i < chartData.length - 1 ? `<line x1="${x}%" y1="${y}%" x2="${nextX}%" y2="${nextY}%" 
+                        stroke="var(--accent)" stroke-width="2" />` : ''}
+                    <circle cx="${x}%" cy="${y}%" r="4" fill="var(--accent)" />
+                    <text x="${x}%" y="${y - 5}%" font-size="10" fill="var(--text)" text-anchor="middle">${d.avg}%</text>
+                `;
+            }).join('')}
+        </svg>
+        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--text-secondary);">
+            <span>${chartData[0].date}</span>
+            <span>${chartData[chartData.length - 1].date}</span>
+        </div>
+    </div>
+`;
         }
 
         // ==================== UTILITIES ====================
