@@ -3791,26 +3791,28 @@ Przykład:
                 }, 600);
             } else {
                 // Ocena z przodu - obrót 360°
-                if (currentCardIndex < cards.length) {
-                    document.getElementById('flashcardBack').textContent = cards[currentCardIndex].back;
-                }
+// Ocena z przodu - obrót 180°
+if (currentCardIndex < cards.length) {
+    document.getElementById('flashcardBack').textContent = cards[currentCardIndex].back;
+}
 
-                //flashcardEl.classList.add('spinning');
-                
-                setTimeout(() => {
-                    if (currentCardIndex < cards.length) {
-                        document.getElementById('flashcardFront').textContent = cards[currentCardIndex].front;
-                        const frontSide = document.querySelector('.flashcard-front');
-                        if (frontSide) frontSide.scrollTop = 0;
-                    }
-                }, 600);
+flashcardEl.classList.add('spinning');
 
-                setTimeout(() => {
-                    flashcardEl.classList.remove('spinning');
-                    isTransitioning = false;
-                    isSpinning = false;
-                    displayFlashcard();
-                }, 1250);
+setTimeout(() => {
+    // W połowie obrotu (300ms) zamieniamy zawartość
+    if (currentCardIndex < cards.length) {
+        document.getElementById('flashcardFront').textContent = cards[currentCardIndex].front;
+        const frontSide = document.querySelector('.flashcard-front');
+        if (frontSide) frontSide.scrollTop = 0;
+    }
+}, 300); // Połowa z 600ms
+
+setTimeout(() => {
+    flashcardEl.classList.remove('spinning');
+    isTransitioning = false;
+    isSpinning = false;
+    displayFlashcard();
+}, 650); // 600ms animacji + 50ms margin
             }
         }
 
@@ -4863,5 +4865,6 @@ const nextY = nextD ? 100 - ((nextD.avg - minScore) / (maxScore - minScore || 1)
     </script>
 </body>
 </html>
+
 
 
