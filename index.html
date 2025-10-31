@@ -3231,6 +3231,9 @@ Przykład:
 
         function flipCard() {
             if (!isTransitioning) {
+
+                isTransitioning = true;
+
                 const flashcardEl = document.getElementById('flashcard');
                 if (!isCardFlipped) {
                     flashcardEl.classList.add('flipped');
@@ -3240,6 +3243,7 @@ Przykład:
                         document.getElementById('flashcardActions').style.display = 'flex';
                         const backSide = document.querySelector('.flashcard-back');
                         if (backSide) backSide.scrollTop = 0;
+                        isTransitioning = false;
                     }, 600);
                 } else {
                     flashcardEl.classList.remove('flipped');
@@ -3249,6 +3253,7 @@ Przykład:
                     setTimeout(() => {
                         const frontSide = document.querySelector('.flashcard-front');
                         if (frontSide) frontSide.scrollTop = 0;
+                        isTransitioning = false;
                     }, 600);
                 }
             }
@@ -3316,7 +3321,7 @@ Przykład:
 
         function updateFlashcardProgress() {
             const totalCards = cards.length;
-            const progress = (answeredCardsCount / totalCards) * 100;
+            const progress = (currentCardIndex / cardQueue.length) * 100;
             document.getElementById('flashcardProgress').style.width = `${progress}%`;
             document.getElementById('flashcardNumber').textContent = 
                 `Fiszka ${answeredCardsCount}/${totalCards} (${currentCardIndex + 1}/${cardQueue.length})`;
