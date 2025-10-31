@@ -2126,7 +2126,7 @@
             }
         }
 
-        // ==================== FORMAT CONVERSION (FIX: Escape delimiter) ====================
+        // ==================== FORMAT CONVERSION ====================
         const DELIMITER = '\u001F'; // Unit Separator (ASCII 31)
 
         function escapeText(text) {
@@ -2883,7 +2883,7 @@ Przykład:
             renderEditTags();
         }
 
-        // ==================== QUIZ GAMEPLAY (FIX: Podsumowanie TYLKO gdy wszystkie ukończone) ====================
+        // ==================== QUIZ GAMEPLAY ====================
         function startQuiz() {
             currentQuizSettings.randomOrder = document.getElementById('randomOrder').checked;
             currentQuizSettings.showLetters = document.getElementById('showLetters').checked;
@@ -2920,11 +2920,7 @@ Przykład:
 
         function displayQuestion() {
             if (currentQuestionIndex >= questionQueue.length) {
-                if (answeredQuestionsCount >= questions.length) {
-                    endQuiz();
-                } else {
-                    showHomeScreen();
-                }
+                endQuiz();
                 return;
             }
             
@@ -2974,11 +2970,11 @@ Przykład:
             selected = decodeHtml(selected);
             correct = decodeHtml(correct);
             
+            const buttons = document.querySelectorAll('.answer-btn');  
             const timeElapsed = (Date.now() - questionStartTime) / 1000;
-            const basePoints = 1000;
+            const basePoints = buttons.length * 250;
             let earnedPoints = 0;
             
-            const buttons = document.querySelectorAll('.answer-btn');
             buttons.forEach(btn => {
                 btn.disabled = true;
                 const btnAnswer = decodeHtml(btn.dataset.answer);
@@ -2993,14 +2989,14 @@ Przykład:
                 if (!isRetry) {
                     firstAttemptAnswered++;
                 }
-                
+
                 if (!isRetry && !firstAttemptCorrect.has(originalIndex)) {
                     firstAttemptCorrect.add(originalIndex);
                     correctAnswers++;
                     score++;
                     answeredQuestionsCount++;
                     
-                    earnedPoints = basePoints - Math.min(500, Math.round(timeElapsed * 10));
+                    earnedPoints = basePoints - Math.min(buttons.length * 125, Math.round(timeElapsed * 10));
                     totalPoints += earnedPoints;
                 }
                 
@@ -3052,7 +3048,7 @@ Przykład:
 
         function updateProgress() {
             const totalQuestions = questions.length;
-            const progress = (answeredQuestionsCount / totalQuestions) * 100;
+            const progress = (currentQuestionIndex / questionQueue.length) * 100;
             document.getElementById('progressBar').style.width = `${progress}%`;
             document.getElementById('questionNumber').textContent = 
                 `Pytanie ${answeredQuestionsCount}/${totalQuestions} (${currentQuestionIndex + 1}/${questionQueue.length})`;
@@ -3093,9 +3089,11 @@ Przykład:
         }
 
         function endQuizEarly() {
-            if (confirm('Czy na pewno chcesz zakończyć quiz? Postęp nie zostanie zapisany.')) {
+            if (currentQuestionIndex < questions.length && confirm('Czy na pewno chcesz zakończyć quiz? Postęp nie zostanie zapisany.')) {
                 stopTimer();
                 showHomeScreen();
+            } else if (currentQuestionIndex >= questions.length && confirm('Czy na pewno chcesz zakończyć quiz? Postęp zostanie zapisany.')) {
+                endQuiz()
             }
         }
 
@@ -3150,7 +3148,7 @@ Przykład:
             return additional;
         }
 
-        // ==================== FLASHCARDS (FIX: completedCards Set + Badge na obu stronach) ====================
+        // ==================== FLASHCARDS ====================
         function startFlashcards() {
             hideAllScreens();
             document.getElementById('flashcardScreen').classList.remove('hidden');
