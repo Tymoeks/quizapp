@@ -3244,7 +3244,7 @@ Przykład:
                         const backSide = document.querySelector('.flashcard-back');
                         if (backSide) backSide.scrollTop = 0;
                         isTransitioning = false;
-                    }, 600);
+                    }, 650);
                 } else {
                     flashcardEl.classList.remove('flipped');
                     isCardFlipped = false;
@@ -3254,7 +3254,7 @@ Przykład:
                         const frontSide = document.querySelector('.flashcard-front');
                         if (frontSide) frontSide.scrollTop = 0;
                         isTransitioning = false;
-                    }, 600);
+                    }, 650);
                 }
             }
         }
@@ -3303,7 +3303,7 @@ Przykład:
 
                 setTimeout(() => {
                     isTransitioning = false;
-                }, 600);
+                }, 650);
             }
             else {
                 flashcardEl.classList.add('flipped');
