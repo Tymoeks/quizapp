@@ -669,7 +669,6 @@
             -moz-user-select: text;
             user-select: text;
         }
-
         /* Quiz Gameplay */
         .quiz-container {
             max-width: 800px;
@@ -1698,7 +1697,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Create Screen -->
         <div id="createScreen" class="screen hidden">
             <div class="card card-white animate-fadeIn">
@@ -1908,6 +1906,7 @@
                 <div class="flashcard-wrapper">
                     <div class="flashcard animate-fadeIn" id="flashcard" onclick="flipCard()">
                         <div class="flashcard-side flashcard-front">
+                            <div class="retry-badge hidden" id="flashcardRetryBadge">🔄 Powtórka</div>
                             <div class="flashcard-content" id="flashcardFront"></div>
                         </div>
                         <div class="flashcard-side flashcard-back">
@@ -1946,7 +1945,7 @@
             </div>
         </div>
 
-        <!-- Flashcard Results Screen (ZMIANA: usunięto "Powtórz trudne") -->
+        <!-- Flashcard Results Screen -->
         <div id="flashcardResultsScreen" class="screen hidden">
             <div class="card card-white results-screen animate-fadeIn">
                 <h2>Sesja nauki zakończona!</h2>
@@ -2090,9 +2089,9 @@
         // Debounce timer
         let searchDebounceTimer = null;
 
-        // Track answered questions in first attempt (FIX)
+        // Track answered questions in first attempt
         let firstAttemptCorrect = new Set();
-        let firstAttemptAnswered = 0; // Liczba odpowiedzianych w pierwszym podejściu
+        let firstAttemptAnswered = 0;
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', () => {
@@ -2100,8 +2099,7 @@
             validateAndCleanData();
             checkSharedQuiz();
             setupKeyboardShortcuts();
-        });
-
+        }
         // ==================== DATA VALIDATION ====================
         function validateQuizFormat(quiz) {
             try {
@@ -2144,7 +2142,19 @@
             }
         }
 
-        // ==================== FORMAT CONVERSION ====================
+        // ==================== FORMAT CONVERSION (FIX: Escape delimiter) ====================
+        const DELIMITER = '\u001F'; // Unit Separator (ASCII 31) - bezpieczny separator
+
+        function escapeText(text) {
+            // Zamień pipe na bezpieczny separator
+            return text.replace(/\|/g, DELIMITER);
+        }
+
+        function unescapeText(text) {
+            // Przywróć pipe z separatora
+            return text.replace(/\u001F/g, '|');
+        }
+
         function decodeFromNewFormat(data) {
             if (!data.data || typeof data.data !== 'string') {
                 throw new Error('Brak pola data w nowym formacie');
@@ -2160,11 +2170,11 @@
                 for (let i = 0; i < parts.length; i += 3) {
                     if (parts[i]) {
                         const card = {
-                            front: parts[i],
-                            back: parts[i + 2] || ''
+                            front: unescapeText(parts[i]),
+                            back: unescapeText(parts[i + 2] || '')
                         };
                         if (parts[i + 1]) {
-                            card.category = parts[i + 1];
+                            card.category = unescapeText(parts[i + 1]);
                         }
                         cards.push(card);
                     }
@@ -2201,16 +2211,16 @@
                     
                     if (parts.length > 0) {
                         const question = {
-                            question: parts[0],
-                            group: parts[1] || undefined,
-                            correct: parts[2]
+                            question: unescapeText(parts[0]),
+                            group: parts[1] ? unescapeText(parts[1]) : undefined,
+                            correct: unescapeText(parts[2])
                         };
                         
                         if (qType === '1') {
                             question.type = 'tf';
-                            question.wrong = [parts[3]];
+                            question.wrong = [unescapeText(parts[3])];
                         } else {
-                            question.wrong = parts.slice(3);
+                            question.wrong = parts.slice(3).map(p => unescapeText(p));
                         }
                         
                         questions.push(question);
@@ -2246,24 +2256,24 @@
             if (quiz.type === 'flashcard') {
                 data = '{1';
                 quiz.cards.forEach(card => {
-                    data += card.front + '|';
-                    data += (card.category || '') + '|';
-                    data += card.back + '|';
+                    data += escapeText(card.front) + '|';
+                    data += escapeText(card.category || '') + '|';
+                    data += escapeText(card.back) + '|';
                 });
                 data += '}';
             } else {
                 data = '{0';
                 quiz.questions.forEach(q => {
                     if (q.type === 'tf') {
-                        data += '1' + q.question + '|';
-                        data += (q.group || '') + '|';
-                        data += q.correct + '|';
-                        data += q.wrong[0] + '|';
+                        data += '1' + escapeText(q.question) + '|';
+                        data += escapeText(q.group || '') + '|';
+                        data += escapeText(q.correct) + '|';
+                        data += escapeText(q.wrong[0]) + '|';
                     } else {
-                        data += '0' + q.question + '|';
-                        data += (q.group || '') + '|';
-                        data += q.correct + '|';
-                        data += q.wrong.join('|') + '|';
+                        data += '0' + escapeText(q.question) + '|';
+                        data += escapeText(q.group || '') + '|';
+                        data += escapeText(q.correct) + '|';
+                        data += q.wrong.map(w => escapeText(w)).join('|') + '|';
                     }
                 });
                 data += '}';
@@ -2331,6 +2341,7 @@
         function updateThemeIcon(theme) {
             document.getElementById('themeIcon').textContent = theme === 'dark' ? '☀️' : '🌙';
         }
+
         // ==================== NAVIGATION ====================
         function hideAllScreens() {
             document.querySelectorAll('.screen').forEach(screen => {
@@ -2659,7 +2670,6 @@ Przykład:
                 showToast('Błąd: ' + error.message, 'error');
             }
         }
-
         function toggleSelectionMode() {
             selectionMode = !selectionMode;
             selectedQuizzes.clear();
@@ -2891,7 +2901,7 @@ Przykład:
             renderEditTags();
         }
 
-        // ==================== QUIZ GAMEPLAY (FIX: Accuracy z odpowiedzianych) ====================
+        // ==================== QUIZ GAMEPLAY (FIX: Kończy się tylko po ukończeniu wszystkich) ====================
         function startQuiz() {
             currentQuizSettings.randomOrder = document.getElementById('randomOrder').checked;
             currentQuizSettings.showLetters = document.getElementById('showLetters').checked;
@@ -2926,8 +2936,16 @@ Przykład:
         }
 
         function displayQuestion() {
+            // FIX: Sprawdź czy wszystkie pytania ZALICZONE przed zakończeniem
             if (currentQuestionIndex >= questionQueue.length) {
-                endQuiz();
+                if (answeredQuestionsCount >= questions.length) {
+                    // Wszystkie pytania zaliczone - pokaż podsumowanie
+                    endQuiz();
+                } else {
+                    // Koniec kolejki ale nie wszystko zaliczone - to nie powinno się zdarzyć
+                    // (znaczy że user przerwał albo coś poszło nie tak)
+                    endQuiz();
+                }
                 return;
             }
             
@@ -2993,7 +3011,6 @@ Przykład:
             const selectedBtn = Array.from(buttons).find(btn => decodeHtml(btn.dataset.answer) === selected);
             
             if (selected === correct) {
-                // FIX: Zlicz odpowiedź w pierwszym podejściu
                 if (!isRetry) {
                     firstAttemptAnswered++;
                 }
@@ -3015,7 +3032,6 @@ Przykład:
                     showStreakIndicator();
                 }
             } else {
-                // FIX: Zlicz odpowiedź w pierwszym podejściu
                 if (!isRetry) {
                     firstAttemptAnswered++;
                 }
@@ -3061,7 +3077,6 @@ Przykład:
         }
 
         function updateStats() {
-            // FIX: Accuracy = poprawne / odpowiedziane (w pierwszym podejściu)
             const accuracy = firstAttemptAnswered > 0 ? 
                 Math.round((firstAttemptCorrect.size / firstAttemptAnswered) * 100) : 0;
             document.getElementById('accuracy').textContent = `Poprawność: ${accuracy}%`;
@@ -3095,19 +3110,20 @@ Przykład:
             showPreQuizScreen(currentQuiz.id);
         }
 
-        // FIX: Podsumowanie przy wcześniejszym zakończeniu
+        // FIX: Zapisywanie wyników z przerwaniem
         function endQuizEarly() {
             if (confirm('Czy na pewno chcesz zakończyć quiz? Wynik zostanie zapisany z dotychczasowych odpowiedzi.')) {
                 stopTimer();
                 const totalTime = (Date.now() - startTime) / 1000;
-                const percentage = Math.round((score / questions.length) * 100);
+                const percentage = Math.round((answeredQuestionsCount / questions.length) * 100);
                 
-                document.getElementById('finalScore').textContent = `${score}/${questions.length} (${percentage}%)`;
+                document.getElementById('finalScore').textContent = `${answeredQuestionsCount}/${questions.length} (${percentage}%)`;
                 document.getElementById('finalPoints').textContent = `${totalPoints} punktów · Najdłuższa seria: ${maxStreak}🔥`;
                 document.getElementById('finalTime').textContent = `Czas: ${formatTime(totalTime)} (Przerwany)`;
                 
+                // FIX: Zapisz wynik nawet jeśli niepełny
                 saveQuizResult(currentQuiz.id, {
-                    score: score,
+                    score: answeredQuestionsCount,
                     total: questions.length,
                     percentage: percentage,
                     points: totalPoints,
@@ -3171,7 +3187,8 @@ Przykład:
             
             return additional;
         }
-        // ==================== FLASHCARDS (FIX: Jak quizy z retry) ====================
+
+        // ==================== FLASHCARDS (FIX: Ostatnia fiszka w pętli + Badge) ====================
         function startFlashcards() {
             hideAllScreens();
             document.getElementById('flashcardScreen').classList.remove('hidden');
@@ -3183,7 +3200,6 @@ Przykład:
                 cards = shuffleArray(cards);
             }
             
-            // Inicjalizacja kolejki fiszek (jak quizy)
             cardQueue = cards.map((c, index) => ({
                 card: c,
                 originalIndex: index,
@@ -3210,6 +3226,7 @@ Przykład:
 
             const currentItem = cardQueue[currentCardIndex];
             const card = currentItem.card;
+            const isRetry = currentItem.isRetry;
             const flashcardEl = document.getElementById('flashcard');
 
             flashcardEl.classList.remove('flipped');
@@ -3220,6 +3237,14 @@ Przykład:
             const backSide = document.querySelector('.flashcard-back');
             if (frontSide) frontSide.scrollTop = 0;
             if (backSide) backSide.scrollTop = 0;
+            
+            // FIX: Badge powtórki w fiszkach
+            const retryBadge = document.getElementById('flashcardRetryBadge');
+            if (isRetry) {
+                retryBadge.classList.remove('hidden');
+            } else {
+                retryBadge.classList.add('hidden');
+            }
             
             document.getElementById('flashcardFront').textContent = card.front;
             document.getElementById('flashcardBack').textContent = card.back;
@@ -3258,24 +3283,28 @@ Przykład:
             isTransitioning = true;
             const currentItem = cardQueue[currentCardIndex];
             
-            // FIX: Jak quizy - easy=zalicz, medium/hard=retry
+            // FIX: Ostatnia fiszka w nieskończonej pętli
             if (difficulty === 'easy') {
                 flashcardStats.easy++;
-                answeredCardsCount++; // Tylko easy zalicza
-            } else if (difficulty === 'medium') {
-                flashcardStats.medium++;
-                cardQueue.push({
-                    card: currentItem.card,
-                    originalIndex: currentItem.originalIndex,
-                    isRetry: true
-                });
-            } else if (difficulty === 'hard') {
-                flashcardStats.hard++;
-                cardQueue.push({
-                    card: currentItem.card,
-                    originalIndex: currentItem.originalIndex,
-                    isRetry: true
-                });
+                answeredCardsCount++;
+            } else if (difficulty === 'medium' || difficulty === 'hard') {
+                flashcardStats[difficulty]++;
+                
+                // Sprawdź czy to nie ostatnia karta
+                const isLastCard = (currentCardIndex === cardQueue.length - 1);
+                const allCardsAnswered = (answeredCardsCount >= cards.length - 1);
+                
+                if (!isLastCard || !allCardsAnswered) {
+                    // Dodaj retry tylko jeśli nie jest to ostatnia karta
+                    cardQueue.push({
+                        card: currentItem.card,
+                        originalIndex: currentItem.originalIndex,
+                        isRetry: true
+                    });
+                } else {
+                    // Ostatnia karta - policz jako answered żeby zakończyć
+                    answeredCardsCount++;
+                }
             }
 
             updateFlashcardStats();
@@ -3286,21 +3315,17 @@ Przykład:
 
             currentCardIndex++;
 
-            // FIX: Swap timing - 0ms przód, 600ms tył
             if (currentCardIndex < cardQueue.length) {
                 const nextCard = cardQueue[currentCardIndex].card;
                 
-                // 0ms - natychmiast aktualizuj przód (niewidoczny)
                 document.getElementById('flashcardFront').textContent = nextCard.front;
                 
-                // 600ms - aktualizuj tył po zakończeniu animacji
                 setTimeout(() => {
                     document.getElementById('flashcardBack').textContent = nextCard.back;
                 }, 600);
             }
 
             if (isCardFlipped) {
-                // Ocena z tyłu - obróć do przodu
                 flashcardEl.classList.remove('flipped');
                 isCardFlipped = false;
 
@@ -3309,7 +3334,6 @@ Przykład:
                     updateFlashcardProgress();
                 }, 600);
             } else {
-                // Ocena z przodu - flash effect
                 flashcardEl.classList.add('flipped');
                 
                 setTimeout(() => {
@@ -3324,7 +3348,6 @@ Przykład:
         }
 
         function updateFlashcardProgress() {
-            // Progress bar rośnie tylko dla ZALICZONYCH fiszek (easy)
             const totalCards = cards.length;
             const progress = (answeredCardsCount / totalCards) * 100;
             document.getElementById('flashcardProgress').style.width = `${progress}%`;
@@ -3359,8 +3382,6 @@ Przykład:
             hideAllScreens();
             document.getElementById('flashcardResultsScreen').classList.remove('hidden');
         }
-
-        // USUNIĘTO: restartFlashcards() - bo usunęliśmy przycisk "Powtórz trudne"
 
         // ==================== HISTORY ====================
         function saveQuizResult(quizId, result) {
@@ -3580,36 +3601,34 @@ Przykład:
                 const itemCount = quiz.type === 'flashcard' ? quiz.cards.length : quiz.questions.length;
                 
                 console.log(`[Share] Quiz: "${quiz.title}" | Items: ${itemCount} | URL length: ${fullUrl.length}`);
-                console.log(`[Share] Protocol: ${window.location.protocol}`);
                 
-                // FIX: Sprawdź czy URL to http/https (NIE file://)
                 const isHttpProtocol = window.location.protocol === 'http:' || window.location.protocol === 'https:';
                 
+                // FIX IS.GD: Prosty fetch bez mode: 'cors'
                 if (isHttpProtocol && fullUrl.length < 2000) {
                     try {
                         console.log('[Share] Attempting is.gd shortening...');
                         
                         const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+                        const timeoutId = setTimeout(() => controller.abort(), 8000);
                         
                         const response = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`, {
-                            signal: controller.signal,
-                            mode: 'cors'
+                            signal: controller.signal
                         });
                         
                         clearTimeout(timeoutId);
                         
-                        if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}`);
-                        }
-                        
-                        const data = await response.json();
-                        
-                        if (data.shorturl) {
-                            shortUrl = data.shorturl;
-                            console.log('[Share] ✓ is.gd SUCCESS:', shortUrl);
-                        } else if (data.errormessage) {
-                            console.warn('[Share] ✗ is.gd error:', data.errormessage);
+                        if (response.ok) {
+                            const data = await response.json();
+                            
+                            if (data.shorturl) {
+                                shortUrl = data.shorturl;
+                                console.log('[Share] ✓ is.gd SUCCESS:', shortUrl);
+                            } else if (data.errormessage) {
+                                console.warn('[Share] ✗ is.gd error:', data.errormessage);
+                            }
+                        } else {
+                            console.warn('[Share] ✗ is.gd HTTP error:', response.status);
                         }
                     } catch (error) {
                         if (error.name === 'AbortError') {
@@ -3777,7 +3796,7 @@ Przykład:
             });
         }
 
-        // ==================== IMPORT/EXPORT (FIX DUPLICATION) ====================
+        // ==================== IMPORT/EXPORT ====================
         function copyPrompt() {
             const prompt = document.getElementById('aiPrompt').textContent;
             navigator.clipboard.writeText(prompt).then(() => {
@@ -3824,7 +3843,6 @@ Przykład:
 
                         const decoded = decodeFromNewFormat(quiz);
                         
-                        // FIX: Sprawdź duplikację po data field
                         const exists = quizzes.find(q => q.data === decoded.data);
                         
                         if (exists) {
@@ -3872,7 +3890,6 @@ Przykład:
                     
                     const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
                     
-                    // FIX: Sprawdź duplikację po data field
                     const exists = quizzes.find(q => q.data === decoded.data);
                     
                     if (exists) {
@@ -4062,6 +4079,7 @@ Przykład:
             document.getElementById('dataSize').textContent = `${totalSize.toFixed(2)} KB`;
             document.getElementById('quizCount').textContent = JSON.parse(quizzes).length;
         }
+
         // ==================== KEYBOARD SHORTCUTS ====================
         function setupKeyboardShortcuts() {
             document.addEventListener('keydown', (e) => {
