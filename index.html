@@ -229,18 +229,6 @@
             transition: all 0.3s ease;
         }
 
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100px;
-            height: 100px;
-            background: var(--gradient-light);
-            opacity: 0.5;
-            transform: translate(30px, -30px) rotate(45deg);
-        }
-
         .card-white {
             background: var(--surface);
             box-shadow: 0 4px 12px var(--shadow);
@@ -2176,6 +2164,10 @@
                 
                 while (i < questionsData.length) {
                     const qType = questionsData[i];
+                    if (qType !== '0' && qType !== '1') {
+                        i++;
+                        continue;
+                    }
                     i++;
                     
                     const parts = [];
@@ -2191,21 +2183,27 @@
                         i++;
                     }
                     
-                    if (parts.length > 0) {
+                    if (current.length > 0) {
+                        parts.push(current);
+                    }
+                    
+                    if (parts.length >= 3) {
                         const question = {
-                            question: unescapeText(parts[0]),
+                            question: unescapeText(parts[0] || ''),
                             group: parts[1] ? unescapeText(parts[1]) : undefined,
-                            correct: unescapeText(parts[2])
+                            correct: unescapeText(parts[2] || '')
                         };
                         
                         if (qType === '1') {
                             question.type = 'tf';
-                            question.wrong = [unescapeText(parts[3])];
+                            question.wrong = [unescapeText(parts[3] || 'Fałsz')];
                         } else {
-                            question.wrong = parts.slice(3).map(p => unescapeText(p));
+                            question.wrong = parts.slice(3).filter(p => p).map(p => unescapeText(p));
                         }
                         
-                        questions.push(question);
+                        if (question.question && question.correct) {
+                            questions.push(question);
+                        }
                     }
                 }
                 
@@ -3622,13 +3620,13 @@ Przykład:
 
                                     onclick="this.select()" id="fullUrlInput">
 
-                                <button class="btn btn-primary" onclick="copyToClipboard('${fullUrl.replace(/'/g, "\\'")}', 'Link skopiowany! 🔗')" 
+                                                                <button class="btn btn-primary" id="copyLinkBtn"
 
-                                    style="width: 100%; margin-top: 12px;">
+                                                                    style="width: 100%; margin-top: 12px;">
 
-                                    📋 Kopiuj link
+                                                                    📋 Kopiuj link
 
-                                </button>
+                                                                </button>
 
                             </div>
 
@@ -3658,13 +3656,55 @@ Przykład:
 
                         
 
-                        document.getElementById('shareModal').classList.remove('hidden');
-
-                        document.getElementById('shareContent').innerHTML = contentHtml;
+                                                document.getElementById('shareModal').classList.remove('hidden');
 
                         
 
-                        if (fullUrl.length < 1000) {
+                                                document.getElementById('shareContent').innerHTML = contentHtml;
+
+                        
+
+                                                
+
+                        
+
+                                                setTimeout(() => {
+
+                        
+
+                                                    const copyBtn = document.getElementById('copyLinkBtn');
+
+                        
+
+                                                    if (copyBtn) {
+
+                        
+
+                                                        copyBtn.addEventListener('click', () => {
+
+                        
+
+                                                            copyToClipboard(fullUrl, 'Link skopiowany! 🔗');
+
+                        
+
+                                                        });
+
+                        
+
+                                                    }
+
+                        
+
+                                                }, 50);
+
+                        
+
+                                                
+
+                        
+
+                                                if (fullUrl.length < 1000) {
 
                             setTimeout(() => {
 
