@@ -266,6 +266,7 @@
             position: relative;
             overflow: hidden;
             touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
          }
 
          .btn::before {
@@ -284,21 +285,36 @@
             pointer-events: none;
          }
 
+         /* Desktop hover effect */
+         @media (hover: hover) and (pointer: fine) {
+            .btn:hover {
+               transform: translateY(-1px);
+               box-shadow: 0 4px 8px var(--shadow);
+            }
+         }
+
+         .btn:active {
+            transform: translateY(0) scale(0.98);
+         }
+
+         /* Mobile-specific: ensure button returns to normal after tap */
+         @media (hover: none) and (pointer: coarse) {
+            .btn:active {
+               transform: scale(0.98);
+               transition: transform 0.1s ease;
+            }
+            
+            .btn {
+               transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+            }
+         }
+
          .btn:active::before {
             width: 500px;
             height: 500px;
             transition:
                width 0s,
                height 0s;
-         }
-
-         .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px var(--shadow);
-         }
-
-         .btn:active {
-            transform: translateY(0) scale(0.98);
          }
 
          .btn-primary {
@@ -411,6 +427,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
          }
 
          .quiz-item.selected {
@@ -443,30 +460,35 @@
             border-radius: 12px;
          }
 
-         .quiz-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px var(--shadow);
+         @media (hover: hover) and (pointer: fine) {
+            .quiz-item:hover {
+               transform: translateY(-2px);
+               box-shadow: 0 6px 20px var(--shadow);
+            }
+
+            .quiz-item:hover::before {
+               opacity: 0.1;
+            }
+            
+            .quiz-item:hover .quiz-actions {
+               opacity: 1;
+            }
          }
 
-         .quiz-item:hover::before {
-            opacity: 0.1;
+         @media (hover: none) and (pointer: coarse) {
+            .quiz-item:active {
+               transform: scale(0.99);
+               transition: transform 0.1s ease;
+            }
+            
+            /* Always show actions on mobile */
+            .quiz-item:not(.selection-mode) .quiz-actions {
+               opacity: 1;
+            }
          }
 
-         .quiz-item h3 {
-            margin-bottom: 8px;
-         }
-
-         .quiz-item p {
-            font-size: 14px;
-         }
-
-         .quiz-date {
-            position: absolute;
-            bottom: 16px;
-            right: 16px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            opacity: 0.7;
+         .quiz-item.selection-mode .quiz-actions {
+            display: none;
          }
 
          .quiz-actions {
@@ -477,14 +499,6 @@
             gap: 8px;
             opacity: 0;
             transition: opacity 0.2s ease;
-         }
-
-         .quiz-item:hover .quiz-actions {
-            opacity: 1;
-         }
-
-         .quiz-item.selection-mode .quiz-actions {
-            display: none;
          }
 
          .quiz-actions button {
@@ -845,13 +859,23 @@
             -webkit-user-select: text;
             -moz-user-select: text;
             user-select: text;
+            -webkit-tap-highlight-color: transparent;
          }
 
-         .answer-btn:hover:not(:disabled) {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px var(--shadow);
-            background: var(--surface);
+         @media (hover: hover) and (pointer: fine) {
+            .answer-btn:hover:not(:disabled) {
+               border-color: var(--primary);
+               transform: translateY(-2px);
+               box-shadow: 0 4px 12px var(--shadow);
+               background: var(--surface);
+            }
+         }
+
+         @media (hover: none) and (pointer: coarse) {
+            .answer-btn:active:not(:disabled) {
+               transform: scale(0.98);
+               transition: transform 0.1s ease;
+            }
          }
 
          .answer-btn:disabled {
@@ -1058,11 +1082,21 @@
             flex: 1;
             justify-content: center;
             min-width: 0;
+            -webkit-tap-highlight-color: transparent;
          }
 
-         .flashcard-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px var(--shadow);
+         @media (hover: hover) and (pointer: fine) {
+            .flashcard-btn:hover {
+               transform: translateY(-2px);
+               box-shadow: 0 4px 12px var(--shadow);
+            }
+         }
+
+         @media (hover: none) and (pointer: coarse) {
+            .flashcard-btn:active {
+               transform: scale(0.98);
+               transition: transform 0.1s ease;
+            }
          }
 
          .btn-hard {
@@ -1290,6 +1324,36 @@
          .modal-close:hover {
             color: var(--danger);
             transform: rotate(90deg);
+         }
+
+         #shareContent {
+            animation: fadeInContent 0.3s ease-out;
+         }
+
+         @keyframes fadeInContent {
+            from {
+               opacity: 0;
+               transform: translateY(10px);
+            }
+            to {
+               opacity: 1;
+               transform: translateY(0);
+            }
+         }
+
+         /* Loading spinner animation */
+         @keyframes spin {
+            from {
+               transform: rotate(0deg);
+            }
+            to {
+               transform: rotate(360deg);
+            }
+         }
+
+         .loading-spinner {
+            display: inline-block;
+            animation: spin 1s linear infinite;
          }
 
          .toast {
@@ -2229,6 +2293,52 @@
                </div>
             </div>
          </div>
+
+         <!-- Storage Cleanup Modal -->
+         <div
+            id="storageCleanupModal"
+            class="modal hidden"
+            onclick="closeModal('storageCleanupModal')"
+         >
+            <div class="modal-content" onclick="event.stopPropagation()">
+               <div class="modal-header">
+                  <h2>⚠️ Brak miejsca</h2>
+                  <button class="modal-close" onclick="closeModal('storageCleanupModal')">
+                     ×
+                  </button>
+               </div>
+               <p style="margin-bottom: 24px; color: var(--text-secondary)">
+                  Brak miejsca w pamięci przeglądarki. Usuń starą historię lub quizy, aby zwolnić miejsce.
+               </p>
+               <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                  <p style="font-size: 14px; margin-bottom: 8px;">
+                     <strong>Historia wyników:</strong> <span id="historySize">0 KB</span>
+                  </p>
+                  <p style="font-size: 14px; margin-bottom: 8px;">
+                     <strong>Liczba quizów:</strong> <span id="quizzesCount">0</span>
+                  </p>
+               </div>
+               <div class="button-group">
+                  <button class="btn btn-danger" onclick="clearAllHistory()">
+                     🗑️ Usuń całą historię
+                  </button>
+                  <button class="btn" onclick="clearOldHistory()">
+                     📅 Usuń historię starszą niż 30 dni
+                  </button>
+                  <button class="btn" onclick="closeModal('storageCleanupModal')">
+                     Anuluj
+                  </button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <!-- Screen Reader Announcements -->
+      <div id="srAnnouncements" 
+           role="status" 
+           aria-live="polite" 
+           aria-atomic="true" 
+           style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;">
       </div>
 
       <!-- Import Modal -->
@@ -2361,7 +2471,111 @@
       </div>
 
       <script>
-         // ==================== STATE ====================
+         // ==================== STATE MANAGEMENT ====================
+         const AppState = {
+            // Quiz state
+            quiz: {
+               current: null,
+               currentQuestionIndex: 0,
+               answeredQuestionsCount: 0,
+               score: 0,
+               totalPoints: 0,
+               correctAnswers: 0,
+               questions: [],
+               questionQueue: [],
+               startTime: null,
+               questionStartTime: null,
+               currentStreak: 0,
+               maxStreak: 0,
+               firstAttemptCorrect: new Set(),
+               firstAttemptAnswered: 0,
+               retriedQuestions: new Set(),
+               settings: {
+                  randomOrder: true,
+                  answerCount: 4,
+                  showLetters: true,
+               }
+            },
+            
+            // Flashcard state
+            flashcard: {
+               current: null,
+               currentCardIndex: 0,
+               answeredCardsCount: 0,
+               stats: { easy: 0, medium: 0, hard: 0 },
+               cards: [],
+               cardQueue: [],
+               isFlipped: false,
+               isTransitioning: false,
+               cardRatings: [],
+               completedCards: new Set(),
+               retriedCards: new Set(),
+               startTime: null,
+            },
+            
+            // UI state
+            ui: {
+               currentFilter: "all",
+               currentTags: [],
+               editTags: [],
+               selectionMode: false,
+               selectedQuizzes: new Set(),
+               currentEditingQuizId: null,
+            },
+            
+            // System state
+            system: {
+               timerInterval: null,
+               activeToast: null,
+               queuedToast: null,
+               toastTimeout: null,
+               searchDebounceTimer: null,
+            },
+            
+            // Methods
+            reset() {
+               this.quiz = {
+                  current: null,
+                  currentQuestionIndex: 0,
+                  answeredQuestionsCount: 0,
+                  score: 0,
+                  totalPoints: 0,
+                  correctAnswers: 0,
+                  questions: [],
+                  questionQueue: [],
+                  startTime: null,
+                  questionStartTime: null,
+                  currentStreak: 0,
+                  maxStreak: 0,
+                  firstAttemptCorrect: new Set(),
+                  firstAttemptAnswered: 0,
+                  retriedQuestions: new Set(),
+                  settings: { ...this.quiz.settings }
+               };
+               
+               this.flashcard = {
+                  current: null,
+                  currentCardIndex: 0,
+                  answeredCardsCount: 0,
+                  stats: { easy: 0, medium: 0, hard: 0 },
+                  cards: [],
+                  cardQueue: [],
+                  isFlipped: false,
+                  isTransitioning: false,
+                  cardRatings: [],
+                  completedCards: new Set(),
+                  retriedCards: new Set(),
+                  startTime: null,
+               };
+            },
+            
+            resetUI() {
+               this.ui.currentTags = [];
+               this.ui.editTags = [];
+            }
+         };
+
+         // Legacy compatibility - gradually replace these
          let currentQuiz = null;
          let currentQuestionIndex = 0;
          let answeredQuestionsCount = 0;
@@ -2373,25 +2587,17 @@
          let startTime = null;
          let questionStartTime = null;
          let currentEditingQuizId = null;
-         let currentQuizSettings = {
-            randomOrder: true,
-            answerCount: 4,
-            showLetters: true,
-         };
+         let currentQuizSettings = AppState.quiz.settings;
          let timerInterval = null;
          let currentStreak = 0;
          let maxStreak = 0;
          let currentFilter = "all";
          let currentTags = [];
          let editTags = [];
-
          let selectionMode = false;
          let selectedQuizzes = new Set();
-
-         // Flashcard state
          let currentFlashcards = null;
          let currentCardIndex = 0;
-         let answeredCardsCount = 0;
          let flashcardStats = { easy: 0, medium: 0, hard: 0 };
          let cards = [];
          let cardQueue = [];
@@ -2400,19 +2606,171 @@
          let cardRatings = [];
          let completedCards = new Set();
          let retriedCards = new Set();
-
-         // Toast queue system
          let activeToast = null;
          let queuedToast = null;
          let toastTimeout = null;
-
-         // Debounce timer
          let searchDebounceTimer = null;
-
-         // Track answered questions in first attempt
          let firstAttemptCorrect = new Set();
          let firstAttemptAnswered = 0;
          let retriedQuestions = new Set();
+
+         // Sync function to gradually migrate
+         function syncLegacyState() {
+            currentQuiz = AppState.quiz.current;
+            currentQuestionIndex = AppState.quiz.currentQuestionIndex;
+            answeredQuestionsCount = AppState.quiz.answeredQuestionsCount;
+            score = AppState.quiz.score;
+            totalPoints = AppState.quiz.totalPoints;
+            correctAnswers = AppState.quiz.correctAnswers;
+            questions = AppState.quiz.questions;
+            questionQueue = AppState.quiz.questionQueue;
+            startTime = AppState.quiz.startTime;
+            questionStartTime = AppState.quiz.questionStartTime;
+            currentStreak = AppState.quiz.currentStreak;
+            maxStreak = AppState.quiz.maxStreak;
+            firstAttemptCorrect = AppState.quiz.firstAttemptCorrect;
+            firstAttemptAnswered = AppState.quiz.firstAttemptAnswered;
+            retriedQuestions = AppState.quiz.retriedQuestions;
+            
+            currentFlashcards = AppState.flashcard.current;
+            currentCardIndex = AppState.flashcard.currentCardIndex;
+            answeredCardsCount = AppState.flashcard.answeredCardsCount;
+            flashcardStats = AppState.flashcard.stats;
+            cards = AppState.flashcard.cards;
+            cardQueue = AppState.flashcard.cardQueue;
+            isCardFlipped = AppState.flashcard.isFlipped;
+            isTransitioning = AppState.flashcard.isTransitioning;
+            completedCards = AppState.flashcard.completedCards;
+            retriedCards = AppState.flashcard.retriedCards;
+            
+            currentFilter = AppState.ui.currentFilter;
+            currentTags = AppState.ui.currentTags;
+            editTags = AppState.ui.editTags;
+            selectionMode = AppState.ui.selectionMode;
+            selectedQuizzes = AppState.ui.selectedQuizzes;
+            currentEditingQuizId = AppState.ui.currentEditingQuizId;
+            
+            timerInterval = AppState.system.timerInterval;
+            activeToast = AppState.system.activeToast;
+            queuedToast = AppState.system.queuedToast;
+            toastTimeout = AppState.system.toastTimeout;
+            searchDebounceTimer = AppState.system.searchDebounceTimer;
+         }
+
+         function updateAppState() {
+            AppState.quiz.current = currentQuiz;
+            AppState.quiz.currentQuestionIndex = currentQuestionIndex;
+            AppState.quiz.answeredQuestionsCount = answeredQuestionsCount;
+            AppState.quiz.score = score;
+            AppState.quiz.totalPoints = totalPoints;
+            AppState.quiz.correctAnswers = correctAnswers;
+            AppState.quiz.questions = questions;
+            AppState.quiz.questionQueue = questionQueue;
+            AppState.quiz.startTime = startTime;
+            AppState.quiz.questionStartTime = questionStartTime;
+            AppState.quiz.currentStreak = currentStreak;
+            AppState.quiz.maxStreak = maxStreak;
+            AppState.quiz.firstAttemptCorrect = firstAttemptCorrect;
+            AppState.quiz.firstAttemptAnswered = firstAttemptAnswered;
+            AppState.quiz.retriedQuestions = retriedQuestions;
+            
+            AppState.flashcard.current = currentFlashcards;
+            AppState.flashcard.currentCardIndex = currentCardIndex;
+            AppState.flashcard.answeredCardsCount = answeredCardsCount;
+            AppState.flashcard.stats = flashcardStats;
+            AppState.flashcard.cards = cards;
+            AppState.flashcard.cardQueue = cardQueue;
+            AppState.flashcard.isFlipped = isCardFlipped;
+            AppState.flashcard.isTransitioning = isTransitioning;
+            AppState.flashcard.completedCards = completedCards;
+            AppState.flashcard.retriedCards = retriedCards;
+            
+            AppState.ui.currentFilter = currentFilter;
+            AppState.ui.currentTags = currentTags;
+            AppState.ui.editTags = editTags;
+            AppState.ui.selectionMode = selectionMode;
+            AppState.ui.selectedQuizzes = selectedQuizzes;
+            AppState.ui.currentEditingQuizId = currentEditingQuizId;
+            
+            AppState.system.timerInterval = timerInterval;
+            AppState.system.activeToast = activeToast;
+            AppState.system.queuedToast = queuedToast;
+            AppState.system.toastTimeout = toastTimeout;
+            AppState.system.searchDebounceTimer = searchDebounceTimer;
+         }
+
+         // ==================== RENDERING CACHE ====================
+         const RenderCache = {
+            quizzes: null,
+            lastQuery: '',
+            lastFilter: null,
+            renderedItems: new Map(),
+            
+            shouldUpdate(query, filter) {
+               return this.lastQuery !== query || this.lastFilter !== filter;
+            },
+            
+            update(query, filter, quizzes) {
+               this.lastQuery = query;
+               this.lastFilter = filter;
+               this.quizzes = quizzes;
+            },
+            
+            clear() {
+               this.quizzes = null;
+               this.lastQuery = '';
+               this.lastFilter = null;
+               this.renderedItems.clear();
+            },
+            
+            getQuizHTML(quiz) {
+               const cacheKey = `${quiz.id}_${selectionMode}_${selectedQuizzes.has(quiz.id)}`;
+               if (this.renderedItems.has(cacheKey)) {
+                  return this.renderedItems.get(cacheKey);
+               }
+               return null;
+            },
+            
+            setQuizHTML(quiz, html) {
+               const cacheKey = `${quiz.id}_${selectionMode}_${selectedQuizzes.has(quiz.id)}`;
+               this.renderedItems.set(cacheKey, html);
+            }
+         };
+
+         // ==================== CLEANUP TRACKING ====================
+         let activeEventListeners = [];
+         let activeTimers = new Set();
+
+         function registerEventListener(element, event, handler, options) {
+            element.addEventListener(event, handler, options);
+            activeEventListeners.push({ element, event, handler, options });
+         }
+
+         function cleanupEventListeners() {
+            activeEventListeners.forEach(({ element, event, handler, options }) => {
+               element.removeEventListener(event, handler, options);
+            });
+            activeEventListeners = [];
+         }
+
+         function registerTimer(timerId) {
+            activeTimers.add(timerId);
+            return timerId;
+         }
+
+         function cleanupTimers() {
+            activeTimers.forEach(timerId => {
+               clearTimeout(timerId);
+               clearInterval(timerId);
+            });
+            activeTimers.clear();
+         }
+
+         function cleanupAll() {
+            cleanupEventListeners();
+            cleanupTimers();
+            stopTimer();
+         }
 
          // ==================== INITIALIZATION ====================
          document.addEventListener("DOMContentLoaded", () => {
@@ -2641,15 +2999,90 @@
                return true;
             } catch (error) {
                if (error.name === "QuotaExceededError") {
-                  showToast(
-                     "Błąd: Brak miejsca w localStorage. Usuń stare quizy.",
-                     "error",
-                  );
+                  return handleStorageQuotaExceeded();
                } else {
                   showToast("Błąd zapisu: " + error.message, "error");
+                  return false;
                }
-               return false;
             }
+         }
+
+         function handleStorageQuotaExceeded() {
+            const historySize = calculateHistorySize();
+            const quizzesCount = JSON.parse(localStorage.getItem("quizzes") || "[]").length;
+            
+            document.getElementById("historySize").textContent = formatBytes(historySize);
+            document.getElementById("quizzesCount").textContent = quizzesCount;
+            
+            document.getElementById("storageCleanupModal").classList.remove("hidden");
+            
+            return false;
+         }
+
+         function calculateHistorySize() {
+            const quizHistory = localStorage.getItem("quizHistory") || "{}";
+            const flashcardHistory = localStorage.getItem("flashcardHistory") || "{}";
+            return new Blob([quizHistory, flashcardHistory]).size;
+         }
+
+         function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + " B";
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
+            return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+         }
+
+         function clearAllHistory() {
+            if (confirm("Czy na pewno chcesz usunąć całą historię wyników? Tej operacji nie można cofnąć.")) {
+               localStorage.setItem("quizHistory", "{}");
+               localStorage.setItem("flashcardHistory", "{}");
+               showToast("Historia została wyczyszczona", "success");
+               closeModal("storageCleanupModal");
+            }
+         }
+
+         function clearOldHistory() {
+            const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+            
+            const quizHistory = JSON.parse(localStorage.getItem("quizHistory") || "{}");
+            const flashcardHistory = JSON.parse(localStorage.getItem("flashcardHistory") || "{}");
+            
+            let removedCount = 0;
+            
+            Object.keys(quizHistory).forEach(quizId => {
+               quizHistory[quizId] = quizHistory[quizId].filter(entry => {
+                  const entryDate = new Date(entry.date).getTime();
+                  if (entryDate < thirtyDaysAgo) {
+                     removedCount++;
+                     return false;
+                  }
+                  return true;
+               });
+               
+               if (quizHistory[quizId].length === 0) {
+                  delete quizHistory[quizId];
+               }
+            });
+            
+            Object.keys(flashcardHistory).forEach(flashcardId => {
+               flashcardHistory[flashcardId] = flashcardHistory[flashcardId].filter(entry => {
+                  const entryDate = new Date(entry.date).getTime();
+                  if (entryDate < thirtyDaysAgo) {
+                     removedCount++;
+                     return false;
+                  }
+                  return true;
+               });
+               
+               if (flashcardHistory[flashcardId].length === 0) {
+                  delete flashcardHistory[flashcardId];
+               }
+            });
+            
+            localStorage.setItem("quizHistory", JSON.stringify(quizHistory));
+            localStorage.setItem("flashcardHistory", JSON.stringify(flashcardHistory));
+            
+            showToast(`Usunięto ${removedCount} starych wpisów historii`, "success");
+            closeModal("storageCleanupModal");
          }
 
          // ==================== THEME ====================
@@ -2707,6 +3140,7 @@
 
          // ==================== NAVIGATION ====================
          function hideAllScreens() {
+            cleanupAll();
             document.querySelectorAll(".screen").forEach((screen) => {
                screen.classList.add("hidden");
             });
@@ -2899,99 +3333,216 @@ Przykład:
                showToast("Błąd wczytywania quizów", "error");
                quizzes = [];
             }
+            
             const quizList = document.getElementById("quizList");
             const searchQuery = document
                .getElementById("searchInput")
                .value.toLowerCase();
 
-            let filtered = quizzes.filter((quiz) => {
-               const matchesSearch =
-                  quiz.title.toLowerCase().includes(searchQuery) ||
-                  (quiz.tags &&
-                     quiz.tags.some((tag) =>
-                        tag.toLowerCase().includes(searchQuery),
-                     ));
-               const matchesFilter =
-                  currentFilter === "all" ||
-                  (currentFilter === "quiz" && quiz.type !== "flashcard") ||
-                  (currentFilter === "flashcard" && quiz.type === "flashcard");
-               return matchesSearch && matchesFilter;
-            });
+             // Determine if we can use cached HTML content
+            const canUseCachedHTML = !RenderCache.shouldUpdate(searchQuery, currentFilter) && 
+                                     !selectionMode && 
+                                     selectedQuizzes.size === 0 &&
+                                     RenderCache.quizzes !== null; // Ensure there's actually cached data
 
-            if (filtered.length === 0) {
+            let filteredQuizzes = [];
+            if (canUseCachedHTML) {
+                filteredQuizzes = RenderCache.quizzes;
+            } else {
+                filteredQuizzes = quizzes.filter((quiz) => {
+                    const matchesSearch =
+                        quiz.title.toLowerCase().includes(searchQuery) ||
+                        (quiz.tags &&
+                            quiz.tags.some((tag) =>
+                                tag.toLowerCase().includes(searchQuery),
+                            ));
+                    const matchesFilter =
+                        currentFilter === "all" ||
+                        (currentFilter === "quiz" && quiz.type !== "flashcard") ||
+                        (currentFilter === "flashcard" && quiz.type === "flashcard");
+                    return matchesSearch && matchesFilter;
+                });
+
+                // Update cache only if we generated new filtered quizzes
+                RenderCache.update(searchQuery, currentFilter, filteredQuizzes);
+            }
+
+            // Always cleanup previous event listeners before (re)rendering
+            cleanupEventListeners();
+
+            if (filteredQuizzes.length === 0) {
                quizList.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
-                        <div class="empty-state-icon">📭</div>
-                        <h3>Brak wyników</h3>
-                        <p>Nie znaleziono quizów spełniających kryteria</p>
-                    </div>
-                `;
+                  <div class="empty-state" style="grid-column: 1/-1;">
+                      <div class="empty-state-icon">📭</div>
+                      <h3>Brak wyników</h3>
+                      <p>Nie znaleziono quizów spełniających kryteria</p>
+                  </div>
+               `;
                return;
             }
 
-            quizList.innerHTML = filtered
-               .map((quiz) => {
-                  const isFlashcard = quiz.type === "flashcard";
-                  const icon = isFlashcard ? "🎴" : "📊";
-                  const count = isFlashcard
-                     ? `${quiz.cards.length} fiszek`
-                     : `${quiz.questions.length} pytań`;
-                  const clickHandler = isFlashcard
-                     ? "showFlashcardScreen"
-                     : "showPreQuizScreen";
+            // Sort quizzes by creation date, newest first
+            filteredQuizzes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-                  const history = getQuizHistory(quiz.id);
-                  const attempts = history.length;
+            const fragment = document.createDocumentFragment();
+            const tempDiv = document.createElement('div');
 
-                  let bestResult = null;
-                  if (attempts > 0) {
-                     bestResult = history.reduce((best, current) => {
-                        return current.points > best.points ? current : best;
-                     }, history[0]);
+            filteredQuizzes.forEach(quiz => {
+               const cachedHTML = RenderCache.getQuizHTML(quiz);
+               let itemHTML;
+               
+               if (cachedHTML && !selectionMode && canUseCachedHTML) { // Only use cached HTML if canUseCachedHTML is true
+                  itemHTML = cachedHTML;
+               } else {
+                  itemHTML = generateQuizItemHTML(quiz);
+                  if (!selectionMode) {
+                     RenderCache.setQuizHTML(quiz, itemHTML);
                   }
+               }
+               
+               tempDiv.innerHTML = itemHTML;
+               fragment.appendChild(tempDiv.firstElementChild);
+            });
 
-                  const tagsHtml =
-                     quiz.tags && quiz.tags.length > 0
-                        ? `<div class="quiz-tags">${quiz.tags
-                             .map((tag) => `<span class="tag">${tag}</span>`)
-                             .join("")}</div>`
-                        : "";
+            quizList.innerHTML = '';
+            quizList.appendChild(fragment);
 
-                  const isSelected = selectedQuizzes.has(quiz.id);
-                  const selectionClass = selectionMode ? "selection-mode" : "";
-                  const selectedClass = isSelected ? "selected" : "";
-                  const checkboxHtml = selectionMode
-                     ? `<input type="checkbox" class="quiz-checkbox" ${isSelected ? "checked" : ""} 
-                     onclick="event.stopPropagation(); toggleQuizSelection('${quiz.id}')" 
-                     data-quiz-id="${quiz.id}">`
-                     : "";
+            // Attach event listeners with cleanup tracking
+            attachQuizItemListeners(quizList, filteredQuizzes);
+         }
 
-                  return `
-                    <div class="quiz-item animate-fadeIn ${selectionClass} ${selectedClass}" 
-                         onclick="${selectionMode ? `toggleQuizSelection('${quiz.id}')` : `${clickHandler}('${quiz.id}')`}">
-                        ${checkboxHtml}
-                        <div class="quiz-type-icon">${icon}</div>
-                        <div class="quiz-actions" ${selectionMode ? 'style="display: none;"' : ""}>
-                            <button onclick="event.stopPropagation(); shareQuiz('${quiz.id}')" title="Udostępnij">🔗</button>
-                            <button onclick="event.stopPropagation(); showEditScreen('${quiz.id}')" title="Edytuj">✏️</button>
-                            <button onclick="event.stopPropagation(); confirmDelete('${quiz.id}')" title="Usuń">🗑️</button>
-                        </div>
-                        <h3>${quiz.title}</h3>
-                        <p>${count}</p>
-                        ${tagsHtml}
-                        ${
-                           bestResult
-                              ? `<div class="quiz-stats-badge">
-                            ${attempts} ${attempts === 1 ? "podejście" : "podejść"} · 
-                            Najlepszy: ${bestResult.percentage}% (${bestResult.points} pkt)
-                        </div>`
-                              : ""
-                        }
-                        <div class="quiz-date">${formatDate(quiz.createdAt)}</div>
-                    </div>
-                `;
-               })
-               .join("");
+         function generateQuizItemHTML(quiz) {
+            const isFlashcard = quiz.type === "flashcard";
+            const icon = isFlashcard ? "🎴" : "📊";
+            const count = isFlashcard
+               ? `${quiz.cards.length} fiszek`
+               : `${quiz.questions.length} pytań`;
+
+            const history = getQuizHistory(quiz.id);
+            const attempts = history.length;
+
+            let bestResult = null;
+            if (attempts > 0) {
+               bestResult = history.reduce((best, current) => {
+                  return current.points > best.points ? current : best;
+               }, history[0]);
+            }
+
+            const tagsHtml =
+               quiz.tags && quiz.tags.length > 0
+                  ? `<div class="quiz-tags" role="list" aria-label="Tagi">${quiz.tags
+                       .map((tag) => `<span class="tag" role="listitem">${escapeHtml(tag)}</span>`)
+                       .join("")}</div>`
+                  : "";
+
+            const isSelected = selectedQuizzes.has(quiz.id);
+            const selectionClass = selectionMode ? "selection-mode" : "";
+            const selectedClass = isSelected ? "selected" : "";
+            const checkboxHtml = selectionMode
+               ? `<input type="checkbox" class="quiz-checkbox" ${isSelected ? "checked" : ""} 
+                  data-quiz-id="${quiz.id}" 
+                  aria-label="Zaznacz ${escapeHtml(quiz.title)}">`
+               : "";
+
+            const ariaLabel = `${quiz.title}, ${count}${bestResult ? `, najlepszy wynik ${bestResult.percentage}%` : ''}`;
+
+            return `
+               <div class="quiz-item animate-fadeIn ${selectionClass} ${selectedClass}" 
+                    data-quiz-id="${quiz.id}"
+                    role="article"
+                    aria-label="${ariaLabel}"
+                    tabindex="0">
+                   ${checkboxHtml}
+                   <div class="quiz-type-icon" aria-hidden="true">${icon}</div>
+                   <div class="quiz-actions" ${selectionMode ? 'style="display: none;"' : ""} role="group" aria-label="Akcje">
+                       <button data-action="share" title="Udostępnij" aria-label="Udostępnij ${escapeHtml(quiz.title)}">🔗</button>
+                       <button data-action="edit" title="Edytuj" aria-label="Edytuj ${escapeHtml(quiz.title)}">✏️</button>
+                       <button data-action="delete" title="Usuń" aria-label="Usuń ${escapeHtml(quiz.title)}">🗑️</button>
+                   </div>
+                   <h3>${escapeHtml(quiz.title)}</h3>
+                   <p>${count}</p>
+                   ${tagsHtml}
+                   ${
+                      bestResult
+                         ? `<div class="quiz-stats-badge" aria-label="Statystyki: ${attempts} ${attempts === 1 ? "podejście" : "podejść"}, najlepszy wynik ${bestResult.percentage}%, ${bestResult.points} punktów">
+                       ${attempts} ${attempts === 1 ? "podejście" : "podejść"} · 
+                       Najlepszy: ${bestResult.percentage}% (${bestResult.points} pkt)
+                   </div>`
+                         : ""
+                   }
+                   <div class="quiz-date" aria-label="Data utworzenia: ${formatDate(quiz.createdAt)}">${formatDate(quiz.createdAt)}</div>
+               </div>
+            `;
+         }
+
+         function attachQuizItemListeners(quizList, filtered) {
+            quizList.querySelectorAll('.quiz-item').forEach(item => {
+               const quizId = item.dataset.quizId;
+               const quiz = filtered.find(q => q.id === quizId);
+               
+               if (!quiz) return;
+
+               const isFlashcard = quiz.type === "flashcard";
+               const clickHandler = (e) => {
+                  if (e.target.closest('.quiz-actions') || e.target.classList.contains('quiz-checkbox')) {
+                     return;
+                  }
+                  if (selectionMode) {
+                     toggleQuizSelection(quizId);
+                  } else {
+                     if (isFlashcard) {
+                        showFlashcardScreen(quizId);
+                     } else {
+                        showPreQuizScreen(quizId);
+                     }
+                  }
+               };
+
+               registerEventListener(item, 'click', clickHandler);
+               
+               // Keyboard support for quiz items
+               registerEventListener(item, 'keydown', (e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                     e.preventDefault();
+                     clickHandler(e);
+                  }
+               });
+
+               // Action buttons
+               const shareBtn = item.querySelector('[data-action="share"]');
+               const editBtn = item.querySelector('[data-action="edit"]');
+               const deleteBtn = item.querySelector('[data-action="delete"]');
+
+               if (shareBtn) {
+                  registerEventListener(shareBtn, 'click', (e) => {
+                     e.stopPropagation();
+                     shareQuiz(quizId);
+                  });
+               }
+
+               if (editBtn) {
+                  registerEventListener(editBtn, 'click', (e) => {
+                     e.stopPropagation();
+                     showEditScreen(quizId);
+                  });
+               }
+
+               if (deleteBtn) {
+                  registerEventListener(deleteBtn, 'click', (e) => {
+                     e.stopPropagation();
+                     confirmDelete(quizId);
+                  });
+               }
+
+               // Checkbox handler
+               const checkbox = item.querySelector('.quiz-checkbox');
+               if (checkbox) {
+                  registerEventListener(checkbox, 'click', (e) => {
+                     e.stopPropagation();
+                     toggleQuizSelection(quizId);
+                  });
+               }
+            });
          }
 
          function filterQuizzes() {
@@ -3011,9 +3562,7 @@ Przykład:
 
          function saveQuiz() {
             const jsonText = document.getElementById("quizJson").value.trim();
-            const titleInput = document
-               .getElementById("quizTitle")
-               .value.trim();
+            const titleInput = sanitizeInput(document.getElementById("quizTitle").value.trim(), 200);
             const answerCount = parseInt(
                document.getElementById("answerCount").value,
             );
@@ -3031,19 +3580,20 @@ Przykład:
                }
 
                const decoded = decodeFromNewFormat(quizData);
+               const sanitized = sanitizeQuizData(decoded);
 
-               const finalTitle = titleInput || decoded.title;
+               const finalTitle = titleInput || sanitized.title;
                if (!finalTitle) {
                   throw new Error("Brak tytułu quizu");
                }
 
-               const jsonTags = decoded.tags || [];
-               const allTags = [...new Set([...currentTags, ...jsonTags])];
+               const jsonTags = sanitized.tags || [];
+               const allTags = [...new Set([...currentTags.map(t => sanitizeInput(t, 50)), ...jsonTags])].filter(Boolean);
 
                const quizzes = JSON.parse(
                   localStorage.getItem("quizzes") || "[]",
                );
-               const exists = quizzes.find((q) => q.data === decoded.data);
+               const exists = quizzes.find((q) => q.data === sanitized.data);
 
                if (exists) {
                   showToast("Ten quiz już istnieje w bibliotece!", "info");
@@ -3053,27 +3603,26 @@ Przykład:
                const quiz = {
                   title: finalTitle,
                   tags: allTags,
-                  type: decoded.type,
-                  data: decoded.data,
+                  type: sanitized.type,
+                  data: sanitized.data,
                   answerCount:
                      window.currentCreateType === "flashcard" ? 4 : answerCount,
                   id: Date.now().toString(),
                   createdAt: new Date().toISOString(),
                };
 
-               if (decoded.type === "flashcard") {
-                  quiz.cards = decoded.cards;
+               if (sanitized.type === "flashcard") {
+                  quiz.cards = sanitized.cards;
                } else {
-                  quiz.questions = decoded.questions;
+                  quiz.questions = sanitized.questions;
                }
 
                quizzes.push(quiz);
 
-               if (!safeLocalStorageSet("quizzes", JSON.stringify(quizzes))) {
-                  return;
-               }
+            localStorage.setItem("quizzes", JSON.stringify(quizzes));
 
-               showToast("Quiz został zapisany!", "success");
+            RenderCache.clear(); // Force re-render after adding quiz
+            showToast("Quiz został zapisany!", "success");
                showHomeScreen();
             } catch (error) {
                showToast("Błąd: " + error.message, "error");
@@ -3102,6 +3651,7 @@ Przykład:
                topButtons.style.display = "flex";
             }
 
+            RenderCache.clear(); // Clear cache on mode change
             loadQuizzes();
          }
 
@@ -3160,34 +3710,16 @@ Przykład:
             }
 
             const quizzes = JSON.parse(localStorage.getItem("quizzes") || "[]");
-            const selected = quizzes
-               .filter((q) => selectedQuizzes.has(q.id))
-               .map((q) => {
-                  return encodeToNewFormat(q);
-               });
+            const selected = quizzes.filter((q) => selectedQuizzes.has(q.id));
 
-            const blob = new Blob([JSON.stringify(selected, null, 2)], {
-               type: "application/json",
-            });
-
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `quizapp_selected_${selectedQuizzes.size}_${new Date().toISOString().split("T")[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-
-            showToast(
-               `Wyeksportowano ${selectedQuizzes.size} quizów`,
-               "success",
-            );
+            exportQuizData(selected, `quizapp_selected_${selectedQuizzes.size}_${new Date().toISOString().split("T")[0]}`);
          }
 
          function updateQuiz() {
             const jsonText = document
                .getElementById("editQuizJson")
                .value.trim();
-            const title = document.getElementById("editQuizTitle").value.trim();
+            const title = sanitizeInput(document.getElementById("editQuizTitle").value.trim(), 200);
 
             if (!jsonText) {
                showToast("Błąd: JSON nie może być pusty", "error");
@@ -3202,6 +3734,7 @@ Przykład:
                }
 
                const decoded = decodeFromNewFormat(updatedData);
+               const sanitized = sanitizeQuizData(decoded);
 
                if (!title) {
                   throw new Error("Brak tytułu");
@@ -3215,33 +3748,37 @@ Przykład:
                );
 
                if (index !== -1) {
-                  const jsonTags = decoded.tags || [];
-                  const allTags = [...new Set([...editTags, ...jsonTags])];
+                  const jsonTags = sanitized.tags || [];
+                  const allTags = [...new Set([...editTags.map(t => sanitizeInput(t, 50)), ...jsonTags])].filter(Boolean);
 
                   quizzes[index] = {
                      title: title,
                      tags: allTags,
-                     type: decoded.type,
-                     data: decoded.data,
+                     type: sanitized.type,
+                     data: sanitized.data,
                      answerCount: quizzes[index].answerCount,
                      id: currentEditingQuizId,
                      createdAt: quizzes[index].createdAt,
                      updatedAt: new Date().toISOString(),
                   };
 
-                  if (decoded.type === "flashcard") {
-                     quizzes[index].cards = decoded.cards;
+                  if (sanitized.type === "flashcard") {
+                     quizzes[index].cards = sanitized.cards;
                   } else {
-                     quizzes[index].questions = decoded.questions;
+                     quizzes[index].questions = sanitized.questions;
                   }
 
-                  if (
-                     !safeLocalStorageSet("quizzes", JSON.stringify(quizzes))
-                  ) {
-                     return;
-                  }
+                              if (!safeLocalStorageSet("quizzes", JSON.stringify(quizzes))) {
 
-                  showToast("Quiz został zaktualizowany!", "success");
+                                 return;
+
+                              }
+
+                  
+
+                              RenderCache.clear(); // Force re-render after update
+
+                              showToast("Quiz został zaktualizowany!", "success");
                   showHomeScreen();
                }
             } catch (error) {
@@ -3277,6 +3814,7 @@ Przykład:
             delete history[quizId];
             localStorage.setItem("quizHistory", JSON.stringify(history));
 
+            RenderCache.clear(); // Clear cache
             showToast("Quiz został usunięty", "success");
             loadQuizzes();
          }
@@ -3286,7 +3824,7 @@ Przykład:
             if (event.key === "Enter") {
                event.preventDefault();
                const input = document.getElementById("tagInput");
-               const tag = input.value.trim();
+               const tag = sanitizeInput(input.value.trim(), 50);
                if (tag && !currentTags.includes(tag)) {
                   currentTags.push(tag);
                   renderTags();
@@ -3299,7 +3837,7 @@ Przykład:
             if (event.key === "Enter") {
                event.preventDefault();
                const input = document.getElementById("editTagInput");
-               const tag = input.value.trim();
+               const tag = sanitizeInput(input.value.trim(), 50);
                if (tag && !editTags.includes(tag)) {
                   editTags.push(tag);
                   renderEditTags();
@@ -3493,6 +4031,7 @@ Przykład:
                if (currentStreak >= 3) {
                   showStreakIndicator();
                }
+               announceToScreenReader(`Poprawna odpowiedź! Zdobyto ${earnedPoints} punktów.`);
             } else {
                if (!isRetry) {
                   firstAttemptAnswered++;
@@ -3511,6 +4050,7 @@ Przykład:
                   });
                   retriedQuestions.add(currentItem.originalIndex);
                }
+               announceToScreenReader('Niepoprawna odpowiedź. Pytanie zostanie powtórzone później.');
             }
 
             updateStats();
@@ -3579,6 +4119,7 @@ Przykład:
                date: new Date().toISOString(),
             });
 
+            announceToScreenReader(`Quiz zakończony. Wynik: ${score} na ${questions.length}, ${percentage}%. Zdobyto ${totalPoints} punktów.`);
             showResultsScreen();
          }
 
@@ -3767,39 +4308,47 @@ Przykład:
          }
 
          function flipCard() {
-            if (!isTransitioning) {
-               isTransitioning = true;
+            if (isTransitioning) {
+               return; // Hard block during transition
+            }
 
-               const flashcardEl = document.getElementById("flashcard");
-               if (!isCardFlipped) {
-                  flashcardEl.classList.add("flipped");
-                  isCardFlipped = true;
+            isTransitioning = true;
+            const flashcardEl = document.getElementById("flashcard");
+            const actionsEl = document.getElementById("flashcardActions");
 
-                  setTimeout(() => {
-                     document.getElementById("flashcardActions").style.display =
-                        "flex";
-                     const backSide = document.querySelector(".flashcard-back");
-                     if (backSide) backSide.scrollTop = 0;
-                     isTransitioning = false;
-                  }, 650);
-               } else {
-                  flashcardEl.classList.remove("flipped");
-                  isCardFlipped = false;
-                  document.getElementById("flashcardActions").style.display =
-                     "none";
+            if (!isCardFlipped) {
+               flashcardEl.classList.add("flipped");
+               isCardFlipped = true;
 
-                  setTimeout(() => {
-                     const frontSide =
-                        document.querySelector(".flashcard-front");
-                     if (frontSide) frontSide.scrollTop = 0;
-                     isTransitioning = false;
-                  }, 650);
-               }
+               const flipTimer = setTimeout(() => {
+                  actionsEl.style.display = "flex";
+                  const backSide = document.querySelector(".flashcard-back");
+                  if (backSide) backSide.scrollTop = 0;
+                  isTransitioning = false;
+                  activeTimers.delete(flipTimer);
+               }, 650);
+               
+               registerTimer(flipTimer);
+            } else {
+               flashcardEl.classList.remove("flipped");
+               isCardFlipped = false;
+               actionsEl.style.display = "none";
+
+               const flipTimer = setTimeout(() => {
+                  const frontSide = document.querySelector(".flashcard-front");
+                  if (frontSide) frontSide.scrollTop = 0;
+                  isTransitioning = false;
+                  activeTimers.delete(flipTimer);
+               }, 650);
+               
+               registerTimer(flipTimer);
             }
          }
 
          function rateCard(difficulty) {
-            if (isTransitioning) return;
+            if (isTransitioning) {
+               return; // Prevent rating during transition
+            }
 
             isTransitioning = true;
             const currentItem = cardQueue[currentCardIndex];
@@ -3838,22 +4387,30 @@ Przykład:
                flashcardEl.classList.remove("flipped");
                isCardFlipped = false;
 
-               displayFlashcard();
-
-               setTimeout(() => {
+               const rateTimer = setTimeout(() => {
+                  displayFlashcard();
                   isTransitioning = false;
+                  activeTimers.delete(rateTimer);
                }, 650);
+               
+               registerTimer(rateTimer);
             } else {
                flashcardEl.classList.add("flipped");
 
-               setTimeout(() => {
+               const flipTimer = setTimeout(() => {
                   flashcardEl.classList.remove("flipped");
 
-                  setTimeout(() => {
-                     isTransitioning = false;
+                  const resetTimer = setTimeout(() => {
                      displayFlashcard();
+                     isTransitioning = false;
+                     activeTimers.delete(resetTimer);
                   }, 600);
+                  
+                  registerTimer(resetTimer);
+                  activeTimers.delete(flipTimer);
                }, 50);
+               
+               registerTimer(flipTimer);
             }
          }
 
@@ -3951,10 +4508,13 @@ Przykład:
             return history[flashcardId] || [];
          }
 
-         function displayQuizHistory(quizId) {
-            const history = getQuizHistory(quizId);
-            const section = document.getElementById("quizHistorySection");
-            const container = document.getElementById("quizHistory");
+         function displayHistory(itemId, type = 'quiz') {
+            const history = type === 'quiz' ? getQuizHistory(itemId) : getFlashcardHistory(itemId);
+            const sectionId = type === 'quiz' ? 'quizHistorySection' : 'flashcardHistorySection';
+            const containerId = type === 'quiz' ? 'quizHistory' : 'flashcardHistory';
+            
+            const section = document.getElementById(sectionId);
+            const container = document.getElementById(containerId);
 
             if (history.length === 0) {
                section.style.display = "none";
@@ -3962,70 +4522,62 @@ Przykład:
             }
 
             section.style.display = "block";
-
             const recent = history.slice(-5).reverse();
 
-            container.innerHTML = `
-                <div class="history-list">
-                    ${recent
-                       .map(
-                          (h) => `
+            if (type === 'quiz') {
+               container.innerHTML = `
+                  <div class="history-list">
+                     ${recent
+                        .map(
+                           (h) => `
                         <div class="history-item">
-                            <div class="history-info">
-                                <div style="font-size: 12px; color: var(--text-secondary);">
-                                    ${formatDate(h.date)}${h.incomplete ? " (przerwany)" : ""}
-                                </div>
-                                <div style="font-size: 14px; margin-top: 4px;">
-                                    ${h.points} pkt · Czas: ${formatTime(h.time)} · Seria: ${h.maxStreak}🔥
-                                </div>
-                            </div>
-                            <div class="history-score">${h.percentage}%</div>
+                           <div class="history-info">
+                              <div style="font-size: 12px; color: var(--text-secondary);">
+                                 ${formatDate(h.date)}${h.incomplete ? " (przerwany)" : ""}
+                              </div>
+                              <div style="font-size: 14px; margin-top: 4px;">
+                                 ${h.points} pkt · Czas: ${formatTime(h.time)} · Seria: ${h.maxStreak}🔥
+                              </div>
+                           </div>
+                           <div class="history-score">${h.percentage}%</div>
                         </div>
-                    `,
-                       )
-                       .join("")}
-                </div>
-            `;
+                     `,
+                        )
+                        .join("")}
+                  </div>
+               `;
+            } else {
+               container.innerHTML = `
+                  <div class="history-list">
+                     ${recent
+                        .map((h) => {
+                           const knownPercent = Math.round((h.easy / h.total) * 100);
+                           return `
+                              <div class="history-item">
+                                 <div class="history-info">
+                                    <div style="font-size: 12px; color: var(--text-secondary);">
+                                       ${formatDate(h.date)}
+                                    </div>
+                                    <div style="font-size: 14px; margin-top: 4px;">
+                                       ✅${h.easy} 🤔${h.medium} ❌${h.hard} · Czas: ${formatTime(h.time)}
+                                    </div>
+                                 </div>
+                                 <div class="history-score">${knownPercent}%</div>
+                              </div>
+                           `;
+                        })
+                        .join("")}
+                  </div>
+               `;
+            }
+         }
+
+         function displayQuizHistory(quizId) {
+            displayHistory(quizId, 'quiz');
          }
 
          function displayFlashcardHistory(flashcardId) {
-            const history = getFlashcardHistory(flashcardId);
-            const section = document.getElementById("flashcardHistorySection");
-            const container = document.getElementById("flashcardHistory");
-
-            if (history.length === 0) {
-               section.style.display = "none";
-               return;
-            }
-
-            section.style.display = "block";
-
-            const recent = history.slice(-5).reverse();
-
-            container.innerHTML = `
-                <div class="history-list">
-                    ${recent
-                       .map((h) => {
-                          const knownPercent = Math.round(
-                             (h.easy / h.total) * 100,
-                          );
-                          return `
-                            <div class="history-item">
-                                <div class="history-info">
-                                    <div style="font-size: 12px; color: var(--text-secondary);">
-                                        ${formatDate(h.date)}
-                                    </div>
-                                    <div style="font-size: 14px; margin-top: 4px;">
-                                        ✅${h.easy} 🤔${h.medium} ❌${h.hard} · Czas: ${formatTime(h.time)}
-                                    </div>
-                                </div>
-                                <div class="history-score">${knownPercent}%</div>
-                            </div>
-                        `;
-                       })
-                       .join("")}
-                </div>
-            `;
+            displayHistory(flashcardId, 'flashcard');
          }
 
          // ==================== SHARING ====================
@@ -4116,17 +4668,32 @@ Przykład:
          async function shareQuiz(quizId) {
             const quizzes = JSON.parse(localStorage.getItem("quizzes") || "[]");
             const quiz = quizzes.find((q) => q.id === quizId);
+            
             if (!quiz) {
                showToast("Quiz nie znaleziony", "error");
                return;
             }
-            const shareData = encodeToNewFormat(quiz);
+
+            // Show modal with animated loading state
+            document.getElementById("shareModal").classList.remove("hidden");
+            document.getElementById("shareContent").innerHTML = `
+               <div style="text-align: center; padding: 40px 20px;">
+                  <div class="loading-spinner" style="font-size: 48px; margin-bottom: 16px;">⏳</div>
+                  <p style="color: var(--text-secondary); font-size: 14px;">
+                     Generowanie linku...
+                  </p>
+               </div>
+            `;
+
+            const startTime = Date.now();
+            
             try {
+               const shareData = encodeToNewFormat(quiz);
                const jsonString = JSON.stringify(shareData);
                const encoder = new TextEncoder();
                const uint8 = encoder.encode(jsonString);
                const deflated = pako.deflate(uint8, { level: 9 });
-               // Convert to base64url
+               
                let binary = "";
                for (let i = 0; i < deflated.length; i++) {
                   binary += String.fromCharCode(deflated[i]);
@@ -4135,76 +4702,116 @@ Przykład:
                   .replace(/\+/g, "-")
                   .replace(/\//g, "_")
                   .replace(/=/g, "");
+               
                const baseUrl = "https://tymoeks.github.io/quizapp/";
                const fullUrl = `${baseUrl}#q=${compressed}`;
+               
                const itemCount =
                   quiz.type === "flashcard"
                      ? quiz.cards.length
                      : quiz.questions.length;
                const itemType = quiz.type === "flashcard" ? "fiszek" : "pytań";
+               
                let contentHtml = `
-<div style="margin-bottom: 24px;">
-   <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
-      <strong>${quiz.title}</strong><br>
-      ${itemCount} ${itemType}
-   </p>
-</div>
-<div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
-   <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
-      Link do udostępnienia:
-   </p>
-   <input type="text" value="${fullUrl}" readonly 
-      style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: monospace; background: var(--surface); word-break: break-all;"
-      onclick="this.select()" id="fullUrlInput">
-   <button class="btn btn-primary" id="copyLinkBtn"
-      style="width: 100%; margin-top: 12px;">
-   📋 Kopiuj link
-   </button>
-</div>
-`;
+                  <div style="margin-bottom: 24px;">
+                     <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
+                        <strong>${escapeHtml(quiz.title)}</strong><br>
+                        ${itemCount} ${itemType}
+                     </p>
+                  </div>
+                  <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                     <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                        Link do udostępnienia:
+                     </p>
+                     <input type="text" value="${fullUrl}" readonly 
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: monospace; background: var(--surface); word-break: break-all;"
+                        onclick="this.select()" id="fullUrlInput">
+                     <button class="btn btn-primary" id="copyLinkBtn"
+                        style="width: 100%; margin-top: 12px;">
+                     📋 Kopiuj link
+                     </button>
+                  </div>
+               `;
+               
+               let qrCodeHtml = '';
                if (fullUrl.length < 1000) {
-                  contentHtml += `
-<div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; text-align: center;">
-   <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-      Kod QR:
-   </p>
-   <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px; box-sizing: border-box; line-height: 0;"></div>
-</div>
-`;
+                  qrCodeHtml = `
+                     <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; text-align: center;">
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                           Kod QR:
+                        </p>
+                        <div id="qrcode" style="display: inline-block; padding: 12px; background: #ffffff; border-radius: 8px; box-sizing: border-box; line-height: 0;"></div>
+                     </div>
+                  `;
                }
-               document.getElementById("shareModal").classList.remove("hidden");
+               
+               contentHtml += qrCodeHtml;
+               
+               const elapsed = Date.now() - startTime;
+               const minLoadTime = 500;
+               const remainingTime = Math.max(0, minLoadTime - elapsed);
+               
+               await new Promise(resolve => {
+                  const waitTimer = setTimeout(() => {
+                     resolve();
+                     activeTimers.delete(waitTimer);
+                  }, remainingTime);
+                  registerTimer(waitTimer);
+               });
+               
                document.getElementById("shareContent").innerHTML = contentHtml;
-               setTimeout(() => {
-                  const copyBtn = document.getElementById("copyLinkBtn");
-                  if (copyBtn) {
-                     copyBtn.addEventListener("click", () => {
-                        copyToClipboard(fullUrl, "Link skopiowany! 🔗");
+               
+               const copyBtn = document.getElementById("copyLinkBtn");
+               if (copyBtn) {
+                  copyBtn.addEventListener("click", () => {
+                     copyToClipboard(fullUrl, "Link skopiowany! 🔗");
+                  });
+               }
+               
+               if (fullUrl.length < 1000) {
+                  await new Promise(resolve => {
+                     const qrTimer = setTimeout(() => {
+                        resolve();
+                        activeTimers.delete(qrTimer);
+                     }, 50);
+                     registerTimer(qrTimer);
+                  });
+                  
+                  const qrDiv = document.getElementById("qrcode");
+                  if (qrDiv) {
+                     qrDiv.innerHTML = "";
+                     new QRCode(qrDiv, {
+                        text: fullUrl,
+                        width: 160,
+                        height: 160,
+                        colorDark: "#2C3E50",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M,
                      });
                   }
-               }, 50);
-               if (fullUrl.length < 1000) {
-                  setTimeout(() => {
-                     const qrDiv = document.getElementById("qrcode");
-                     if (qrDiv) {
-                        qrDiv.innerHTML = "";
-                        new QRCode(qrDiv, {
-                           text: fullUrl,
-                           width: 160,
-                           height: 160,
-                           colorDark: "#2C3E50",
-                           colorLight: "#ffffff",
-                           correctLevel: QRCode.CorrectLevel.M,
-                        });
-                     }
-                  }, 100);
                }
+               
             } catch (error) {
-               document.getElementById("shareModal").classList.remove("hidden");
+               const elapsed = Date.now() - startTime;
+               const minLoadTime = 500;
+               const remainingTime = Math.max(0, minLoadTime - elapsed);
+               
+               await new Promise(resolve => {
+                  const errorTimer = setTimeout(() => {
+                     resolve();
+                     activeTimers.delete(errorTimer);
+                  }, remainingTime);
+                  registerTimer(errorTimer);
+               });
+               
                document.getElementById("shareContent").innerHTML = `
-<p style="color: var(--danger); text-align: center;">
-   ❌ Błąd: ${error.message}
-</p>
-`;
+                  <div style="text-align: center; padding: 40px 20px;">
+                     <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
+                     <p style="color: var(--danger);">
+                        Błąd: ${escapeHtml(error.message)}
+                     </p>
+                  </div>
+               `;
             }
          }
 
@@ -4228,11 +4835,27 @@ Przykład:
          }
 
          function showImportModal() {
-            document.getElementById("importModal").classList.remove("hidden");
+            modalFocusTrap = document.activeElement;
+            const modal = document.getElementById("importModal");
+            modal.classList.remove("hidden");
+            
+            // Focus first interactive element
+            setTimeout(() => {
+               const firstInput = modal.querySelector('input, button, textarea');
+               if (firstInput) firstInput.focus();
+            }, 100);
          }
+
+         let modalFocusTrap = null;
 
          function closeModal(modalId) {
             document.getElementById(modalId).classList.add("hidden");
+            
+            // Restore focus
+            if (modalFocusTrap) {
+               modalFocusTrap.focus();
+               modalFocusTrap = null;
+            }
          }
 
          function handleFileImport(event) {
@@ -4296,16 +4919,23 @@ Przykład:
                      addedCount++;
                   });
 
-                  if (
-                     !safeLocalStorageSet("quizzes", JSON.stringify(quizzes))
-                  ) {
-                     closeModal("importModal");
-                     document.getElementById("importJson").value = "";
-                     document.getElementById("importFile").value = "";
-                     return;
-                  }
+                              if (!safeLocalStorageSet("quizzes", JSON.stringify(quizzes))) {
 
-                  let message = `Zaimportowano ${addedCount} quizów`;
+                                 closeModal("importModal");
+
+                                 document.getElementById("importJson").value = "";
+
+                                 document.getElementById("importFile").value = "";
+
+                                 return;
+
+                              }
+
+                  
+
+                              RenderCache.clear(); // Force re-render after batch import
+
+                              let message = `Zaimportowano ${addedCount} quizów`;
                   if (skippedCount > 0)
                      message += `, pominięto ${skippedCount} duplikatów`;
                   if (invalidCount > 0)
@@ -4347,15 +4977,14 @@ Przykład:
                   }
 
                   quizzes.push(quiz);
-                  if (
-                     !safeLocalStorageSet("quizzes", JSON.stringify(quizzes))
-                  ) {
-                     closeModal("importModal");
-                     document.getElementById("importJson").value = "";
-                     document.getElementById("importFile").value = "";
-                     return;
-                  }
-                  showToast("Quiz zaimportowany!", "success");
+                              if (!safeLocalStorageSet("quizzes", JSON.stringify(quizzes))) {
+                                 closeModal("importModal");
+                                 document.getElementById("importJson").value = "";
+                                 document.getElementById("importFile").value = "";
+                                 return;
+                              }
+                              RenderCache.clear(); // Force re-render after import
+                              showToast("Quiz zaimportowany!", "success");
                }
 
                closeModal("importModal");
@@ -4376,21 +5005,26 @@ Przykład:
                return;
             }
 
-            const exportData = encodeToNewFormat(quiz);
+            exportQuizData([quiz], quiz.title);
+         }
 
-            const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+         function exportQuizData(quizzes, filename = 'export') {
+            const exportData = quizzes.map(q => encodeToNewFormat(q));
+            const data = exportData.length === 1 ? exportData[0] : exportData;
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], {
                type: "application/json",
             });
 
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `${quiz.title.replace(/[^a-z0-9]/gi, "_")}.json`;
+            a.download = `${filename.replace(/[^a-z0-9]/gi, "_")}.json`;
 
             setTimeout(() => {
                a.click();
                URL.revokeObjectURL(url);
-               showToast("Quiz wyeksportowany!", "success");
+               showToast(quizzes.length === 1 ? "Quiz wyeksportowany!" : `Wyeksportowano ${quizzes.length} quizów`, "success");
             }, 100);
          }
 
@@ -4478,17 +5112,13 @@ Przykład:
                         }
                      });
 
-                     if (
-                        !safeLocalStorageSet(
-                           "quizzes",
-                           JSON.stringify(validQuizzes),
-                        )
-                     ) {
-                        event.target.value = "";
-                        return;
-                     }
+            if (!safeLocalStorageSet("quizzes", JSON.stringify(validQuizzes))) {
+               event.target.value = "";
+               return;
+            }
 
-                     if (invalidCount > 0) {
+            RenderCache.clear(); // Force re-render after restore
+            if (invalidCount > 0) {
                         showToast(
                            `Przywrócono dane (odrzucono ${invalidCount} nieprawidłowych quizów)`,
                            "success",
@@ -4522,13 +5152,18 @@ Przykład:
          }
 
          function showBackupModal() {
+            modalFocusTrap = document.activeElement;
             const modal = document.getElementById("backupModal");
             modal.classList.remove("hidden");
 
             const quizzes = localStorage.getItem("quizzes") || "[]";
-
-            document.getElementById("quizCount").textContent =
-               JSON.parse(quizzes).length;
+            document.getElementById("quizCount").textContent = JSON.parse(quizzes).length;
+            
+            // Focus first button
+            setTimeout(() => {
+               const firstButton = modal.querySelector('button');
+               if (firstButton) firstButton.focus();
+            }, 100);
          }
 
          // ==================== KEYBOARD SHORTCUTS ====================
@@ -4673,11 +5308,14 @@ Przykład:
                   element.textContent = formatTime(elapsed);
                }
             }, 1000);
+            
+            registerTimer(timerInterval);
          }
 
          function stopTimer() {
             if (timerInterval) {
                clearInterval(timerInterval);
+               activeTimers.delete(timerInterval);
                timerInterval = null;
             }
          }
@@ -4697,10 +5335,60 @@ Przykład:
             return div.innerHTML;
          }
 
+         function sanitizeInput(input, maxLength = 1000) {
+            if (typeof input !== 'string') {
+               return '';
+            }
+            
+            // Trim whitespace
+            input = input.trim();
+            
+            // Limit length
+            if (input.length > maxLength) {
+               input = input.substring(0, maxLength);
+            }
+            
+            // Remove control characters except newlines and tabs
+            input = input.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+            
+            return input;
+         }
+
+         function sanitizeQuizData(quiz) {
+            return {
+               ...quiz,
+               title: sanitizeInput(quiz.title, 200),
+               tags: Array.isArray(quiz.tags) ? quiz.tags.map(tag => sanitizeInput(tag, 50)).filter(Boolean) : [],
+               questions: quiz.questions ? quiz.questions.map(q => ({
+                  ...q,
+                  question: sanitizeInput(q.question, 1000),
+                  correct: sanitizeInput(q.correct, 500),
+                  wrong: Array.isArray(q.wrong) ? q.wrong.map(w => sanitizeInput(w, 500)) : [],
+                  group: q.group ? sanitizeInput(q.group, 100) : undefined
+               })) : undefined,
+               cards: quiz.cards ? quiz.cards.map(c => ({
+                  front: sanitizeInput(c.front, 1000),
+                  back: sanitizeInput(c.back, 1000),
+                  category: c.category ? sanitizeInput(c.category, 100) : undefined
+               })) : undefined
+            };
+         }
+
          function decodeHtml(html) {
             const txt = document.createElement("textarea");
             txt.innerHTML = html;
             return txt.value;
+         }
+
+         function announceToScreenReader(message, priority = 'polite') {
+            const announcer = document.getElementById('srAnnouncements');
+            if (announcer) {
+               announcer.setAttribute('aria-live', priority);
+               announcer.textContent = '';
+               setTimeout(() => {
+                  announcer.textContent = message;
+               }, 100);
+            }
          }
       </script>
    </body>
