@@ -1708,6 +1708,14 @@
                   </button>
                </div>
             </div>
+            <div id="topButtons" style="text-align: center; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px;">
+               <button class="btn btn-primary" onclick="showChooseTypeScreen()">
+                  ➕ Utwórz nowy
+               </button>
+               <button class="btn" onclick="toggleSelectionMode()" id="selectionModeBtn">
+                  ☑️ Zaznacz wiele
+               </button>
+            </div>
             <div
                id="batchActions"
                class="search-bar"
@@ -1732,26 +1740,6 @@
                </div>
             </div>
             <div class="quiz-list" id="quizList"></div>
-            <div
-               style="
-                  text-align: center;
-                  display: flex;
-                  gap: 12px;
-                  justify-content: center;
-                  flex-wrap: wrap;
-               "
-            >
-               <button class="btn btn-primary" onclick="showChooseTypeScreen()">
-                  ➕ Utwórz nowy
-               </button>
-               <button
-                  class="btn"
-                  onclick="toggleSelectionMode()"
-                  id="selectionModeBtn"
-               >
-                  ☑️ Zaznacz wiele
-               </button>
-            </div>
          </div>
 
          <!-- Choose Type Screen -->
@@ -3097,15 +3085,18 @@ Przykład:
 
             const btn = document.getElementById("selectionModeBtn");
             const batchActions = document.getElementById("batchActions");
+            const topButtons = document.getElementById("topButtons");
 
             if (selectionMode) {
                btn.textContent = "✕ Anuluj zaznaczanie";
                btn.classList.add("btn-danger");
                batchActions.style.display = "flex";
+               topButtons.style.display = "none";
             } else {
                btn.textContent = "☑️ Zaznacz wiele";
                btn.classList.remove("btn-danger");
                batchActions.style.display = "none";
+               topButtons.style.display = "flex";
             }
 
             loadQuizzes();
