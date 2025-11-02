@@ -482,7 +482,7 @@
             }
             
             /* Always show actions on mobile */
-            .quiz-item:not(.selection-mode) .quiz-actions {
+            .quiz-actions {
                opacity: 1;
             }
          }
@@ -529,6 +529,14 @@
             background: var(--surface-alt);
             padding: 4px 8px;
             border-radius: 4px;
+         }
+
+         .quiz-date {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            font-size: 11px;
+            color: var(--text-secondary);
          }
 
          .quiz-type-icon {
@@ -1639,6 +1647,7 @@
             .btn-small {
                padding: 10px 16px;
                min-height: 40px;
+               height: 40px;
             }
 
             .flashcard {
