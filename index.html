@@ -2279,7 +2279,7 @@
                   color: var(--text-secondary);
                "
             >
-               ℹ️ Istniejące quizy nie zostaną nadpisane - dodane zostaną tylko
+               ℹ️ Istniejące quizy nie zostaną nadpisane, dodane zostaną tylko
                nowe.
             </p>
             <div class="button-group">
@@ -2337,8 +2337,6 @@
                "
             >
                <p style="font-size: 14px; color: var(--text-secondary)">
-                  <strong>Rozmiar danych:</strong>
-                  <span id="dataSize">0 KB</span><br />
                   <strong>Liczba quizów:</strong> <span id="quizCount">0</span>
                </p>
             </div>
@@ -4532,15 +4530,7 @@ Przykład:
             modal.classList.remove("hidden");
 
             const quizzes = localStorage.getItem("quizzes") || "[]";
-            const history = localStorage.getItem("quizHistory") || "{}";
-            const flashcardHistory =
-               localStorage.getItem("flashcardHistory") || "{}";
-            const totalSize =
-               (quizzes.length + history.length + flashcardHistory.length) /
-               1024;
 
-            document.getElementById("dataSize").textContent =
-               `${totalSize.toFixed(2)} KB`;
             document.getElementById("quizCount").textContent =
                JSON.parse(quizzes).length;
          }
