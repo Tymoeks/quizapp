@@ -298,7 +298,7 @@
          }
 
          .btn:active {
-            transform: scale(0.98);
+            transform: translateY(0) scale(0.98);
          }
 
          .btn-primary {
@@ -3091,11 +3091,14 @@ Przykład:
                btn.textContent = "✕ Anuluj zaznaczanie";
                btn.classList.add("btn-danger");
                batchActions.style.display = "flex";
+               batchActions.classList.add("animate-fadeIn");
                topButtons.style.display = "none";
+               document.getElementById("selectedCount").textContent = "0 zaznaczonych";
             } else {
                btn.textContent = "☑️ Zaznacz wiele";
                btn.classList.remove("btn-danger");
                batchActions.style.display = "none";
+               batchActions.classList.remove("animate-fadeIn");
                topButtons.style.display = "flex";
             }
 
@@ -3144,6 +3147,8 @@ Przykład:
                localStorage.setItem("quizHistory", JSON.stringify(history));
 
                showToast(`Usunięto ${selectedQuizzes.size} quizów`, "success");
+               selectedQuizzes.clear();
+               document.getElementById("selectedCount").textContent = "0 zaznaczonych";
                toggleSelectionMode();
             }
          }
