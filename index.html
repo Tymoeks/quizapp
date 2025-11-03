@@ -3548,6 +3548,8 @@ Przykład:
                   return current.points > best.points ? current : best;
                }, history[0]);
                if (bestResult.percentage === undefined | bestResult.points === undefined) {
+                  current.percentage = 0
+                  current.points = 0
                   bestResult = null;
                }
             }
@@ -4702,15 +4704,6 @@ Przykład:
             }
          }
 
-         function displayQuizHistory(quizId) {
-            // Nie wyświetlaj historii - funkcja pusta
-         }
-
-         function displayFlashcardHistory(flashcardId) {
-            // Nie wyświetlaj historii - funkcja pusta
-         }
-
-         // ==================== SHARING ====================
          function checkSharedQuiz() {
             const hash = window.location.hash;
             if (hash.startsWith("#q=")) {
