@@ -303,9 +303,13 @@
                transform: scale(0.98);
                transition: transform 0.1s ease;
             }
-            
+
             .btn {
-               transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+               transition:
+                  transform 0.15s ease,
+                  box-shadow 0.15s ease,
+                  background 0.2s ease,
+                  border-color 0.2s ease;
             }
          }
 
@@ -469,10 +473,6 @@
             .quiz-item:hover::before {
                opacity: 0.1;
             }
-            
-            .quiz-item:hover .quiz-actions {
-               opacity: 1;
-            }
          }
 
          @media (hover: none) and (pointer: coarse) {
@@ -480,44 +480,6 @@
                transform: scale(0.99);
                transition: transform 0.1s ease;
             }
-            
-            /* Always show actions on mobile */
-            .quiz-actions {
-               opacity: 1;
-            }
-         }
-
-         .quiz-item.selection-mode .quiz-actions {
-            display: none;
-         }
-
-         .quiz-actions {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            display: flex;
-            gap: 8px;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-         }
-
-         .quiz-actions button {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-         }
-
-         .quiz-actions button:hover {
-            background: var(--surface-alt);
-            border-color: var(--primary);
          }
 
          .quiz-stats-badge {
@@ -1646,8 +1608,7 @@
 
             .btn-small {
                padding: 10px 16px;
-               min-height: 40px;
-               height: 40px;
+               min-height: 44px;
             }
 
             .flashcard {
@@ -1781,11 +1742,25 @@
                   </button>
                </div>
             </div>
-            <div id="topButtons" style="text-align: center; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px;">
+            <div
+               id="topButtons"
+               style="
+                  text-align: center;
+                  display: flex;
+                  gap: 12px;
+                  justify-content: center;
+                  flex-wrap: wrap;
+                  margin-bottom: 24px;
+               "
+            >
                <button class="btn btn-primary" onclick="showChooseTypeScreen()">
                   ➕ Utwórz nowy
                </button>
-               <button class="btn" onclick="toggleSelectionMode()" id="selectionModeBtn">
+               <button
+                  class="btn"
+                  onclick="toggleSelectionMode()"
+                  id="selectionModeBtn"
+               >
                   ☑️ Zaznacz wiele
                </button>
             </div>
@@ -1939,16 +1914,10 @@
                   <button class="btn btn-primary" onclick="updateQuiz()">
                      💾 Zapisz zmiany
                   </button>
-                  <button
-                     class="btn btn-accent"
-                     onclick="shareQuiz(currentEditingQuizId)"
-                  >
-                     🔗 Udostępnij
-                  </button>
                   <button class="btn btn-danger" onclick="deleteCurrentQuiz()">
                      🗑️ Usuń
                   </button>
-                  <button class="btn" onclick="showHomeScreen()">Anuluj</button>
+                  <button class="btn" onclick="cancelEdit()">Anuluj</button>
                </div>
             </div>
          </div>
@@ -1995,6 +1964,12 @@
                      onclick="shareQuiz(currentQuiz.id)"
                   >
                      🔗 Udostępnij
+                  </button>
+                  <button
+                     class="btn btn-small"
+                     onclick="showEditScreen(currentQuiz.id)"
+                  >
+                     ✏️ Edytuj
                   </button>
                   <button
                      class="btn btn-small"
@@ -2106,6 +2081,12 @@
                      onclick="shareQuiz(currentFlashcards.id)"
                   >
                      🔗 Udostępnij
+                  </button>
+                  <button
+                     class="btn btn-small"
+                     onclick="showEditScreen(currentFlashcards.id)"
+                  >
+                     ✏️ Edytuj
                   </button>
                   <button
                      class="btn btn-small"
@@ -2312,19 +2293,32 @@
             <div class="modal-content" onclick="event.stopPropagation()">
                <div class="modal-header">
                   <h2>⚠️ Brak miejsca</h2>
-                  <button class="modal-close" onclick="closeModal('storageCleanupModal')">
+                  <button
+                     class="modal-close"
+                     onclick="closeModal('storageCleanupModal')"
+                  >
                      ×
                   </button>
                </div>
                <p style="margin-bottom: 24px; color: var(--text-secondary)">
-                  Brak miejsca w pamięci przeglądarki. Usuń starą historię lub quizy, aby zwolnić miejsce.
+                  Brak miejsca w pamięci przeglądarki. Usuń starą historię lub
+                  quizy, aby zwolnić miejsce.
                </p>
-               <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
-                  <p style="font-size: 14px; margin-bottom: 8px;">
-                     <strong>Historia wyników:</strong> <span id="historySize">0 KB</span>
+               <div
+                  style="
+                     background: var(--surface-alt);
+                     padding: 16px;
+                     border-radius: 8px;
+                     margin-bottom: 16px;
+                  "
+               >
+                  <p style="font-size: 14px; margin-bottom: 8px">
+                     <strong>Historia wyników:</strong>
+                     <span id="historySize">0 KB</span>
                   </p>
-                  <p style="font-size: 14px; margin-bottom: 8px;">
-                     <strong>Liczba quizów:</strong> <span id="quizzesCount">0</span>
+                  <p style="font-size: 14px; margin-bottom: 8px">
+                     <strong>Liczba quizów:</strong>
+                     <span id="quizzesCount">0</span>
                   </p>
                </div>
                <div class="button-group">
@@ -2334,7 +2328,10 @@
                   <button class="btn" onclick="clearOldHistory()">
                      📅 Usuń historię starszą niż 30 dni
                   </button>
-                  <button class="btn" onclick="closeModal('storageCleanupModal')">
+                  <button
+                     class="btn"
+                     onclick="closeModal('storageCleanupModal')"
+                  >
                      Anuluj
                   </button>
                </div>
@@ -2343,12 +2340,19 @@
       </div>
 
       <!-- Screen Reader Announcements -->
-      <div id="srAnnouncements" 
-           role="status" 
-           aria-live="polite" 
-           aria-atomic="true" 
-           style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;">
-      </div>
+      <div
+         id="srAnnouncements"
+         role="status"
+         aria-live="polite"
+         aria-atomic="true"
+         style="
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+         "
+      ></div>
 
       <!-- Import Modal -->
       <div
@@ -2503,9 +2507,9 @@
                   randomOrder: true,
                   answerCount: 4,
                   showLetters: true,
-               }
+               },
             },
-            
+
             // Flashcard state
             flashcard: {
                current: null,
@@ -2521,7 +2525,7 @@
                retriedCards: new Set(),
                startTime: null,
             },
-            
+
             // UI state
             ui: {
                currentFilter: "all",
@@ -2531,7 +2535,7 @@
                selectedQuizzes: new Set(),
                currentEditingQuizId: null,
             },
-            
+
             // System state
             system: {
                timerInterval: null,
@@ -2540,7 +2544,7 @@
                toastTimeout: null,
                searchDebounceTimer: null,
             },
-            
+
             // Methods
             reset() {
                this.quiz = {
@@ -2559,9 +2563,9 @@
                   firstAttemptCorrect: new Set(),
                   firstAttemptAnswered: 0,
                   retriedQuestions: new Set(),
-                  settings: { ...this.quiz.settings }
+                  settings: { ...this.quiz.settings },
                };
-               
+
                this.flashcard = {
                   current: null,
                   currentCardIndex: 0,
@@ -2577,11 +2581,11 @@
                   startTime: null,
                };
             },
-            
+
             resetUI() {
                this.ui.currentTags = [];
                this.ui.editTags = [];
-            }
+            },
          };
 
          // Legacy compatibility - gradually replace these
@@ -2640,7 +2644,7 @@
             firstAttemptCorrect = AppState.quiz.firstAttemptCorrect;
             firstAttemptAnswered = AppState.quiz.firstAttemptAnswered;
             retriedQuestions = AppState.quiz.retriedQuestions;
-            
+
             currentFlashcards = AppState.flashcard.current;
             currentCardIndex = AppState.flashcard.currentCardIndex;
             answeredCardsCount = AppState.flashcard.answeredCardsCount;
@@ -2651,14 +2655,14 @@
             isTransitioning = AppState.flashcard.isTransitioning;
             completedCards = AppState.flashcard.completedCards;
             retriedCards = AppState.flashcard.retriedCards;
-            
+
             currentFilter = AppState.ui.currentFilter;
             currentTags = AppState.ui.currentTags;
             editTags = AppState.ui.editTags;
             selectionMode = AppState.ui.selectionMode;
             selectedQuizzes = AppState.ui.selectedQuizzes;
             currentEditingQuizId = AppState.ui.currentEditingQuizId;
-            
+
             timerInterval = AppState.system.timerInterval;
             activeToast = AppState.system.activeToast;
             queuedToast = AppState.system.queuedToast;
@@ -2682,7 +2686,7 @@
             AppState.quiz.firstAttemptCorrect = firstAttemptCorrect;
             AppState.quiz.firstAttemptAnswered = firstAttemptAnswered;
             AppState.quiz.retriedQuestions = retriedQuestions;
-            
+
             AppState.flashcard.current = currentFlashcards;
             AppState.flashcard.currentCardIndex = currentCardIndex;
             AppState.flashcard.answeredCardsCount = answeredCardsCount;
@@ -2693,14 +2697,14 @@
             AppState.flashcard.isTransitioning = isTransitioning;
             AppState.flashcard.completedCards = completedCards;
             AppState.flashcard.retriedCards = retriedCards;
-            
+
             AppState.ui.currentFilter = currentFilter;
             AppState.ui.currentTags = currentTags;
             AppState.ui.editTags = editTags;
             AppState.ui.selectionMode = selectionMode;
             AppState.ui.selectedQuizzes = selectedQuizzes;
             AppState.ui.currentEditingQuizId = currentEditingQuizId;
-            
+
             AppState.system.timerInterval = timerInterval;
             AppState.system.activeToast = activeToast;
             AppState.system.queuedToast = queuedToast;
@@ -2711,27 +2715,27 @@
          // ==================== RENDERING CACHE ====================
          const RenderCache = {
             quizzes: null,
-            lastQuery: '',
+            lastQuery: "",
             lastFilter: null,
             renderedItems: new Map(),
-            
+
             shouldUpdate(query, filter) {
                return this.lastQuery !== query || this.lastFilter !== filter;
             },
-            
+
             update(query, filter, quizzes) {
                this.lastQuery = query;
                this.lastFilter = filter;
                this.quizzes = quizzes;
             },
-            
+
             clear() {
                this.quizzes = null;
-               this.lastQuery = '';
+               this.lastQuery = "";
                this.lastFilter = null;
                this.renderedItems.clear();
             },
-            
+
             getQuizHTML(quiz) {
                const cacheKey = `${quiz.id}_${selectionMode}_${selectedQuizzes.has(quiz.id)}`;
                if (this.renderedItems.has(cacheKey)) {
@@ -2739,11 +2743,11 @@
                }
                return null;
             },
-            
+
             setQuizHTML(quiz, html) {
                const cacheKey = `${quiz.id}_${selectionMode}_${selectedQuizzes.has(quiz.id)}`;
                this.renderedItems.set(cacheKey, html);
-            }
+            },
          };
 
          // ==================== CLEANUP TRACKING ====================
@@ -2756,9 +2760,11 @@
          }
 
          function cleanupEventListeners() {
-            activeEventListeners.forEach(({ element, event, handler, options }) => {
-               element.removeEventListener(event, handler, options);
-            });
+            activeEventListeners.forEach(
+               ({ element, event, handler, options }) => {
+                  element.removeEventListener(event, handler, options);
+               },
+            );
             activeEventListeners = [];
          }
 
@@ -2768,7 +2774,7 @@
          }
 
          function cleanupTimers() {
-            activeTimers.forEach(timerId => {
+            activeTimers.forEach((timerId) => {
                clearTimeout(timerId);
                clearInterval(timerId);
             });
@@ -3018,19 +3024,25 @@
 
          function handleStorageQuotaExceeded() {
             const historySize = calculateHistorySize();
-            const quizzesCount = JSON.parse(localStorage.getItem("quizzes") || "[]").length;
-            
-            document.getElementById("historySize").textContent = formatBytes(historySize);
+            const quizzesCount = JSON.parse(
+               localStorage.getItem("quizzes") || "[]",
+            ).length;
+
+            document.getElementById("historySize").textContent =
+               formatBytes(historySize);
             document.getElementById("quizzesCount").textContent = quizzesCount;
-            
-            document.getElementById("storageCleanupModal").classList.remove("hidden");
-            
+
+            document
+               .getElementById("storageCleanupModal")
+               .classList.remove("hidden");
+
             return false;
          }
 
          function calculateHistorySize() {
             const quizHistory = localStorage.getItem("quizHistory") || "{}";
-            const flashcardHistory = localStorage.getItem("flashcardHistory") || "{}";
+            const flashcardHistory =
+               localStorage.getItem("flashcardHistory") || "{}";
             return new Blob([quizHistory, flashcardHistory]).size;
          }
 
@@ -3041,7 +3053,11 @@
          }
 
          function clearAllHistory() {
-            if (confirm("Czy na pewno chcesz usunąć całą historię wyników? Tej operacji nie można cofnąć.")) {
+            if (
+               confirm(
+                  "Czy na pewno chcesz usunąć całą historię wyników? Tej operacji nie można cofnąć.",
+               )
+            ) {
                localStorage.setItem("quizHistory", "{}");
                localStorage.setItem("flashcardHistory", "{}");
                showToast("Historia została wyczyszczona", "success");
@@ -3050,15 +3066,19 @@
          }
 
          function clearOldHistory() {
-            const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-            
-            const quizHistory = JSON.parse(localStorage.getItem("quizHistory") || "{}");
-            const flashcardHistory = JSON.parse(localStorage.getItem("flashcardHistory") || "{}");
-            
+            const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+
+            const quizHistory = JSON.parse(
+               localStorage.getItem("quizHistory") || "{}",
+            );
+            const flashcardHistory = JSON.parse(
+               localStorage.getItem("flashcardHistory") || "{}",
+            );
+
             let removedCount = 0;
-            
-            Object.keys(quizHistory).forEach(quizId => {
-               quizHistory[quizId] = quizHistory[quizId].filter(entry => {
+
+            Object.keys(quizHistory).forEach((quizId) => {
+               quizHistory[quizId] = quizHistory[quizId].filter((entry) => {
                   const entryDate = new Date(entry.date).getTime();
                   if (entryDate < thirtyDaysAgo) {
                      removedCount++;
@@ -3066,14 +3086,16 @@
                   }
                   return true;
                });
-               
+
                if (quizHistory[quizId].length === 0) {
                   delete quizHistory[quizId];
                }
             });
-            
-            Object.keys(flashcardHistory).forEach(flashcardId => {
-               flashcardHistory[flashcardId] = flashcardHistory[flashcardId].filter(entry => {
+
+            Object.keys(flashcardHistory).forEach((flashcardId) => {
+               flashcardHistory[flashcardId] = flashcardHistory[
+                  flashcardId
+               ].filter((entry) => {
                   const entryDate = new Date(entry.date).getTime();
                   if (entryDate < thirtyDaysAgo) {
                      removedCount++;
@@ -3081,16 +3103,22 @@
                   }
                   return true;
                });
-               
+
                if (flashcardHistory[flashcardId].length === 0) {
                   delete flashcardHistory[flashcardId];
                }
             });
-            
+
             localStorage.setItem("quizHistory", JSON.stringify(quizHistory));
-            localStorage.setItem("flashcardHistory", JSON.stringify(flashcardHistory));
-            
-            showToast(`Usunięto ${removedCount} starych wpisów historii`, "success");
+            localStorage.setItem(
+               "flashcardHistory",
+               JSON.stringify(flashcardHistory),
+            );
+
+            showToast(
+               `Usunięto ${removedCount} starych wpisów historii`,
+               "success",
+            );
             closeModal("storageCleanupModal");
          }
 
@@ -3281,6 +3309,27 @@ Przykład:
             }
          }
 
+         function cancelEdit() {
+            if (!currentEditingQuizId) {
+               showHomeScreen();
+               return;
+            }
+
+            const quizzes = JSON.parse(localStorage.getItem("quizzes") || "[]");
+            const quiz = quizzes.find((q) => q.id === currentEditingQuizId);
+            
+            if (!quiz) {
+               showHomeScreen();
+               return;
+            }
+
+            if (quiz.type === "flashcard") {
+               showFlashcardScreen(currentEditingQuizId);
+            } else {
+               showPreQuizScreen(currentEditingQuizId);
+            }
+         }
+
          function showPreQuizScreen(quizId) {
             hideAllScreens();
             document.getElementById("preQuizScreen").classList.remove("hidden");
@@ -3342,38 +3391,40 @@ Przykład:
                showToast("Błąd wczytywania quizów", "error");
                quizzes = [];
             }
-            
+
             const quizList = document.getElementById("quizList");
             const searchQuery = document
                .getElementById("searchInput")
                .value.toLowerCase();
 
-             // Determine if we can use cached HTML content
-            const canUseCachedHTML = !RenderCache.shouldUpdate(searchQuery, currentFilter) && 
-                                     !selectionMode && 
-                                     selectedQuizzes.size === 0 &&
-                                     RenderCache.quizzes !== null; // Ensure there's actually cached data
+            // Determine if we can use cached HTML content
+            const canUseCachedHTML =
+               !RenderCache.shouldUpdate(searchQuery, currentFilter) &&
+               !selectionMode &&
+               selectedQuizzes.size === 0 &&
+               RenderCache.quizzes !== null; // Ensure there's actually cached data
 
             let filteredQuizzes = [];
             if (canUseCachedHTML) {
-                filteredQuizzes = RenderCache.quizzes;
+               filteredQuizzes = RenderCache.quizzes;
             } else {
-                filteredQuizzes = quizzes.filter((quiz) => {
-                    const matchesSearch =
-                        quiz.title.toLowerCase().includes(searchQuery) ||
-                        (quiz.tags &&
-                            quiz.tags.some((tag) =>
-                                tag.toLowerCase().includes(searchQuery),
-                            ));
-                    const matchesFilter =
-                        currentFilter === "all" ||
-                        (currentFilter === "quiz" && quiz.type !== "flashcard") ||
-                        (currentFilter === "flashcard" && quiz.type === "flashcard");
-                    return matchesSearch && matchesFilter;
-                });
+               filteredQuizzes = quizzes.filter((quiz) => {
+                  const matchesSearch =
+                     quiz.title.toLowerCase().includes(searchQuery) ||
+                     (quiz.tags &&
+                        quiz.tags.some((tag) =>
+                           tag.toLowerCase().includes(searchQuery),
+                        ));
+                  const matchesFilter =
+                     currentFilter === "all" ||
+                     (currentFilter === "quiz" && quiz.type !== "flashcard") ||
+                     (currentFilter === "flashcard" &&
+                        quiz.type === "flashcard");
+                  return matchesSearch && matchesFilter;
+               });
 
-                // Update cache only if we generated new filtered quizzes
-                RenderCache.update(searchQuery, currentFilter, filteredQuizzes);
+               // Update cache only if we generated new filtered quizzes
+               RenderCache.update(searchQuery, currentFilter, filteredQuizzes);
             }
 
             // Always cleanup previous event listeners before (re)rendering
@@ -3391,16 +3442,19 @@ Przykład:
             }
 
             // Sort quizzes by creation date, newest first
-            filteredQuizzes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            filteredQuizzes.sort(
+               (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+            );
 
             const fragment = document.createDocumentFragment();
-            const tempDiv = document.createElement('div');
+            const tempDiv = document.createElement("div");
 
-            filteredQuizzes.forEach(quiz => {
+            filteredQuizzes.forEach((quiz) => {
                const cachedHTML = RenderCache.getQuizHTML(quiz);
                let itemHTML;
-               
-               if (cachedHTML && !selectionMode && canUseCachedHTML) { // Only use cached HTML if canUseCachedHTML is true
+
+               if (cachedHTML && !selectionMode && canUseCachedHTML) {
+                  // Only use cached HTML if canUseCachedHTML is true
                   itemHTML = cachedHTML;
                } else {
                   itemHTML = generateQuizItemHTML(quiz);
@@ -3408,12 +3462,12 @@ Przykład:
                      RenderCache.setQuizHTML(quiz, itemHTML);
                   }
                }
-               
+
                tempDiv.innerHTML = itemHTML;
                fragment.appendChild(tempDiv.firstElementChild);
             });
 
-            quizList.innerHTML = '';
+            quizList.innerHTML = "";
             quizList.appendChild(fragment);
 
             // Attach event listeners with cleanup tracking
@@ -3440,7 +3494,10 @@ Przykład:
             const tagsHtml =
                quiz.tags && quiz.tags.length > 0
                   ? `<div class="quiz-tags" role="list" aria-label="Tagi">${quiz.tags
-                       .map((tag) => `<span class="tag" role="listitem">${escapeHtml(tag)}</span>`)
+                       .map(
+                          (tag) =>
+                             `<span class="tag" role="listitem">${escapeHtml(tag)}</span>`,
+                       )
                        .join("")}</div>`
                   : "";
 
@@ -3453,22 +3510,17 @@ Przykład:
                   aria-label="Zaznacz ${escapeHtml(quiz.title)}">`
                : "";
 
-            const ariaLabel = `${quiz.title}, ${count}${bestResult ? `, najlepszy wynik ${bestResult.percentage}%` : ''}`;
+            const ariaLabel = `${quiz.title}, ${count}${bestResult ? `, najlepszy wynik ${bestResult.percentage}%` : ""}`;
 
             return `
                <div class="quiz-item animate-fadeIn ${selectionClass} ${selectedClass}" 
-                    data-quiz-id="${quiz.id}"
-                    role="article"
-                    aria-label="${ariaLabel}"
-                    tabindex="0">
-                   ${checkboxHtml}
-                   <div class="quiz-type-icon" aria-hidden="true">${icon}</div>
-                   <div class="quiz-actions" ${selectionMode ? 'style="display: none;"' : ""} role="group" aria-label="Akcje">
-                       <button data-action="share" title="Udostępnij" aria-label="Udostępnij ${escapeHtml(quiz.title)}">🔗</button>
-                       <button data-action="edit" title="Edytuj" aria-label="Edytuj ${escapeHtml(quiz.title)}">✏️</button>
-                       <button data-action="delete" title="Usuń" aria-label="Usuń ${escapeHtml(quiz.title)}">🗑️</button>
-                   </div>
-                   <h3>${escapeHtml(quiz.title)}</h3>
+                  data-quiz-id="${quiz.id}"
+                  role="article"
+                  aria-label="${ariaLabel}"
+                  tabindex="0">
+                  ${checkboxHtml}
+                  <div class="quiz-type-icon" aria-hidden="true">${icon}</div>
+                  <h3>${escapeHtml(quiz.title)}</h3>
                    <p>${count}</p>
                    ${tagsHtml}
                    ${
@@ -3485,15 +3537,18 @@ Przykład:
          }
 
          function attachQuizItemListeners(quizList, filtered) {
-            quizList.querySelectorAll('.quiz-item').forEach(item => {
+            quizList.querySelectorAll(".quiz-item").forEach((item) => {
                const quizId = item.dataset.quizId;
-               const quiz = filtered.find(q => q.id === quizId);
-               
+               const quiz = filtered.find((q) => q.id === quizId);
+
                if (!quiz) return;
 
                const isFlashcard = quiz.type === "flashcard";
                const clickHandler = (e) => {
-                  if (e.target.closest('.quiz-actions') || e.target.classList.contains('quiz-checkbox')) {
+                  if (
+                     e.target.closest(".quiz-actions") ||
+                     e.target.classList.contains("quiz-checkbox")
+                  ) {
                      return;
                   }
                   if (selectionMode) {
@@ -3507,46 +3562,20 @@ Przykład:
                   }
                };
 
-               registerEventListener(item, 'click', clickHandler);
-               
+               registerEventListener(item, "click", clickHandler);
+
                // Keyboard support for quiz items
-               registerEventListener(item, 'keydown', (e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
+               registerEventListener(item, "keydown", (e) => {
+                  if (e.key === "Enter" || e.key === " ") {
                      e.preventDefault();
                      clickHandler(e);
                   }
                });
 
-               // Action buttons
-               const shareBtn = item.querySelector('[data-action="share"]');
-               const editBtn = item.querySelector('[data-action="edit"]');
-               const deleteBtn = item.querySelector('[data-action="delete"]');
-
-               if (shareBtn) {
-                  registerEventListener(shareBtn, 'click', (e) => {
-                     e.stopPropagation();
-                     shareQuiz(quizId);
-                  });
-               }
-
-               if (editBtn) {
-                  registerEventListener(editBtn, 'click', (e) => {
-                     e.stopPropagation();
-                     showEditScreen(quizId);
-                  });
-               }
-
-               if (deleteBtn) {
-                  registerEventListener(deleteBtn, 'click', (e) => {
-                     e.stopPropagation();
-                     confirmDelete(quizId);
-                  });
-               }
-
                // Checkbox handler
-               const checkbox = item.querySelector('.quiz-checkbox');
+               const checkbox = item.querySelector(".quiz-checkbox");
                if (checkbox) {
-                  registerEventListener(checkbox, 'click', (e) => {
+                  registerEventListener(checkbox, "click", (e) => {
                      e.stopPropagation();
                      toggleQuizSelection(quizId);
                   });
@@ -3571,7 +3600,10 @@ Przykład:
 
          function saveQuiz() {
             const jsonText = document.getElementById("quizJson").value.trim();
-            const titleInput = sanitizeInput(document.getElementById("quizTitle").value.trim(), 200);
+            const titleInput = sanitizeInput(
+               document.getElementById("quizTitle").value.trim(),
+               200,
+            );
             const answerCount = parseInt(
                document.getElementById("answerCount").value,
             );
@@ -3597,7 +3629,12 @@ Przykład:
                }
 
                const jsonTags = sanitized.tags || [];
-               const allTags = [...new Set([...currentTags.map(t => sanitizeInput(t, 50)), ...jsonTags])].filter(Boolean);
+               const allTags = [
+                  ...new Set([
+                     ...currentTags.map((t) => sanitizeInput(t, 50)),
+                     ...jsonTags,
+                  ]),
+               ].filter(Boolean);
 
                const quizzes = JSON.parse(
                   localStorage.getItem("quizzes") || "[]",
@@ -3628,10 +3665,10 @@ Przykład:
 
                quizzes.push(quiz);
 
-            localStorage.setItem("quizzes", JSON.stringify(quizzes));
+               localStorage.setItem("quizzes", JSON.stringify(quizzes));
 
-            RenderCache.clear(); // Force re-render after adding quiz
-            showToast("Quiz został zapisany!", "success");
+               RenderCache.clear(); // Force re-render after adding quiz
+               showToast("Quiz został zapisany!", "success");
                showHomeScreen();
             } catch (error) {
                showToast("Błąd: " + error.message, "error");
@@ -3651,7 +3688,8 @@ Przykład:
                batchActions.style.display = "flex";
                batchActions.classList.add("animate-fadeIn");
                topButtons.style.display = "none";
-               document.getElementById("selectedCount").textContent = "0 zaznaczonych";
+               document.getElementById("selectedCount").textContent =
+                  "0 zaznaczonych";
             } else {
                btn.textContent = "☑️ Zaznacz wiele";
                btn.classList.remove("btn-danger");
@@ -3707,7 +3745,8 @@ Przykład:
 
                showToast(`Usunięto ${selectedQuizzes.size} quizów`, "success");
                selectedQuizzes.clear();
-               document.getElementById("selectedCount").textContent = "0 zaznaczonych";
+               document.getElementById("selectedCount").textContent =
+                  "0 zaznaczonych";
                toggleSelectionMode();
             }
          }
@@ -3721,14 +3760,20 @@ Przykład:
             const quizzes = JSON.parse(localStorage.getItem("quizzes") || "[]");
             const selected = quizzes.filter((q) => selectedQuizzes.has(q.id));
 
-            exportQuizData(selected, `quizapp_selected_${selectedQuizzes.size}_${new Date().toISOString().split("T")[0]}`);
+            exportQuizData(
+               selected,
+               `quizapp_selected_${selectedQuizzes.size}_${new Date().toISOString().split("T")[0]}`,
+            );
          }
 
          function updateQuiz() {
             const jsonText = document
                .getElementById("editQuizJson")
                .value.trim();
-            const title = sanitizeInput(document.getElementById("editQuizTitle").value.trim(), 200);
+            const title = sanitizeInput(
+               document.getElementById("editQuizTitle").value.trim(),
+               200,
+            );
 
             if (!jsonText) {
                showToast("Błąd: JSON nie może być pusty", "error");
@@ -3758,7 +3803,12 @@ Przykład:
 
                if (index !== -1) {
                   const jsonTags = sanitized.tags || [];
-                  const allTags = [...new Set([...editTags.map(t => sanitizeInput(t, 50)), ...jsonTags])].filter(Boolean);
+                  const allTags = [
+                     ...new Set([
+                        ...editTags.map((t) => sanitizeInput(t, 50)),
+                        ...jsonTags,
+                     ]),
+                  ].filter(Boolean);
 
                   quizzes[index] = {
                      title: title,
@@ -3777,17 +3827,15 @@ Przykład:
                      quizzes[index].questions = sanitized.questions;
                   }
 
-                              if (!safeLocalStorageSet("quizzes", JSON.stringify(quizzes))) {
+                  if (
+                     !safeLocalStorageSet("quizzes", JSON.stringify(quizzes))
+                  ) {
+                     return;
+                  }
 
-                                 return;
+                  RenderCache.clear(); // Force re-render after update
 
-                              }
-
-                  
-
-                              RenderCache.clear(); // Force re-render after update
-
-                              showToast("Quiz został zaktualizowany!", "success");
+                  showToast("Quiz został zaktualizowany!", "success");
                   showHomeScreen();
                }
             } catch (error) {
@@ -4040,7 +4088,9 @@ Przykład:
                if (currentStreak >= 3) {
                   showStreakIndicator();
                }
-               announceToScreenReader(`Poprawna odpowiedź! Zdobyto ${earnedPoints} punktów.`);
+               announceToScreenReader(
+                  `Poprawna odpowiedź! Zdobyto ${earnedPoints} punktów.`,
+               );
             } else {
                if (!isRetry) {
                   firstAttemptAnswered++;
@@ -4059,7 +4109,9 @@ Przykład:
                   });
                   retriedQuestions.add(currentItem.originalIndex);
                }
-               announceToScreenReader('Niepoprawna odpowiedź. Pytanie zostanie powtórzone później.');
+               announceToScreenReader(
+                  "Niepoprawna odpowiedź. Pytanie zostanie powtórzone później.",
+               );
             }
 
             updateStats();
@@ -4128,7 +4180,9 @@ Przykład:
                date: new Date().toISOString(),
             });
 
-            announceToScreenReader(`Quiz zakończony. Wynik: ${score} na ${questions.length}, ${percentage}%. Zdobyto ${totalPoints} punktów.`);
+            announceToScreenReader(
+               `Quiz zakończony. Wynik: ${score} na ${questions.length}, ${percentage}%. Zdobyto ${totalPoints} punktów.`,
+            );
             showResultsScreen();
          }
 
@@ -4336,7 +4390,7 @@ Przykład:
                   isTransitioning = false;
                   activeTimers.delete(flipTimer);
                }, 650);
-               
+
                registerTimer(flipTimer);
             } else {
                flashcardEl.classList.remove("flipped");
@@ -4349,7 +4403,7 @@ Przykład:
                   isTransitioning = false;
                   activeTimers.delete(flipTimer);
                }, 650);
-               
+
                registerTimer(flipTimer);
             }
          }
@@ -4401,7 +4455,7 @@ Przykład:
                   isTransitioning = false;
                   activeTimers.delete(rateTimer);
                }, 650);
-               
+
                registerTimer(rateTimer);
             } else {
                flashcardEl.classList.add("flipped");
@@ -4414,11 +4468,11 @@ Przykład:
                      isTransitioning = false;
                      activeTimers.delete(resetTimer);
                   }, 600);
-                  
+
                   registerTimer(resetTimer);
                   activeTimers.delete(flipTimer);
                }, 50);
-               
+
                registerTimer(flipTimer);
             }
          }
@@ -4517,11 +4571,18 @@ Przykład:
             return history[flashcardId] || [];
          }
 
-         function displayHistory(itemId, type = 'quiz') {
-            const history = type === 'quiz' ? getQuizHistory(itemId) : getFlashcardHistory(itemId);
-            const sectionId = type === 'quiz' ? 'quizHistorySection' : 'flashcardHistorySection';
-            const containerId = type === 'quiz' ? 'quizHistory' : 'flashcardHistory';
-            
+         function displayHistory(itemId, type = "quiz") {
+            const history =
+               type === "quiz"
+                  ? getQuizHistory(itemId)
+                  : getFlashcardHistory(itemId);
+            const sectionId =
+               type === "quiz"
+                  ? "quizHistorySection"
+                  : "flashcardHistorySection";
+            const containerId =
+               type === "quiz" ? "quizHistory" : "flashcardHistory";
+
             const section = document.getElementById(sectionId);
             const container = document.getElementById(containerId);
 
@@ -4533,7 +4594,7 @@ Przykład:
             section.style.display = "block";
             const recent = history.slice(-5).reverse();
 
-            if (type === 'quiz') {
+            if (type === "quiz") {
                container.innerHTML = `
                   <div class="history-list">
                      ${recent
@@ -4560,7 +4621,9 @@ Przykład:
                   <div class="history-list">
                      ${recent
                         .map((h) => {
-                           const knownPercent = Math.round((h.easy / h.total) * 100);
+                           const knownPercent = Math.round(
+                              (h.easy / h.total) * 100,
+                           );
                            return `
                               <div class="history-item">
                                  <div class="history-info">
@@ -4582,11 +4645,11 @@ Przykład:
          }
 
          function displayQuizHistory(quizId) {
-            displayHistory(quizId, 'quiz');
+            displayHistory(quizId, "quiz");
          }
 
          function displayFlashcardHistory(flashcardId) {
-            displayHistory(flashcardId, 'flashcard');
+            displayHistory(flashcardId, "flashcard");
          }
 
          // ==================== SHARING ====================
@@ -4677,7 +4740,7 @@ Przykład:
          async function shareQuiz(quizId) {
             const quizzes = JSON.parse(localStorage.getItem("quizzes") || "[]");
             const quiz = quizzes.find((q) => q.id === quizId);
-            
+
             if (!quiz) {
                showToast("Quiz nie znaleziony", "error");
                return;
@@ -4695,14 +4758,14 @@ Przykład:
             `;
 
             const startTime = Date.now();
-            
+
             try {
                const shareData = encodeToNewFormat(quiz);
                const jsonString = JSON.stringify(shareData);
                const encoder = new TextEncoder();
                const uint8 = encoder.encode(jsonString);
                const deflated = pako.deflate(uint8, { level: 9 });
-               
+
                let binary = "";
                for (let i = 0; i < deflated.length; i++) {
                   binary += String.fromCharCode(deflated[i]);
@@ -4711,16 +4774,16 @@ Przykład:
                   .replace(/\+/g, "-")
                   .replace(/\//g, "_")
                   .replace(/=/g, "");
-               
+
                const baseUrl = "https://tymoeks.github.io/quizapp/";
                const fullUrl = `${baseUrl}#q=${compressed}`;
-               
+
                const itemCount =
                   quiz.type === "flashcard"
                      ? quiz.cards.length
                      : quiz.questions.length;
                const itemType = quiz.type === "flashcard" ? "fiszek" : "pytań";
-               
+
                let contentHtml = `
                   <div style="margin-bottom: 24px;">
                      <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
@@ -4741,8 +4804,8 @@ Przykład:
                      </button>
                   </div>
                `;
-               
-               let qrCodeHtml = '';
+
+               let qrCodeHtml = "";
                if (fullUrl.length < 1000) {
                   qrCodeHtml = `
                      <div style="background: var(--surface-alt); padding: 16px; border-radius: 8px; text-align: center;">
@@ -4753,39 +4816,39 @@ Przykład:
                      </div>
                   `;
                }
-               
+
                contentHtml += qrCodeHtml;
-               
+
                const elapsed = Date.now() - startTime;
                const minLoadTime = 500;
                const remainingTime = Math.max(0, minLoadTime - elapsed);
-               
-               await new Promise(resolve => {
+
+               await new Promise((resolve) => {
                   const waitTimer = setTimeout(() => {
                      resolve();
                      activeTimers.delete(waitTimer);
                   }, remainingTime);
                   registerTimer(waitTimer);
                });
-               
+
                document.getElementById("shareContent").innerHTML = contentHtml;
-               
+
                const copyBtn = document.getElementById("copyLinkBtn");
                if (copyBtn) {
                   copyBtn.addEventListener("click", () => {
                      copyToClipboard(fullUrl, "Link skopiowany! 🔗");
                   });
                }
-               
+
                if (fullUrl.length < 1000) {
-                  await new Promise(resolve => {
+                  await new Promise((resolve) => {
                      const qrTimer = setTimeout(() => {
                         resolve();
                         activeTimers.delete(qrTimer);
                      }, 50);
                      registerTimer(qrTimer);
                   });
-                  
+
                   const qrDiv = document.getElementById("qrcode");
                   if (qrDiv) {
                      qrDiv.innerHTML = "";
@@ -4799,20 +4862,19 @@ Przykład:
                      });
                   }
                }
-               
             } catch (error) {
                const elapsed = Date.now() - startTime;
                const minLoadTime = 500;
                const remainingTime = Math.max(0, minLoadTime - elapsed);
-               
-               await new Promise(resolve => {
+
+               await new Promise((resolve) => {
                   const errorTimer = setTimeout(() => {
                      resolve();
                      activeTimers.delete(errorTimer);
                   }, remainingTime);
                   registerTimer(errorTimer);
                });
-               
+
                document.getElementById("shareContent").innerHTML = `
                   <div style="text-align: center; padding: 40px 20px;">
                      <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
@@ -4847,10 +4909,12 @@ Przykład:
             modalFocusTrap = document.activeElement;
             const modal = document.getElementById("importModal");
             modal.classList.remove("hidden");
-            
+
             // Focus first interactive element
             setTimeout(() => {
-               const firstInput = modal.querySelector('input, button, textarea');
+               const firstInput = modal.querySelector(
+                  "input, button, textarea",
+               );
                if (firstInput) firstInput.focus();
             }, 100);
          }
@@ -4859,7 +4923,7 @@ Przykład:
 
          function closeModal(modalId) {
             document.getElementById(modalId).classList.add("hidden");
-            
+
             // Restore focus
             if (modalFocusTrap) {
                modalFocusTrap.focus();
@@ -4928,23 +4992,21 @@ Przykład:
                      addedCount++;
                   });
 
-                              if (!safeLocalStorageSet("quizzes", JSON.stringify(quizzes))) {
+                  if (
+                     !safeLocalStorageSet("quizzes", JSON.stringify(quizzes))
+                  ) {
+                     closeModal("importModal");
 
-                                 closeModal("importModal");
+                     document.getElementById("importJson").value = "";
 
-                                 document.getElementById("importJson").value = "";
+                     document.getElementById("importFile").value = "";
 
-                                 document.getElementById("importFile").value = "";
+                     return;
+                  }
 
-                                 return;
+                  RenderCache.clear(); // Force re-render after batch import
 
-                              }
-
-                  
-
-                              RenderCache.clear(); // Force re-render after batch import
-
-                              let message = `Zaimportowano ${addedCount} quizów`;
+                  let message = `Zaimportowano ${addedCount} quizów`;
                   if (skippedCount > 0)
                      message += `, pominięto ${skippedCount} duplikatów`;
                   if (invalidCount > 0)
@@ -4986,14 +5048,16 @@ Przykład:
                   }
 
                   quizzes.push(quiz);
-                              if (!safeLocalStorageSet("quizzes", JSON.stringify(quizzes))) {
-                                 closeModal("importModal");
-                                 document.getElementById("importJson").value = "";
-                                 document.getElementById("importFile").value = "";
-                                 return;
-                              }
-                              RenderCache.clear(); // Force re-render after import
-                              showToast("Quiz zaimportowany!", "success");
+                  if (
+                     !safeLocalStorageSet("quizzes", JSON.stringify(quizzes))
+                  ) {
+                     closeModal("importModal");
+                     document.getElementById("importJson").value = "";
+                     document.getElementById("importFile").value = "";
+                     return;
+                  }
+                  RenderCache.clear(); // Force re-render after import
+                  showToast("Quiz zaimportowany!", "success");
                }
 
                closeModal("importModal");
@@ -5017,8 +5081,8 @@ Przykład:
             exportQuizData([quiz], quiz.title);
          }
 
-         function exportQuizData(quizzes, filename = 'export') {
-            const exportData = quizzes.map(q => encodeToNewFormat(q));
+         function exportQuizData(quizzes, filename = "export") {
+            const exportData = quizzes.map((q) => encodeToNewFormat(q));
             const data = exportData.length === 1 ? exportData[0] : exportData;
 
             const blob = new Blob([JSON.stringify(data, null, 2)], {
@@ -5033,7 +5097,12 @@ Przykład:
             setTimeout(() => {
                a.click();
                URL.revokeObjectURL(url);
-               showToast(quizzes.length === 1 ? "Quiz wyeksportowany!" : `Wyeksportowano ${quizzes.length} quizów`, "success");
+               showToast(
+                  quizzes.length === 1
+                     ? "Quiz wyeksportowany!"
+                     : `Wyeksportowano ${quizzes.length} quizów`,
+                  "success",
+               );
             }, 100);
          }
 
@@ -5121,13 +5190,18 @@ Przykład:
                         }
                      });
 
-            if (!safeLocalStorageSet("quizzes", JSON.stringify(validQuizzes))) {
-               event.target.value = "";
-               return;
-            }
+                     if (
+                        !safeLocalStorageSet(
+                           "quizzes",
+                           JSON.stringify(validQuizzes),
+                        )
+                     ) {
+                        event.target.value = "";
+                        return;
+                     }
 
-            RenderCache.clear(); // Force re-render after restore
-            if (invalidCount > 0) {
+                     RenderCache.clear(); // Force re-render after restore
+                     if (invalidCount > 0) {
                         showToast(
                            `Przywrócono dane (odrzucono ${invalidCount} nieprawidłowych quizów)`,
                            "success",
@@ -5166,11 +5240,12 @@ Przykład:
             modal.classList.remove("hidden");
 
             const quizzes = localStorage.getItem("quizzes") || "[]";
-            document.getElementById("quizCount").textContent = JSON.parse(quizzes).length;
-            
+            document.getElementById("quizCount").textContent =
+               JSON.parse(quizzes).length;
+
             // Focus first button
             setTimeout(() => {
-               const firstButton = modal.querySelector('button');
+               const firstButton = modal.querySelector("button");
                if (firstButton) firstButton.focus();
             }, 100);
          }
@@ -5317,7 +5392,7 @@ Przykład:
                   element.textContent = formatTime(elapsed);
                }
             }, 1000);
-            
+
             registerTimer(timerInterval);
          }
 
@@ -5345,21 +5420,21 @@ Przykład:
          }
 
          function sanitizeInput(input, maxLength = 1000) {
-            if (typeof input !== 'string') {
-               return '';
+            if (typeof input !== "string") {
+               return "";
             }
-            
+
             // Trim whitespace
             input = input.trim();
-            
+
             // Limit length
             if (input.length > maxLength) {
                input = input.substring(0, maxLength);
             }
-            
+
             // Remove control characters except newlines and tabs
-            input = input.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
-            
+            input = input.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+
             return input;
          }
 
@@ -5367,19 +5442,31 @@ Przykład:
             return {
                ...quiz,
                title: sanitizeInput(quiz.title, 200),
-               tags: Array.isArray(quiz.tags) ? quiz.tags.map(tag => sanitizeInput(tag, 50)).filter(Boolean) : [],
-               questions: quiz.questions ? quiz.questions.map(q => ({
-                  ...q,
-                  question: sanitizeInput(q.question, 1000),
-                  correct: sanitizeInput(q.correct, 500),
-                  wrong: Array.isArray(q.wrong) ? q.wrong.map(w => sanitizeInput(w, 500)) : [],
-                  group: q.group ? sanitizeInput(q.group, 100) : undefined
-               })) : undefined,
-               cards: quiz.cards ? quiz.cards.map(c => ({
-                  front: sanitizeInput(c.front, 1000),
-                  back: sanitizeInput(c.back, 1000),
-                  category: c.category ? sanitizeInput(c.category, 100) : undefined
-               })) : undefined
+               tags: Array.isArray(quiz.tags)
+                  ? quiz.tags
+                       .map((tag) => sanitizeInput(tag, 50))
+                       .filter(Boolean)
+                  : [],
+               questions: quiz.questions
+                  ? quiz.questions.map((q) => ({
+                       ...q,
+                       question: sanitizeInput(q.question, 1000),
+                       correct: sanitizeInput(q.correct, 500),
+                       wrong: Array.isArray(q.wrong)
+                          ? q.wrong.map((w) => sanitizeInput(w, 500))
+                          : [],
+                       group: q.group ? sanitizeInput(q.group, 100) : undefined,
+                    }))
+                  : undefined,
+               cards: quiz.cards
+                  ? quiz.cards.map((c) => ({
+                       front: sanitizeInput(c.front, 1000),
+                       back: sanitizeInput(c.back, 1000),
+                       category: c.category
+                          ? sanitizeInput(c.category, 100)
+                          : undefined,
+                    }))
+                  : undefined,
             };
          }
 
@@ -5389,11 +5476,11 @@ Przykład:
             return txt.value;
          }
 
-         function announceToScreenReader(message, priority = 'polite') {
-            const announcer = document.getElementById('srAnnouncements');
+         function announceToScreenReader(message, priority = "polite") {
+            const announcer = document.getElementById("srAnnouncements");
             if (announcer) {
-               announcer.setAttribute('aria-live', priority);
-               announcer.textContent = '';
+               announcer.setAttribute("aria-live", priority);
+               announcer.textContent = "";
                setTimeout(() => {
                   announcer.textContent = message;
                }, 100);
