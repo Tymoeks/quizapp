@@ -267,6 +267,11 @@
             overflow: hidden;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
+            min-height: 48px; /* Stała wysokość */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2; /* Kontroluj wysokość linii */
          }
 
          .btn::before {
@@ -348,6 +353,7 @@
          .btn-small {
             padding: 8px 16px;
             font-size: 13px;
+            min-height: 40px; /* Stała wysokość dla małych */
          }
 
          .search-bar {
@@ -399,6 +405,10 @@
             cursor: pointer;
             font-size: 14px;
             transition: all 0.2s ease;
+            min-height: 40px; /* Stała wysokość */
+            display: flex;
+            align-items: center;
+            justify-content: center;
          }
 
          .filter-btn:hover {
@@ -981,7 +991,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            transform: rotateY(180deg);
+            transform: rotateY(-180deg);
             background: linear-gradient(
                135deg,
                var(--surface) 0%,
@@ -1002,12 +1012,19 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 40px;
+            padding: 50px 40px 40px 40px;
             -webkit-touch-callout: none;
             -webkit-user-select: text;
             -moz-user-select: text;
             user-select: text;
             touch-action: pan-y;
+         }
+
+         @media (max-width: 768px) {
+            .flashcard-content {
+               font-size: 1.25rem;
+               padding: 45px 20px 30px 20px; /* Mobile: mniejszy top padding */
+            }
          }
 
          .flashcard-side::-webkit-scrollbar {
@@ -1053,6 +1070,8 @@
             justify-content: center;
             min-width: 0;
             -webkit-tap-highlight-color: transparent;
+            min-height: 48px; /* Dodaj stałą wysokość */
+            line-height: 1.2;
          }
 
          @media (hover: hover) and (pointer: fine) {
@@ -1602,13 +1621,13 @@
             .btn {
                padding: 14px 20px;
                font-size: 16px;
-               min-height: 48px;
+               min-height: 52px; /* Większe na mobile */
                touch-action: manipulation;
             }
 
             .btn-small {
                padding: 10px 16px;
-               min-height: 44px;
+               min-height: 44px; /* Proporcjonalnie większe */
             }
 
             .flashcard {
@@ -1627,7 +1646,7 @@
             .flashcard-btn {
                font-size: 13px;
                padding: 14px 16px;
-               min-height: 48px;
+               min-height: 52px; /* Większe na mobile */
             }
 
             .score-display {
@@ -1928,15 +1947,6 @@
                <h2 id="preQuizTitle"></h2>
                <p id="preQuizDescription" style="margin-bottom: 32px"></p>
 
-               <div
-                  id="quizHistorySection"
-                  class="quiz-settings"
-                  style="margin-bottom: 24px"
-               >
-                  <h3 style="margin-bottom: 16px">📊 Historia wyników</h3>
-                  <div id="quizHistory"></div>
-               </div>
-
                <div class="quiz-settings">
                   <h3 style="margin-bottom: 16px">⚙️ Ustawienia</h3>
                   <div class="setting-row">
@@ -2047,15 +2057,6 @@
             <div class="card card-white animate-fadeIn">
                <h2 id="preFlashcardTitle"></h2>
                <p id="preFlashcardDescription" style="margin-bottom: 32px"></p>
-
-               <div
-                  id="flashcardHistorySection"
-                  class="quiz-settings"
-                  style="margin-bottom: 24px"
-               >
-                  <h3 style="margin-bottom: 16px">📊 Historia nauki</h3>
-                  <div id="flashcardHistory"></div>
-               </div>
 
                <div class="quiz-settings">
                   <h3 style="margin-bottom: 16px">⚙️ Ustawienia</h3>
@@ -2862,6 +2863,57 @@
                throw new Error("Brak pola data w nowym formacie");
             }
 
+            // NOWY FORMAT - sprawdź czy data jest obiektem/tablicą
+            if (typeof data.data === "object" && Array.isArray(data.data)) {
+               if (data.type === 0) {
+                  // Quiz format - konwertuj do {0...}
+                  let encoded = "{0";
+                  data.data.forEach((item) => {
+                     if (item.type === 1) {
+                        // True/False
+                        encoded += "1" + escapeText(item.question) + "|";
+                        encoded += escapeText(item.category || "") + "|";
+                        encoded += escapeText(item.answers[0]) + "|";
+                        encoded += escapeText(item.answers[1] || "Fałsz") + "|";
+                     } else {
+                        // ABCD
+                        encoded += "0" + escapeText(item.question) + "|";
+                        encoded += escapeText(item.category || "") + "|";
+                        encoded +=
+                           item.answers.map((a) => escapeText(a)).join("|") +
+                           "|";
+                     }
+                  });
+                  encoded += "}";
+
+                  // Rekurencyjnie wywołaj z przekonwertowanym formatem
+                  return decodeFromNewFormat({
+                     title: data.title,
+                     tags: data.tags,
+                     answerCount: data.answer || 4,
+                     type: "quiz",
+                     data: encoded,
+                  });
+               } else if (data.type === 1) {
+                  // Flashcard format - konwertuj do {1...}
+                  let encoded = "{1";
+                  data.data.forEach((card) => {
+                     encoded += escapeText(card.front) + "|";
+                     encoded += escapeText(card.category || "") + "|";
+                     encoded += escapeText(card.back) + "|";
+                  });
+                  encoded += "}";
+
+                  return decodeFromNewFormat({
+                     title: data.title,
+                     tags: data.tags,
+                     type: "flashcard",
+                     data: encoded,
+                  });
+               }
+            }
+
+            // STARY FORMAT - istniejąca logika
             const content = data.data;
 
             if (content.startsWith("{1")) {
@@ -3205,69 +3257,110 @@
             renderTags();
 
             const prompts = {
-               quiz: `Wygeneruj quiz w nowym formacie na temat [TWÓJ TEMAT].
+               quiz: `Wygeneruj quiz w formacie JSON.
 
-Parametry opcjonalne:
+Parametry:
+- Temat: [TWÓJ TEMAT]
 - Liczba pytań: [np. 10]
 - Liczba pytań prawda/fałsz: [np. 3]
 
-Format:
+Format JSON:
 {
   "title": "Tytuł quizu",
   "tags": ["tag1", "tag2", "tag3"],
-  "answerCount": 4,
-  "data": "{0pytanie ABCD|grupa|poprawna|błędna1|błędna2|błędna3|1pytanie PF|grupa|Prawda|Fałsz|}"
+  "type": 0,
+  "answer": 4,
+  "data": [
+    {
+      "type": 0,
+      "category": "kategoria",
+      "question": "Pytanie ABCD",
+      "answers": ["poprawna", "błędna1", "błędna2", "błędna3"]
+    },
+    {
+      "type": 1,
+      "question": "Pytanie PF",
+      "answers": ["poprawna", "błędna"]
+    }
+  ]
 }
 
-Struktura data:
-- Zaczyna się od {0 (quiz)
-- Każde pytanie ABCD: 0pytanie|grupa|poprawna|błędna1|błędna2|błędna3|
-- Każde pytanie PF: 1pytanie|grupa|Prawda|Fałsz|
-- Jeśli brak grupy: ||
-- Kończy się }
-
-Uwagi:
-- W odpowiedziach i pytaniach nie może znaleźć się '|'
-- Nie używaj w odpowiedziach i pytaniach żadnych elementów specjalnych do formatowania ciągów
-- W tym formacie łatwo popełnić błędy, upewnij się, że wszystko się zgadza
-- Najpierw wyobraź sobie to w takim zwykłym JSON, a później zamień na ten format
+Zasady:
+- "type" : 0 = quiz
+- W pytaniach: type: 0 = ABCD, type: 1 = Prawda/Fałsz
+- Pierwsza odpowiedź w "answers" to zawsze ta poprawna
+- category jest opcjonalne, czyli można pominąć pole
+- Dla PF używaj "Prawda" oraz "Fałsz" lub podobnych odpowiedzi
+- W pytaniach i odpowiedziach nie może się znaleźć '|' oraz nie używaj tam jakichkolwiek elementów do formatowania tekstu
 
 Przykład:
 {
-  "title": "Quiz o Polsce",
+  "title": "Historia Polski",
   "tags": ["historia", "polska", "edukacja"],
-  "answerCount": 4,
-  "data": "{00Kto był pierwszym królem Polski?|osoba|Bolesław Chrobry|Mieszko I|Kazimierz Wielki|Władysław Jagiełło|1Warszawa jest stolicą Polski|geografia|Prawda|Fałsz|0Jaka rzeka płynie przez Warszawę?||Wisła|Odra|Warta|Bug|}"
+  "type": 0,
+  "answer": 4,
+  "data": [
+    {
+      "type": 0,
+      "category": "Królowie",
+      "question": "Kto był pierwszym królem Polski?",
+      "answers": ["Bolesław Chrobry", "Mieszko I", "Kazimierz Wielki", "Władysław Jagiełło"]
+    },
+    {
+      "type": 1,
+      "question": "Warszawa jest stolicą Polski",
+      "answers": ["Prawda", "Fałsz"]
+    }
+  ]
 }`,
-               flashcard: `Wygeneruj fiszki w nowym formacie na temat [TWÓJ TEMAT].
 
-Parametry opcjonalne:
+               flashcard: `Wygeneruj fiszki w formacie JSON.
+
+Parametry:
+- Temat: [TWÓJ TEMAT]
 - Liczba fiszek: [np. 20]
 
-Format:
+Format JSON:
 {
   "title": "Tytuł zestawu",
   "tags": ["tag1", "tag2", "tag3"],
-  "data": "{1przód1|kategoria1|tył1|przód2|kategoria2|tył2|}"
+  "type": 1,
+  "data": [
+    {
+      "category": "kategoria",
+      "front": "przód",
+      "back": "tył"
+    }
+  ]
 }
 
-Struktura data:
-- Zaczyna się od {1 (fiszki)
-- Każda fiszka: przód|kategoria|tył|
-- Jeśli brak kategorii: ||
-- Kończy się }
-
-Uwagi:
-- W odpowiedziach i pytaniach nie może znaleźć się '|'
-- Nie używaj w odpowiedziach i pytaniach żadnych elementów specjalnych do formatowania ciągów
-- W tym formacie łatwo popełnić błędy, upewnij się, że wszystko się zgadza
-- Najpierw wyobraź sobie to w takim zwykłym JSON, a później zamień na ten format
+Zasady:
+- "type" : 1 = fiszki
+- "category" jest opcjonalne, czyli można pominąć pole
+- "front" = pytanie/termin, "back" = odpowiedź/definicja
+- W pytaniach i odpowiedziach nie może się znaleźć '|' oraz nie używaj tam jakichkolwiek elementów do formatowania tekstu
 
 Przykład:
 {
   "title": "Angielski - Zwierzęta",
   "tags": ["angielski", "zwierzęta", "podstawy"],
-  "data": "{1dog|zwierzęta domowe|pies|cat|zwierzęta domowe|kot|bird|ptaki|ptak|fish||ryba|}"
+  "type": 1,
+  "data": [
+    {
+      "category": "Domowe",
+      "front": "dog",
+      "back": "pies"
+    },
+    {
+      "front": "cat",
+      "back": "kot"
+    },
+    {
+      "category": "Ptaki",
+      "front": "bird",
+      "back": "ptak"
+    }
+  ]
 }`,
             };
 
@@ -3327,7 +3420,7 @@ Przykład:
 
             const quizzes = JSON.parse(localStorage.getItem("quizzes") || "[]");
             const quiz = quizzes.find((q) => q.id === currentEditingQuizId);
-            
+
             if (!quiz) {
                showHomeScreen();
                return;
@@ -3357,8 +3450,6 @@ Przykład:
                document.getElementById("preQuizDescription").textContent =
                   `${currentQuiz.questions.length} pytań (${mcQuestions} wielokrotnego wyboru, ${tfQuestions} prawda/fałsz)`;
                currentQuizSettings.answerCount = currentQuiz.answerCount || 4;
-
-               displayQuizHistory(quizId);
             }
          }
 
@@ -3386,8 +3477,6 @@ Przykład:
                   currentFlashcards.title;
                document.getElementById("preFlashcardDescription").textContent =
                   `${currentFlashcards.cards.length} fiszek do nauki`;
-
-               displayFlashcardHistory(flashcardId);
             }
          }
 
@@ -4549,29 +4638,26 @@ Przykład:
             const history = JSON.parse(
                localStorage.getItem("quizHistory") || "{}",
             );
-            if (!history[quizId]) {
-               history[quizId] = [];
+
+            // Zapisz tylko jeśli to najlepszy wynik (według punktów)
+            if (!history[quizId] || result.points > history[quizId].points) {
+               history[quizId] = result; // Zapisz pojedynczy obiekt, nie tablicę
             }
-            history[quizId].push(result);
+
             localStorage.setItem("quizHistory", JSON.stringify(history));
          }
 
          function saveFlashcardResult(flashcardId, result) {
-            const history = JSON.parse(
-               localStorage.getItem("flashcardHistory") || "{}",
-            );
-            if (!history[flashcardId]) {
-               history[flashcardId] = [];
-            }
-            history[flashcardId].push(result);
-            localStorage.setItem("flashcardHistory", JSON.stringify(history));
+            // Nie zapisuj historii fiszek - pozostaw pustą funkcję
+            return;
          }
 
          function getQuizHistory(quizId) {
             const history = JSON.parse(
                localStorage.getItem("quizHistory") || "{}",
             );
-            return history[quizId] || [];
+            // Zwróć jako tablicę dla kompatybilności z istniejącym kodem
+            return history[quizId] ? [history[quizId]] : [];
          }
 
          function getFlashcardHistory(flashcardId) {
@@ -4655,11 +4741,11 @@ Przykład:
          }
 
          function displayQuizHistory(quizId) {
-            displayHistory(quizId, "quiz");
+            // Nie wyświetlaj historii - funkcja pusta
          }
 
          function displayFlashcardHistory(flashcardId) {
-            displayHistory(flashcardId, "flashcard");
+            // Nie wyświetlaj historii - funkcja pusta
          }
 
          // ==================== SHARING ====================
@@ -5499,6 +5585,3 @@ Przykład:
       </script>
    </body>
 </html>
-
-
-
