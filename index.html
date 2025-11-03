@@ -3543,11 +3543,11 @@ Przykład:
             const attempts = history.length;
 
             let bestResult = null;
-            if (attempts > 0) {
+            if (attempts && attempts > 0) {
                bestResult = history.reduce((best, current) => {
                   return current.points > best.points ? current : best;
                }, history[0]);
-               if (!bestResult.percentage && !bestResult.points) {
+               if (!bestResult.percentage | !bestResult.points) {
                   bestResult = null;
                }
             }
