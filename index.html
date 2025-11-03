@@ -3547,10 +3547,6 @@ Przykład:
                bestResult = history.reduce((best, current) => {
                   return current.points > best.points ? current : best;
                }, history[0]);
-               if (bestResult.percentage === undefined | bestResult.points === undefined) {
-                  history = null
-                  bestResult = null;
-               }
             }
 
             const tagsHtml =
@@ -4581,15 +4577,6 @@ Przykład:
             document.getElementById("flashcardFinalTime").textContent =
                `Czas: ${formatTime(totalTime)} · Znane: ${knownPercent}%`;
 
-            saveFlashcardResult(currentFlashcards.id, {
-               easy: flashcardStats.easy,
-               medium: flashcardStats.medium,
-               hard: flashcardStats.hard,
-               total: cards.length,
-               time: totalTime,
-               date: new Date().toISOString(),
-            });
-
             hideAllScreens();
             document
                .getElementById("flashcardResultsScreen")
@@ -4602,17 +4589,11 @@ Przykład:
                localStorage.getItem("quizHistory") || "{}",
             );
 
-            // Zapisz tylko jeśli to najlepszy wynik (według punktów)
-            if (!history[quizId] || result.points > history[quizId].points) {
-               history[quizId] = result; // Zapisz pojedynczy obiekt, nie tablicę
+            if (!history[quizId] || history[quizId] === undefined || result.points > history[quizId].points) {
+               history[quizId] = result;
             }
 
             localStorage.setItem("quizHistory", JSON.stringify(history));
-         }
-
-         function saveFlashcardResult(flashcardId, result) {
-            // Nie zapisuj historii fiszek - pozostaw pustą funkcję
-            return;
          }
 
          function getQuizHistory(quizId) {
