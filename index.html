@@ -1012,7 +1012,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 50px 40px 40px 40px;
+            padding: 40px;
             -webkit-touch-callout: none;
             -webkit-user-select: text;
             -moz-user-select: text;
@@ -1023,26 +1023,17 @@
          @media (max-width: 768px) {
             .flashcard-content {
                font-size: 1.25rem;
-               padding: 45px 20px 30px 20px; /* Mobile: mniejszy top padding */
+               padding: 45px 20px 30px 20px;
             }
          }
 
+         .flashcard-side {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+         }
+
          .flashcard-side::-webkit-scrollbar {
-            width: 8px;
-         }
-
-         .flashcard-side::-webkit-scrollbar-track {
-            background: var(--surface-alt);
-            border-radius: 4px;
-         }
-
-         .flashcard-side::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-         }
-
-         .flashcard-side::-webkit-scrollbar-thumb:hover {
-            background: var(--secondary);
+            display: none;
          }
 
          .flashcard-actions {
