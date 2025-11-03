@@ -4449,9 +4449,9 @@ Przykład:
             if (isCardFlipped) {
                flashcardEl.classList.remove("flipped");
                isCardFlipped = false;
+               displayFlashcard();
 
                const rateTimer = setTimeout(() => {
-                  displayFlashcard();
                   isTransitioning = false;
                   activeTimers.delete(rateTimer);
                }, 650);
@@ -4462,9 +4462,9 @@ Przykład:
 
                const flipTimer = setTimeout(() => {
                   flashcardEl.classList.remove("flipped");
+                  displayFlashcard();
 
                   const resetTimer = setTimeout(() => {
-                     displayFlashcard();
                      isTransitioning = false;
                      activeTimers.delete(resetTimer);
                   }, 600);
@@ -5489,3 +5489,4 @@ Przykład:
       </script>
    </body>
 </html>
+
