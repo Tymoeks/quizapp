@@ -1023,7 +1023,7 @@
          @media (max-width: 768px) {
             .flashcard-content {
                font-size: 1.25rem;
-               padding: 20px;
+               padding: 40px;
             }
          }
 
@@ -1061,7 +1061,7 @@
             justify-content: center;
             min-width: 0;
             -webkit-tap-highlight-color: transparent;
-            min-height: 48px; /* Dodaj stałą wysokość */
+            min-height: 48px;
             line-height: 1.2;
          }
 
@@ -3547,7 +3547,7 @@ Przykład:
                bestResult = history.reduce((best, current) => {
                   return current.points > best.points ? current : best;
                }, history[0]);
-               if (!bestResult.percentage | !bestResult.points) {
+               if (bestResult.percentage === 0 | bestResult.points === 0) {
                   bestResult = null;
                }
             }
