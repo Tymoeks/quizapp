@@ -3540,13 +3540,10 @@ Przykład:
                : `${quiz.questions.length} pytań`;
 
             const history = getQuizHistory(quiz.id);
-            const attempts = history.length;
 
-            let bestResult = null;
-            if (attempts && attempts > 0) {
-               bestResult = history.reduce((best, current) => {
-                  return current.points > best.points ? current : best;
-               }, history[0]);
+            let result = null;
+            if (history) {
+               result = history
             }
 
             const tagsHtml =
@@ -3568,7 +3565,7 @@ Przykład:
                   aria-label="Zaznacz ${escapeHtml(quiz.title)}">`
                : "";
 
-            const ariaLabel = `${quiz.title}, ${count}${bestResult ? `, najlepszy wynik ${bestResult.percentage}%` : ""}`;
+            const ariaLabel = `${quiz.title}, ${count}${result ? `, najlepszy wynik ${result.percentage}%` : ""}`;
 
             return `
                <div class="quiz-item animate-fadeIn ${selectionClass} ${selectedClass}" 
@@ -3582,10 +3579,9 @@ Przykład:
                    <p>${count}</p>
                    ${tagsHtml}
                    ${
-                      bestResult
-                         ? `<div class="quiz-stats-badge" aria-label="Statystyki: ${attempts} ${attempts === 1 ? "podejście" : "podejść"}, najlepszy wynik ${bestResult.percentage}%, ${bestResult.points} punktów">
-                       ${attempts} ${attempts === 1 ? "podejście" : "podejść"} · 
-                       Najlepszy: ${bestResult.percentage}% (${bestResult.points} pkt)
+                      result
+                         ? `<div class="quiz-stats-badge" aria-label="Statystyki: najlepszy wynik ${result.percentage}%, ${result.points} punktów">
+                       Najlepszy wynik: ${result.percentage}% (${result.points} pkt)
                    </div>`
                          : ""
                    }
@@ -4589,7 +4585,7 @@ Przykład:
                localStorage.getItem("quizHistory") || "{}",
             );
 
-            if (!history[quizId] || result.points > history[quizId].points) {
+            if (!history[quizId] || 0 < result.points > history[quizId].points) {
                history[quizId] = result;
             }
 
@@ -4600,8 +4596,8 @@ Przykład:
             const history = JSON.parse(
                localStorage.getItem("quizHistory") || "{}",
             );
-            // Zwróć jako tablicę dla kompatybilności z istniejącym kodem
-            return history[quizId] ? [history[quizId]] : [];
+
+            return history[quizId];
          }
 
          function getFlashcardHistory(flashcardId) {
