@@ -3226,6 +3226,10 @@ Struktura data:
 - Jeśli brak grupy: ||
 - Kończy się }
 
+Uwagi:
+- W odpowiedziach i pytaniach nie może znaleźć się '|'
+- Nie używaj w odpowiedziach i pytaniach żadnych elementów specjalnych do formatowania ciągów
+
 Przykład:
 {
   "title": "Quiz o Polsce",
@@ -3242,7 +3246,6 @@ Format:
 {
   "title": "Tytuł zestawu",
   "tags": ["tag1", "tag2", "tag3"],
-  "type": "flashcard",
   "data": "{1przód1|kategoria1|tył1|przód2|kategoria2|tył2|}"
 }
 
@@ -3251,6 +3254,10 @@ Struktura data:
 - Każda fiszka: przód|kategoria|tył|
 - Jeśli brak kategorii: ||
 - Kończy się }
+
+Uwagi:
+- W odpowiedziach i pytaniach nie może znaleźć się '|'
+- Nie używaj w odpowiedziach i pytaniach żadnych elementów specjalnych do formatowania ciągów
 
 Przykład:
 {
@@ -5489,4 +5496,5 @@ Przykład:
       </script>
    </body>
 </html>
+
 
