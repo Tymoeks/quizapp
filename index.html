@@ -3548,8 +3548,7 @@ Przykład:
                   return current.points > best.points ? current : best;
                }, history[0]);
                if (bestResult.percentage === undefined | bestResult.points === undefined) {
-                  current.percentage = 0
-                  current.points = 0
+                  history = {}
                   bestResult = null;
                }
             }
