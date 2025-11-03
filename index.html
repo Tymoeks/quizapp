@@ -3547,10 +3547,6 @@ Przykład:
                bestResult = history.reduce((best, current) => {
                   return current.points > best.points ? current : best;
                }, history[0]);
-               if (bestResult.percentage === undefined | bestResult.points === undefined) {
-                  history = {}
-                  bestResult = null;
-               }
             }
 
             const tagsHtml =
