@@ -1452,20 +1452,6 @@
             opacity: 0.5;
          }
 
-         .keyboard-hint {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            box-shadow: 0 2px 8px var(--shadow);
-            z-index: 100;
-         }
-
          .kbd {
             background: var(--surface-alt);
             border: 1px solid var(--border);
@@ -1491,10 +1477,6 @@
          }
 
          @media (max-width: 768px) {
-            .keyboard-hint {
-               display: none;
-            }
-
             .mobile-only {
                display: inline;
             }
@@ -2016,11 +1998,6 @@
                      Zakończ quiz
                   </button>
                </div>
-
-               <div class="keyboard-hint">
-                  <kbd class="kbd">1-4</kbd> Wybierz odpowiedź ·
-                  <kbd class="kbd">Esc</kbd> Wyjdź
-               </div>
             </div>
          </div>
 
@@ -2147,8 +2124,7 @@
                      "
                   >
                      <span class="desktop-only"
-                        >Kliknij kartę lub naciśnij
-                        <kbd class="kbd">Spacja</kbd> aby ją obrócić</span
+                        >Kliknij kartę aby ją obrócić</span
                      >
                      <span class="mobile-only"
                         >Naciśnij na kartę aby ją obrócić</span
@@ -2184,13 +2160,6 @@
                   <button class="btn" onclick="endFlashcardsEarly()">
                      Zakończ naukę
                   </button>
-               </div>
-
-               <div class="keyboard-hint">
-                  <kbd class="kbd">1</kbd> Nie znam ·
-                  <kbd class="kbd">2</kbd> Trudne ·
-                  <kbd class="kbd">3</kbd> Znam ·
-                  <kbd class="kbd">Spacja</kbd> Obróć
                </div>
             </div>
          </div>
@@ -2784,7 +2753,6 @@
             initTheme();
             validateAndCleanData();
             checkSharedQuiz();
-            setupKeyboardShortcuts();
          });
 
          // ==================== DATA VALIDATION ====================
@@ -5335,63 +5303,6 @@ Przykład:
                const firstButton = modal.querySelector("button");
                if (firstButton) firstButton.focus();
             }, 100);
-         }
-
-         // ==================== KEYBOARD SHORTCUTS ====================
-         function setupKeyboardShortcuts() {
-            document.addEventListener("keydown", (e) => {
-               const activeScreen = document.querySelector(
-                  ".screen:not(.hidden)",
-               );
-               if (!activeScreen) return;
-
-               if (activeScreen.id === "quizScreen") {
-                  if (e.key === "Escape") {
-                     e.preventDefault();
-                     endQuizEarly();
-                  } else if (["1", "2", "3", "4"].includes(e.key)) {
-                     const index = parseInt(e.key) - 1;
-                     const buttons = document.querySelectorAll(
-                        ".answer-btn:not(:disabled)",
-                     );
-                     if (buttons[index]) {
-                        buttons[index].click();
-                     }
-                  }
-               }
-
-               if (activeScreen.id === "flashcardScreen") {
-                  if (e.key === " " || e.key === "Spacebar") {
-                     e.preventDefault();
-                     flipCard();
-                  } else if (e.key === "1") {
-                     const btn = document.querySelector(
-                        ".btn-hard:not(:disabled)",
-                     );
-                     if (btn && !isTransitioning) btn.click();
-                  } else if (e.key === "2") {
-                     const btn = document.querySelector(
-                        ".btn-medium:not(:disabled)",
-                     );
-                     if (btn && !isTransitioning) btn.click();
-                  } else if (e.key === "3") {
-                     const btn = document.querySelector(
-                        ".btn-easy:not(:disabled)",
-                     );
-                     if (btn && !isTransitioning) btn.click();
-                  }
-               }
-            });
-
-            const themeToggle = document.querySelector(".theme-toggle");
-            if (themeToggle) {
-               themeToggle.addEventListener("keydown", (e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                     e.preventDefault();
-                     toggleTheme();
-                  }
-               });
-            }
          }
 
          // ==================== TOAST SYSTEM ====================
