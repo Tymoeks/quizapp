@@ -4589,7 +4589,7 @@ Przykład:
                localStorage.getItem("quizHistory") || "{}",
             );
 
-            if (!history[quizId] || history[quizId] === undefined || result.points > history[quizId].points) {
+            if (!history[quizId] || result.points > history[quizId].points) {
                history[quizId] = result;
             }
 
