@@ -5,6 +5,25 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>QuizApp 2.5 - Twórz i rozwiązuj quizy oraz fiszki</title>
 
+      <!-- Open Graph / Facebook -->
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="https://tymoeks.github.io/quizapp/" />
+      <meta property="og:title" content="QuizApp 2.5 - Twórz i rozwiązuj quizy oraz fiszki" />
+      <meta property="og:description" content="Profesjonalna platforma do tworzenia i rozwiązywania quizów i fiszek." />
+      <meta property="og:locale" content="pl_PL" />
+      <meta property="og:site_name" content="QuizApp 2.5" />
+
+      <!-- Twitter Card -->
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:url" content="https://tymoeks.github.io/quizapp/" />
+      <meta name="twitter:title" content="QuizApp 2.5 - Twórz i rozwiązuj quizy oraz fiszki" />
+      <meta name="twitter:description" content="Profesjonalna platforma do tworzenia i rozwiązywania quizów i fiszek." />
+
+      <!-- Additional Meta Tags -->
+      <meta name="description" content="Profesjonalna platforma do tworzenia i rozwiązywania quizów i fiszek." />
+      <meta name="keywords" content="quiz, fiszki, nauka, edukacja, testy, AI, generator quizów" />
+      <meta name="author" content="QuizApp 2.5" />
+
       <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
       <style>
@@ -267,11 +286,13 @@
             overflow: hidden;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
-            min-height: 48px; /* Stała wysokość */
+            min-height: 48px;
+            height: 48px;
+            box-sizing: border-box;
             display: flex;
             align-items: center;
             justify-content: center;
-            line-height: 1.2; /* Kontroluj wysokość linii */
+            line-height: 1.2;
          }
 
          .btn::before {
@@ -353,7 +374,9 @@
          .btn-small {
             padding: 8px 16px;
             font-size: 13px;
-            min-height: 40px; /* Stała wysokość dla małych */
+            min-height: 40px;
+            height: 40px;
+            box-sizing: border-box;
          }
 
          .search-bar {
@@ -1012,7 +1035,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 40px;
+            padding: 50px 40px 40px 40px;
             -webkit-touch-callout: none;
             -webkit-user-select: text;
             -moz-user-select: text;
@@ -1023,7 +1046,7 @@
          @media (max-width: 768px) {
             .flashcard-content {
                font-size: 1.25rem;
-               padding: 40px;
+               padding: 50px 30px 30px 30px;
             }
          }
 
@@ -1061,7 +1084,7 @@
             justify-content: center;
             min-width: 0;
             -webkit-tap-highlight-color: transparent;
-            min-height: 48px;
+            min-height: 40px;
             line-height: 1.2;
          }
 
@@ -1942,22 +1965,13 @@
                   <button class="btn btn-accent" onclick="startQuiz()">
                      ▶️ Rozpocznij quiz
                   </button>
-                  <button
-                     class="btn btn-small"
-                     onclick="shareQuiz(currentQuiz.id)"
-                  >
+                  <button class="btn" onclick="shareQuiz(currentQuiz.id)">
                      🔗 Udostępnij
                   </button>
-                  <button
-                     class="btn btn-small"
-                     onclick="showEditScreen(currentQuiz.id)"
-                  >
+                  <button class="btn" onclick="showEditScreen(currentQuiz.id)">
                      ✏️ Edytuj
                   </button>
-                  <button
-                     class="btn btn-small"
-                     onclick="exportQuiz(currentQuiz.id)"
-                  >
+                  <button class="btn" onclick="exportQuiz(currentQuiz.id)">
                      📤 Eksportuj
                   </button>
                   <button class="btn" onclick="showHomeScreen()">Powrót</button>
@@ -2045,20 +2059,17 @@
                   <button class="btn btn-accent" onclick="startFlashcards()">
                      ▶️ Rozpocznij naukę
                   </button>
-                  <button
-                     class="btn btn-small"
-                     onclick="shareQuiz(currentFlashcards.id)"
-                  >
+                  <button class="btn" onclick="shareQuiz(currentFlashcards.id)">
                      🔗 Udostępnij
                   </button>
                   <button
-                     class="btn btn-small"
+                     class="btn"
                      onclick="showEditScreen(currentFlashcards.id)"
                   >
                      ✏️ Edytuj
                   </button>
                   <button
-                     class="btn btn-small"
+                     class="btn"
                      onclick="exportQuiz(currentFlashcards.id)"
                   >
                      📤 Eksportuj
@@ -2549,7 +2560,6 @@
             },
          };
 
-         // Legacy compatibility - gradually replace these
          let currentQuiz = null;
          let currentQuestionIndex = 0;
          let answeredQuestionsCount = 0;
@@ -2587,91 +2597,6 @@
          let firstAttemptCorrect = new Set();
          let firstAttemptAnswered = 0;
          let retriedQuestions = new Set();
-
-         // Sync function to gradually migrate
-         function syncLegacyState() {
-            currentQuiz = AppState.quiz.current;
-            currentQuestionIndex = AppState.quiz.currentQuestionIndex;
-            answeredQuestionsCount = AppState.quiz.answeredQuestionsCount;
-            score = AppState.quiz.score;
-            totalPoints = AppState.quiz.totalPoints;
-            correctAnswers = AppState.quiz.correctAnswers;
-            questions = AppState.quiz.questions;
-            questionQueue = AppState.quiz.questionQueue;
-            startTime = AppState.quiz.startTime;
-            questionStartTime = AppState.quiz.questionStartTime;
-            currentStreak = AppState.quiz.currentStreak;
-            maxStreak = AppState.quiz.maxStreak;
-            firstAttemptCorrect = AppState.quiz.firstAttemptCorrect;
-            firstAttemptAnswered = AppState.quiz.firstAttemptAnswered;
-            retriedQuestions = AppState.quiz.retriedQuestions;
-
-            currentFlashcards = AppState.flashcard.current;
-            currentCardIndex = AppState.flashcard.currentCardIndex;
-            answeredCardsCount = AppState.flashcard.answeredCardsCount;
-            flashcardStats = AppState.flashcard.stats;
-            cards = AppState.flashcard.cards;
-            cardQueue = AppState.flashcard.cardQueue;
-            isCardFlipped = AppState.flashcard.isFlipped;
-            isTransitioning = AppState.flashcard.isTransitioning;
-            completedCards = AppState.flashcard.completedCards;
-            retriedCards = AppState.flashcard.retriedCards;
-
-            currentFilter = AppState.ui.currentFilter;
-            currentTags = AppState.ui.currentTags;
-            editTags = AppState.ui.editTags;
-            selectionMode = AppState.ui.selectionMode;
-            selectedQuizzes = AppState.ui.selectedQuizzes;
-            currentEditingQuizId = AppState.ui.currentEditingQuizId;
-
-            timerInterval = AppState.system.timerInterval;
-            activeToast = AppState.system.activeToast;
-            queuedToast = AppState.system.queuedToast;
-            toastTimeout = AppState.system.toastTimeout;
-            searchDebounceTimer = AppState.system.searchDebounceTimer;
-         }
-
-         function updateAppState() {
-            AppState.quiz.current = currentQuiz;
-            AppState.quiz.currentQuestionIndex = currentQuestionIndex;
-            AppState.quiz.answeredQuestionsCount = answeredQuestionsCount;
-            AppState.quiz.score = score;
-            AppState.quiz.totalPoints = totalPoints;
-            AppState.quiz.correctAnswers = correctAnswers;
-            AppState.quiz.questions = questions;
-            AppState.quiz.questionQueue = questionQueue;
-            AppState.quiz.startTime = startTime;
-            AppState.quiz.questionStartTime = questionStartTime;
-            AppState.quiz.currentStreak = currentStreak;
-            AppState.quiz.maxStreak = maxStreak;
-            AppState.quiz.firstAttemptCorrect = firstAttemptCorrect;
-            AppState.quiz.firstAttemptAnswered = firstAttemptAnswered;
-            AppState.quiz.retriedQuestions = retriedQuestions;
-
-            AppState.flashcard.current = currentFlashcards;
-            AppState.flashcard.currentCardIndex = currentCardIndex;
-            AppState.flashcard.answeredCardsCount = answeredCardsCount;
-            AppState.flashcard.stats = flashcardStats;
-            AppState.flashcard.cards = cards;
-            AppState.flashcard.cardQueue = cardQueue;
-            AppState.flashcard.isFlipped = isCardFlipped;
-            AppState.flashcard.isTransitioning = isTransitioning;
-            AppState.flashcard.completedCards = completedCards;
-            AppState.flashcard.retriedCards = retriedCards;
-
-            AppState.ui.currentFilter = currentFilter;
-            AppState.ui.currentTags = currentTags;
-            AppState.ui.editTags = editTags;
-            AppState.ui.selectionMode = selectionMode;
-            AppState.ui.selectedQuizzes = selectedQuizzes;
-            AppState.ui.currentEditingQuizId = currentEditingQuizId;
-
-            AppState.system.timerInterval = timerInterval;
-            AppState.system.activeToast = activeToast;
-            AppState.system.queuedToast = queuedToast;
-            AppState.system.toastTimeout = toastTimeout;
-            AppState.system.searchDebounceTimer = searchDebounceTimer;
-         }
 
          // ==================== RENDERING CACHE ====================
          const RenderCache = {
@@ -2759,6 +2684,14 @@
          function validateQuizFormat(quiz) {
             try {
                if (!quiz.title || typeof quiz.title !== "string") return false;
+
+               // Nowy format: data jest tablicą
+               if (quiz.data && Array.isArray(quiz.data)) {
+                  if (typeof quiz.type !== "number") return false;
+                  return true;
+               }
+
+               // Stary format: data jest stringiem
                if (!quiz.data || typeof quiz.data !== "string") return false;
 
                const data = quiz.data;
@@ -2818,12 +2751,12 @@
          }
 
          function decodeFromNewFormat(data) {
-            if (!data.data || typeof data.data !== "string") {
-               throw new Error("Brak pola data w nowym formacie");
-            }
-
             // NOWY FORMAT - sprawdź czy data jest obiektem/tablicą
-            if (typeof data.data === "object" && Array.isArray(data.data)) {
+            if (
+               data.data &&
+               typeof data.data === "object" &&
+               Array.isArray(data.data)
+            ) {
                if (data.type === 0) {
                   // Quiz format - konwertuj do {0...}
                   let encoded = "{0";
@@ -2873,6 +2806,10 @@
             }
 
             // STARY FORMAT - istniejąca logika
+            if (!data.data || typeof data.data !== "string") {
+               throw new Error("Nieprawidłowy format danych");
+            }
+
             const content = data.data;
 
             if (content.startsWith("{1")) {
@@ -3543,7 +3480,7 @@ Przykład:
 
             let result = null;
             if (history) {
-               result = history
+               result = history;
             }
 
             const tagsHtml =
@@ -3901,16 +3838,6 @@ Przykład:
             if (confirm("Czy na pewno chcesz usunąć ten quiz?")) {
                deleteQuiz(currentEditingQuizId);
                showHomeScreen();
-            }
-         }
-
-         function confirmDelete(quizId) {
-            if (
-               confirm(
-                  "Czy na pewno chcesz usunąć ten quiz? Tej operacji nie można cofnąć.",
-               )
-            ) {
-               deleteQuiz(quizId);
             }
          }
 
@@ -4585,7 +4512,10 @@ Przykład:
                localStorage.getItem("quizHistory") || "{}",
             );
 
-            if (!history[quizId] || 0 < result.points > history[quizId].points) {
+            if (
+               !history[quizId] ||
+               0 < result.points > history[quizId].points
+            ) {
                history[quizId] = result;
             }
 
@@ -4598,86 +4528,6 @@ Przykład:
             );
 
             return history[quizId];
-         }
-
-         function getFlashcardHistory(flashcardId) {
-            const history = JSON.parse(
-               localStorage.getItem("flashcardHistory") || "{}",
-            );
-            return history[flashcardId] || [];
-         }
-
-         function displayHistory(itemId, type = "quiz") {
-            const history =
-               type === "quiz"
-                  ? getQuizHistory(itemId)
-                  : getFlashcardHistory(itemId);
-            const sectionId =
-               type === "quiz"
-                  ? "quizHistorySection"
-                  : "flashcardHistorySection";
-            const containerId =
-               type === "quiz" ? "quizHistory" : "flashcardHistory";
-
-            const section = document.getElementById(sectionId);
-            const container = document.getElementById(containerId);
-
-            if (history.length === 0) {
-               section.style.display = "none";
-               return;
-            }
-
-            section.style.display = "block";
-            const recent = history.slice(-5).reverse();
-
-            if (type === "quiz") {
-               container.innerHTML = `
-                  <div class="history-list">
-                     ${recent
-                        .map(
-                           (h) => `
-                        <div class="history-item">
-                           <div class="history-info">
-                              <div style="font-size: 12px; color: var(--text-secondary);">
-                                 ${formatDate(h.date)}${h.incomplete ? " (przerwany)" : ""}
-                              </div>
-                              <div style="font-size: 14px; margin-top: 4px;">
-                                 ${h.points} pkt · Czas: ${formatTime(h.time)} · Seria: ${h.maxStreak}🔥
-                              </div>
-                           </div>
-                           <div class="history-score">${h.percentage}%</div>
-                        </div>
-                     `,
-                        )
-                        .join("")}
-                  </div>
-               `;
-            } else {
-               container.innerHTML = `
-                  <div class="history-list">
-                     ${recent
-                        .map((h) => {
-                           const knownPercent = Math.round(
-                              (h.easy / h.total) * 100,
-                           );
-                           return `
-                              <div class="history-item">
-                                 <div class="history-info">
-                                    <div style="font-size: 12px; color: var(--text-secondary);">
-                                       ${formatDate(h.date)}
-                                    </div>
-                                    <div style="font-size: 14px; margin-top: 4px;">
-                                       ✅${h.easy} 🤔${h.medium} ❌${h.hard} · Czas: ${formatTime(h.time)}
-                                    </div>
-                                 </div>
-                                 <div class="history-score">${knownPercent}%</div>
-                              </div>
-                           `;
-                        })
-                        .join("")}
-                  </div>
-               `;
-            }
          }
 
          function checkSharedQuiz() {
