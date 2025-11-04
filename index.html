@@ -2848,27 +2848,34 @@
                   }
                   i++;
 
+                  // Określ ile pól oczekujemy
+                  const expectedFields = qType === "1" ? 4 : 6; // T/F=4, ABCD=6
+
                   const parts = [];
                   let current = "";
+                  let fieldCount = 0;
 
+                  // Zbieraj dokładnie expectedFields pól
                   while (
                      i < questionsData.length &&
-                     questionsData[i] !== "0" &&
-                     questionsData[i] !== "1"
+                     fieldCount < expectedFields
                   ) {
                      if (questionsData[i] === "|") {
                         parts.push(current);
                         current = "";
+                        fieldCount++;
                      } else {
                         current += questionsData[i];
                      }
                      i++;
                   }
 
+                  // Dodaj ostatnie pole jeśli istnieje
                   if (current.length > 0) {
                      parts.push(current);
                   }
 
+                  // Walidacja: czy mamy odpowiednią liczbę pól?
                   if (parts.length >= 3) {
                      const question = {
                         question: unescapeText(parts[0] || ""),
@@ -5307,8 +5314,3 @@ Przykład:
       </script>
    </body>
 </html>
-
-
-
-
-
