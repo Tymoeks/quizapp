@@ -726,31 +726,6 @@
             font-weight: 500;
          }
 
-         .streak-indicator {
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            background: var(--success);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 18px;
-            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
-            animation: pulse 0.5s ease;
-            z-index: 100;
-         }
-
-         @keyframes pulse {
-            0%,
-            100% {
-               transform: scale(1);
-            }
-            50% {
-               transform: scale(1.1);
-            }
-         }
-
          .question-card {
             background: var(--surface);
             padding: 48px;
@@ -1033,7 +1008,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 50px 40px 40px 40px;
+            padding: 52px 40px 40px 40px;
             -webkit-touch-callout: none;
             -webkit-user-select: text;
             -moz-user-select: text;
@@ -1044,7 +1019,7 @@
          @media (max-width: 768px) {
             .flashcard-content {
                font-size: 1.25rem;
-               padding: 50px 30px 30px 30px;
+               padding: 52px 30px 30px 30px;
             }
          }
 
@@ -1879,14 +1854,6 @@
                   ></textarea>
                </div>
 
-               <div class="form-group" id="answerCountGroup">
-                  <label>Liczba odpowiedzi w pytaniach:</label>
-                  <select id="answerCount">
-                     <option value="3">3 odpowiedzi</option>
-                     <option value="4" selected>4 odpowiedzi</option>
-                  </select>
-               </div>
-
                <div class="button-group">
                   <button class="btn btn-primary" onclick="saveQuiz()">
                      💾 Zapisz
@@ -1992,7 +1959,6 @@
                   <span id="questionNumber">Pytanie 1/10</span>
                   <span id="accuracy">Poprawność: 0%</span>
                   <span id="score">Punkty: 0</span>
-                  <span id="streak">Seria: 0🔥</span>
                   <span id="quizTimer">00:00</span>
                </div>
 
@@ -2468,14 +2434,11 @@
                questionQueue: [],
                startTime: null,
                questionStartTime: null,
-               currentStreak: 0,
-               maxStreak: 0,
                firstAttemptCorrect: new Set(),
                firstAttemptAnswered: 0,
                retriedQuestions: new Set(),
                settings: {
                   randomOrder: true,
-                  answerCount: 4,
                   showLetters: true,
                },
             },
@@ -2528,8 +2491,6 @@
                   questionQueue: [],
                   startTime: null,
                   questionStartTime: null,
-                  currentStreak: 0,
-                  maxStreak: 0,
                   firstAttemptCorrect: new Set(),
                   firstAttemptAnswered: 0,
                   retriedQuestions: new Set(),
@@ -2571,8 +2532,6 @@
          let currentEditingQuizId = null;
          let currentQuizSettings = AppState.quiz.settings;
          let timerInterval = null;
-         let currentStreak = 0;
-         let maxStreak = 0;
          let currentFilter = "all";
          let currentTags = [];
          let editTags = [];
@@ -2780,7 +2739,6 @@
                   return decodeFromNewFormat({
                      title: data.title,
                      tags: data.tags,
-                     answerCount: data.answer || 4,
                      type: "quiz",
                      data: encoded,
                   });
@@ -2903,7 +2861,6 @@
                   title: data.title,
                   tags: data.tags || [],
                   type: "quiz",
-                  answerCount: data.answerCount || 4,
                   data: content,
                   questions: questions,
                };
@@ -2917,7 +2874,6 @@
                return {
                   title: quiz.title,
                   tags: quiz.tags || [],
-                  answerCount: quiz.answerCount || 4,
                   type: quiz.type,
                   data: quiz.data,
                };
@@ -2954,7 +2910,6 @@
             return {
                title: quiz.title,
                tags: quiz.tags || [],
-               answerCount: quiz.answerCount || 4,
                type: quiz.type,
                data: data,
             };
@@ -3280,8 +3235,6 @@ Przykład:
             document.getElementById("aiPrompt").textContent = prompts[type];
 
             window.currentCreateType = type;
-            document.getElementById("answerCountGroup").style.display =
-               type === "flashcard" ? "none" : "block";
          }
 
          function showEditScreen(quizId) {
@@ -3301,7 +3254,6 @@ Przykład:
                   title: quiz.title,
                   tags: quiz.tags,
                   type: quiz.type,
-                  answerCount: quiz.answerCount,
                   data: quiz.data,
                };
 
@@ -3350,7 +3302,6 @@ Przykład:
                const mcQuestions = currentQuiz.questions.length - tfQuestions;
                document.getElementById("preQuizDescription").textContent =
                   `${currentQuiz.questions.length} pytań (${mcQuestions} wielokrotnego wyboru, ${tfQuestions} prawda/fałsz)`;
-               currentQuizSettings.answerCount = currentQuiz.answerCount || 4;
             }
          }
 
@@ -3600,9 +3551,6 @@ Przykład:
                document.getElementById("quizTitle").value.trim(),
                200,
             );
-            const answerCount = parseInt(
-               document.getElementById("answerCount").value,
-            );
 
             if (!jsonText) {
                showToast("Błąd: Wklej JSON quizu", "error");
@@ -3647,8 +3595,6 @@ Przykład:
                   tags: allTags,
                   type: sanitized.type,
                   data: sanitized.data,
-                  answerCount:
-                     window.currentCreateType === "flashcard" ? 4 : answerCount,
                   id: Date.now().toString(),
                   createdAt: new Date().toISOString(),
                };
@@ -3811,7 +3757,6 @@ Przykład:
                      tags: allTags,
                      type: sanitized.type,
                      data: sanitized.data,
-                     answerCount: quizzes[index].answerCount,
                      id: currentEditingQuizId,
                      createdAt: quizzes[index].createdAt,
                      updatedAt: new Date().toISOString(),
@@ -3961,8 +3906,6 @@ Przykład:
             score = 0;
             totalPoints = 0;
             correctAnswers = 0;
-            currentStreak = 0;
-            maxStreak = 0;
             startTime = Date.now();
 
             firstAttemptCorrect = new Set();
@@ -4068,12 +4011,6 @@ Przykład:
                   totalPoints += earnedPoints;
                }
 
-               currentStreak++;
-               maxStreak = Math.max(maxStreak, currentStreak);
-
-               if (currentStreak >= 3) {
-                  showStreakIndicator();
-               }
                announceToScreenReader(
                   `Poprawna odpowiedź! Zdobyto ${earnedPoints} punktów.`,
                );
@@ -4082,7 +4019,6 @@ Przykład:
                   firstAttemptAnswered++;
                }
 
-               currentStreak = 0;
                selectedBtn.classList.add("incorrect");
                selectedBtn.classList.add("animate-shake");
 
@@ -4108,18 +4044,6 @@ Przykład:
             }, 1500);
          }
 
-         function showStreakIndicator() {
-            const existing = document.querySelector(".streak-indicator");
-            if (existing) existing.remove();
-
-            const indicator = document.createElement("div");
-            indicator.className = "streak-indicator";
-            indicator.textContent = `${currentStreak} 🔥`;
-            document.body.appendChild(indicator);
-
-            setTimeout(() => indicator.remove(), 2000);
-         }
-
          function updateProgress() {
             const totalQuestions = questions.length;
             const progress =
@@ -4140,8 +4064,6 @@ Przykład:
                `Poprawność: ${accuracy}%`;
             document.getElementById("score").textContent =
                `Punkty: ${totalPoints}`;
-            document.getElementById("streak").textContent =
-               `Seria: ${currentStreak}🔥`;
          }
 
          function endQuiz() {
@@ -4152,7 +4074,7 @@ Przykład:
             document.getElementById("finalScore").textContent =
                `${score}/${questions.length} (${percentage}%)`;
             document.getElementById("finalPoints").textContent =
-               `${totalPoints} punktów · Najdłuższa seria: ${maxStreak}🔥`;
+               `${totalPoints} punktów`;
             document.getElementById("finalTime").textContent =
                `Czas: ${formatTime(totalTime)}`;
 
@@ -4162,7 +4084,6 @@ Przykład:
                percentage: percentage,
                points: totalPoints,
                time: totalTime,
-               maxStreak: maxStreak,
                date: new Date().toISOString(),
             });
 
@@ -4203,7 +4124,7 @@ Przykład:
             let answers = [question.correct];
             let wrongAnswers = [...question.wrong];
 
-            const neededWrongAnswers = currentQuizSettings.answerCount - 1;
+            const neededWrongAnswers = 4 - 1;
 
             if (wrongAnswers.length < neededWrongAnswers) {
                const additionalAnswers = getAdditionalWrongAnswers(
@@ -4584,7 +4505,6 @@ Przykład:
                         tags: decoded.tags,
                         type: decoded.type,
                         data: decoded.data,
-                        answerCount: decoded.answerCount || 4,
                         id: Date.now().toString(),
                         createdAt: new Date().toISOString(),
                      };
@@ -4859,7 +4779,6 @@ Przykład:
                         tags: decoded.tags,
                         type: decoded.type,
                         data: decoded.data,
-                        answerCount: decoded.answerCount || 4,
                         id: Date.now().toString() + Math.random(),
                         createdAt: new Date().toISOString(),
                      };
@@ -4918,7 +4837,6 @@ Przykład:
                      tags: decoded.tags,
                      type: decoded.type,
                      data: decoded.data,
-                     answerCount: decoded.answerCount || 4,
                      id: Date.now().toString(),
                      createdAt: new Date().toISOString(),
                   };
@@ -5052,7 +4970,6 @@ Przykład:
                                  tags: decoded.tags,
                                  type: decoded.type,
                                  data: decoded.data,
-                                 answerCount: decoded.answerCount || 4,
                                  id: Date.now().toString() + Math.random(),
                                  createdAt: new Date().toISOString(),
                               };
