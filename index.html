@@ -4112,21 +4112,18 @@ Przykład:
          }
 
          function endQuizEarly() {
-            if (
-               (currentQuestionIndex < questions.length && score === 0) &&
-               confirm(
-                  "Czy na pewno chcesz zakończyć quiz? Postęp nie zostanie zapisany.",
-               )
-            ) {
-               stopTimer();
-               showHomeScreen();
-            } else if (
-               currentQuestionIndex >= questions.length && score > 0 &&
-               confirm(
-                  "Czy na pewno chcesz zakończyć quiz? Postęp zostanie zapisany.",
-               )
-            ) {
-               endQuiz();
+            // Nie skończyłeś pierwszego przejścia LUB masz 0 punktów
+            if (currentQuestionIndex < questions.length || score === 0) {
+               if (confirm("Czy na pewno chcesz zakończyć quiz? Postęp nie zostanie zapisany.")) {
+                  stopTimer();
+                  showHomeScreen();
+               }
+            } 
+            // Jesteś w powtórkach i masz punkty
+            else {
+               if (confirm("Czy na pewno chcesz zakończyć quiz? Postęp zostanie zapisany.")) {
+                  endQuiz();
+               }
             }
          }
 
