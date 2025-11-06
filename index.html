@@ -4078,6 +4078,13 @@ Przykład:
             const totalTime = (Date.now() - startTime) / 1000;
             const percentage = Math.round((score / questions.length) * 100);
 
+            // Jeśli pusty wynik, nie pokazuj ekranu końcowego
+            if (score === 0 || totalPoints === 0) {
+               showToast("Quiz zakończony bez wyniku", "info");
+               showHomeScreen();
+               return;
+            }
+
             document.getElementById("finalScore").textContent =
                `${score}/${questions.length} (${percentage}%)`;
             document.getElementById("finalPoints").textContent =
@@ -4106,7 +4113,7 @@ Przykład:
 
          function endQuizEarly() {
             if (
-               currentQuestionIndex < questions.length &&
+               (currentQuestionIndex < questions.length && score === 0) &&
                confirm(
                   "Czy na pewno chcesz zakończyć quiz? Postęp nie zostanie zapisany.",
                )
@@ -4114,7 +4121,7 @@ Przykład:
                stopTimer();
                showHomeScreen();
             } else if (
-               currentQuestionIndex >= questions.length &&
+               currentQuestionIndex >= questions.length && score > 0 &&
                confirm(
                   "Czy na pewno chcesz zakończyć quiz? Postęp zostanie zapisany.",
                )
