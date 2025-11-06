@@ -8,18 +8,33 @@
       <!-- Open Graph / Facebook -->
       <meta property="og:type" content="website" />
       <meta property="og:url" content="" />
-      <meta property="og:title" content="QuizApp 2.5 - Twórz i rozwiązuj quizy oraz fiszki" />
-      <meta property="og:description" content="Profesjonalna platforma do tworzenia i rozwiązywania quizów i fiszek." />
+      <meta
+         property="og:title"
+         content="QuizApp 2.5 - Twórz i rozwiązuj quizy oraz fiszki"
+      />
+      <meta
+         property="og:description"
+         content="Profesjonalna platforma do tworzenia i rozwiązywania quizów i fiszek."
+      />
       <meta property="og:locale" content="pl_PL" />
       <meta property="og:site_name" content="QuizApp 2.5" />
 
       <!-- Twitter Card -->
       <meta name="twitter:url" content="" />
-      <meta name="twitter:title" content="QuizApp 2.5 - Twórz i rozwiązuj quizy oraz fiszki" />
-      <meta name="twitter:description" content="Profesjonalna platforma do tworzenia i rozwiązywania quizów i fiszek." />
+      <meta
+         name="twitter:title"
+         content="QuizApp 2.5 - Twórz i rozwiązuj quizy oraz fiszki"
+      />
+      <meta
+         name="twitter:description"
+         content="Profesjonalna platforma do tworzenia i rozwiązywania quizów i fiszek."
+      />
 
       <!-- Additional Meta Tags -->
-      <meta name="description" content="Profesjonalna platforma do tworzenia i rozwiązywania quizów i fiszek." />
+      <meta
+         name="description"
+         content="Profesjonalna platforma do tworzenia i rozwiązywania quizów i fiszek."
+      />
       <meta name="author" content="QuizApp 2.5" />
 
       <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
@@ -3139,6 +3154,7 @@ Zasady:
 - Pierwsza odpowiedź w "answers" to zawsze ta poprawna
 - category jest opcjonalne, czyli można pominąć pole
 - Dla PF używaj "Prawda" oraz "Fałsz" lub podobnych odpowiedzi
+- Pytania PF mogą tylko 'sprawdzać' odpowiedź na istniejące pytanie ABCD.
 - W pytaniach i odpowiedziach nie może się znaleźć '|' oraz nie używaj tam jakichkolwiek elementów do formatowania tekstu
 
 Przykład:
@@ -4425,18 +4441,23 @@ Przykład:
 
          // ==================== HISTORY ====================
          function saveQuizResult(quizId, result) {
+            // Nie zapisuj pustych wyników (0 punktów i 0% poprawnych odpowiedzi)
+            if (result.score === 0 || result.percentage === 0) {
+               return;
+            }
+
             const history = JSON.parse(
                localStorage.getItem("quizHistory") || "{}",
             );
 
-            if (
-               !history[quizId] ||
-               0 < result.points > history[quizId].points
-            ) {
+            // Sprawdź czy nie ma wyniku dla tego quizu lub nowy wynik jest lepszy
+            if (!history[quizId] || result.points > history[quizId].points) {
                history[quizId] = result;
-            }
+               localStorage.setItem("quizHistory", JSON.stringify(history));
 
-            localStorage.setItem("quizHistory", JSON.stringify(history));
+               // Wymuś odświeżenie listy quizów, aby pokazać nowy najlepszy wynik
+               RenderCache.clear();
+            }
          }
 
          function getQuizHistory(quizId) {
