@@ -1029,7 +1029,7 @@
         }
 
         .ai-prompt::after {
-            content: "✨";
+            content: "📝";
             position: absolute;
             bottom: -15px;
             right: -15px;
@@ -2342,19 +2342,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Tagi (naciśnij Enter aby dodać, opcjonalnie):</label>
-                    <div class="tag-input-container" id="tagContainer">
-                        <input
-                            type="text"
-                            id="tagInput"
-                            placeholder="Dodaj tag..."
-                            onkeypress="handleTagInput(event)"
-                            maxlength="50"
-                        />
-                    </div>
-                </div>
-
-                <div class="form-group">
                     <label for="quizJson" id="jsonLabel">Wklej JSON:</label>
                     <textarea
                         id="quizJson"
@@ -2379,19 +2366,6 @@
                 <div class="form-group">
                     <label for="editQuizTitle">Tytuł:</label>
                     <input type="text" id="editQuizTitle" maxlength="200" />
-                </div>
-
-                <div class="form-group">
-                    <label>Tagi:</label>
-                    <div class="tag-input-container" id="editTagContainer">
-                        <input
-                            type="text"
-                            id="editTagInput"
-                            placeholder="Dodaj tag..."
-                            onkeypress="handleEditTagInput(event)"
-                            maxlength="50"
-                        />
-                    </div>
                 </div>
 
                 <div class="form-group">
@@ -2852,8 +2826,6 @@
         // UI state
         ui: {
             currentFilter: "all",
-            currentTags: [],
-            editTags: [],
             selectionMode: false,
             selectedQuizzes: new Set(),
             currentEditingId: null,
@@ -2904,8 +2876,6 @@
 
         // Reset UI state for forms
         resetFormState() {
-            this.ui.currentTags = [];
-            this.ui.editTags = [];
         }
     };
 
@@ -3681,7 +3651,6 @@
             // Clear form
             document.getElementById("quizJson").value = "";
             document.getElementById("quizTitle").value = "";
-            Tags.render("tagContainer", "tagInput", State.ui.currentTags);
 
             // Update UI text
             const isFlashcard = type === "flashcard";
@@ -3703,8 +3672,6 @@
 
             if (quiz) {
                 document.getElementById("editQuizTitle").value = quiz.title || "";
-                State.ui.editTags = quiz.tags || [];
-                Tags.render("editTagContainer", "editTagInput", State.ui.editTags);
 
                 const jsonData = {
                     title: quiz.title,
@@ -3752,8 +3719,8 @@
 
 Parametry:
 - Temat: [TWÓJ TEMAT]
-- Liczba pytań: [np. 10]
-- Liczba pytań prawda/fałsz: [np. 3]
+- Liczba pytań ABCD: [np. 10]
+- Dodatkowa liczba pytań Prawda/Fałsz do pytań ABCD: [ok. + 1/6 pytań ABCD]
 
 Format JSON:
 {
@@ -3777,11 +3744,12 @@ Format JSON:
 
 Zasady:
 - "type" : 0 = quiz
-- W pytaniach: type: 0 = ABCD, type: 1 = Prawda/Fałsz
+- W pytaniach: "type" : 0 = ABCD, "type" : 1 = Prawda/Fałsz
 - Pierwsza odpowiedź w "answers" to zawsze ta poprawna
-- category jest opcjonalne
+- "category" jest opcjonalne
 - Dla PF używaj "Prawda" oraz "Fałsz"
-- W pytaniach i odpowiedziach nie może się znaleźć '|'`,
+- Pytania PF powinny zawsze się odwoływać do istniejących pytań ABCD, najlepiej tych najważniejszych
+- W pytaniach i odpowiedziach nie może się znaleźć '|' oraz nie używaj tam żadnego formatowania`,
 
                 flashcard: `Wygeneruj fiszki w formacie JSON.
 
@@ -3839,59 +3807,6 @@ Zasady:
             Navigation.showPreFlashcard(State.ui.currentEditingId);
         } else {
             Navigation.showPreQuiz(State.ui.currentEditingId);
-        }
-    }
-
-    // ==================== TAGS MANAGEMENT ====================
-    const Tags = {
-        render(containerId, inputId, tagsArray) {
-            const container = document.getElementById(containerId);
-            const input = document.getElementById(inputId);
-
-            const tagsHtml = tagsArray.map((tag, index) => `
-                <span class="tag-removable">
-                    ${Utils.escapeHtml(tag)}
-                    <button onclick="Tags.remove('${containerId}', '${inputId}', ${index})" aria-label="Usuń tag ${Utils.escapeHtml(tag)}">×</button>
-                </span>
-            `).join("");
-
-            container.innerHTML = tagsHtml;
-            container.appendChild(input);
-        },
-
-        add(containerId, inputId, tagsArray, tag) {
-            const sanitized = Utils.sanitizeInput(tag, CONSTANTS.MAX_TAG_LENGTH);
-            if (sanitized && !tagsArray.includes(sanitized)) {
-                tagsArray.push(sanitized);
-                this.render(containerId, inputId, tagsArray);
-            }
-        },
-
-        remove(containerId, inputId, index) {
-            const isEdit = containerId === "editTagContainer";
-            const tagsArray = isEdit ? State.ui.editTags : State.ui.currentTags;
-            
-            tagsArray.splice(index, 1);
-            this.render(containerId, inputId, tagsArray);
-        }
-    };
-
-    // Global tag functions
-    function handleTagInput(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            const input = document.getElementById("tagInput");
-            Tags.add("tagContainer", "tagInput", State.ui.currentTags, input.value.trim());
-            input.value = "";
-        }
-    }
-
-    function handleEditTagInput(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            const input = document.getElementById("editTagInput");
-            Tags.add("editTagContainer", "editTagInput", State.ui.editTags, input.value.trim());
-            input.value = "";
         }
     }
 
@@ -4194,10 +4109,7 @@ Zasady:
                     throw new Error("Brak tytułu quizu");
                 }
 
-                const allTags = [...new Set([
-                    ...State.ui.currentTags,
-                    ...(sanitized.tags || [])
-                ])].filter(Boolean);
+                const allTags = [...new Set(sanitized.tags || [])];
 
                 const quizzes = Storage.getQuizzes();
 
@@ -4260,10 +4172,7 @@ Zasady:
                 const index = quizzes.findIndex(q => q.id === State.ui.currentEditingId);
 
                 if (index !== -1) {
-                    const allTags = [...new Set([
-                        ...State.ui.editTags,
-                        ...(sanitized.tags || [])
-                    ])].filter(Boolean);
+                    const allTags = [...new Set(sanitized.tags || [])];
 
                     quizzes[index] = {
                         ...quizzes[index],
