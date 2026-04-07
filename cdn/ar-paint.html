@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>AR Paint</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{--accent:#00FFB2;--bg:#0a0a0f;--text:#e8e8ec;--text-dim:rgba(255,255,255,0.45)}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text)}
+
+  #startScreen{
+    position:fixed;inset:0;z-index:200;background:var(--bg);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;text-align:center;
+    transition:opacity 0.4s;
+  }
+  #startScreen.hidden{opacity:0;pointer-events:none}
+  #startScreen h1{font-family:'Space Mono',monospace;font-size:28px;color:var(--accent)}
+  #startScreen p{color:var(--text-dim);max-width:300px;line-height:1.5}
+  #startScreen .warn{color:#FF3B6C;font-size:13px;display:none;max-width:300px}
+  .start-btn{
+    padding:14px 36px;border-radius:99px;border:none;
+    background:var(--accent);color:#000;font-weight:700;font-size:16px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  }
+
+  #hud{position:fixed;inset:0;z-index:50;pointer-events:none;display:none}
+  #hud>*{pointer-events:auto}
+
+  .topbar{
+    position:absolute;top:0;left:0;right:0;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:calc(env(safe-area-inset-top,12px)+8px) 16px 10px;pointer-events:none;
+  }
+  .topbar>*{pointer-events:auto}
+  .logo{font-family:'Space Mono',monospace;font-size:18px;color:var(--accent);letter-spacing:-0.5px}
+  .logo span{color:var(--text);opacity:0.5}
+
+  .colorbar{
+    position:absolute;bottom:0;left:0;right:0;
+    padding:12px 16px calc(env(safe-area-inset-bottom,12px)+12px);
+    display:flex;align-items:center;gap:8px;
+    background:linear-gradient(to top,rgba(0,0,0,0.55),transparent);
+  }
+  .color-dot{
+    width:34px;height:34px;border-radius:50%;border:2px solid transparent;
+    cursor:pointer;transition:transform 0.2s,border-color 0.2s;flex-shrink:0;
+  }
+  .color-dot.active{border-color:#fff;transform:scale(1.25)}
+  .size-slider{
+    flex:1;-webkit-appearance:none;appearance:none;
+    height:4px;background:rgba(255,255,255,0.15);border-radius:2px;outline:none;margin:0 4px;
+  }
+  .size-slider::-webkit-slider-thumb{
+    -webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;
+  }
+  .btn-icon{
+    width:38px;height:38px;border-radius:50%;border:none;
+    background:rgba(255,255,255,0.08);color:var(--text);font-size:16px;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);flex-shrink:0;
+  }
+  .btn-icon.active{background:var(--accent);color:#000}
+
+  #reticleLabel{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,28px);
+    font-size:12px;color:var(--text-dim);white-space:nowrap;
+    text-shadow:0 1px 4px rgba(0,0,0,0.8);
+  }
+  .crosshair{
+    position:absolute;top:50%;left:50%;width:28px;height:28px;
+    transform:translate(-50%,-50%);pointer-events:none;
+  }
+  .crosshair::before,.crosshair::after{
+    content:'';position:absolute;background:rgba(255,255,255,0.5);border-radius:1px;
+  }
+  .crosshair::before{width:2px;height:100%;left:50%;transform:translateX(-50%)}
+  .crosshair::after{height:2px;width:100%;top:50%;transform:translateY(-50%)}
+
+  #paintCount{
+    position:absolute;top:calc(env(safe-area-inset-top,12px)+48px);right:16px;
+    font-size:11px;color:var(--text-dim);
+  }
+
+  .minimap{
+    position:absolute;bottom:80px;right:10px;
+    width:110px;height:110px;border-radius:12px;
+    overflow:hidden;border:2px solid rgba(255,255,255,0.1);
+    box-shadow:0 4px 20px rgba(0,0,0,0.5);background:#12121f;
+  }
+  .minimap canvas{width:100%;height:100%}
+
+  /* Subtitle modal */
+  #subtitleModal{
+    position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.85);
+    display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;
+  }
+  #subtitleModal.show{display:flex}
+  #subtitleModal p{color:var(--text);font-size:16px;font-weight:500}
+  #subtitleInput{
+    width:100%;max-width:320px;padding:14px 18px;border-radius:14px;border:2px solid rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.06);color:#fff;font-size:16px;font-family:'DM Sans',sans-serif;
+    outline:none;text-align:center;
+  }
+  #subtitleInput:focus{border-color:var(--accent)}
+  #subtitleModal .modal-btns{display:flex;gap:12px}
+  .modal-btn{
+    padding:12px 28px;border-radius:99px;border:none;font-weight:700;font-size:14px;
+    cursor:pointer;font-family:'DM Sans',sans-serif;
+  }
+  .modal-btn.primary{background:var(--accent);color:#000}
+  .modal-btn.secondary{background:rgba(255,255,255,0.1);color:var(--text)}
+
+  /* Flash effect */
+  #flashOverlay{
+    position:fixed;inset:0;z-index:250;background:#fff;opacity:0;pointer-events:none;
+    transition:opacity 0.1s;
+  }
+  #flashOverlay.flash{opacity:0.8}
+</style>
+</head>
+<body>
+
+<div id="startScreen">
+  <h1>AR Paint</h1>
+  <p>Paint in 3D space. Your strokes stay anchored to real-world surfaces as you move around.</p>
+  <p style="font-size:13px;color:var(--text-dim)">Requires Android Chrome with ARCore.</p>
+  <button class="start-btn" id="startBtn">Start AR Session</button>
+  <p class="warn" id="warnMsg"></p>
+</div>
+
+<div id="hud">
+  <div class="topbar">
+    <div class="logo">AR<span>Paint</span></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-icon" id="undoBtn">↩</button>
+      <button class="btn-icon" id="photoBtn">📷</button>
+    </div>
+  </div>
+  <div class="crosshair" id="crosshairEl"></div>
+  <div id="reticleLabel">Point at a surface</div>
+  <div id="paintCount"></div>
+  <div class="minimap"><canvas id="mapCanvas" width="220" height="220"></canvas></div>
+  <div class="colorbar">
+    <button class="btn-icon" id="eraserBtn">⌫</button>
+    <div class="color-dot active" data-color="#00FFB2" style="background:#00FFB2"></div>
+    <div class="color-dot" data-color="#FF3B6C" style="background:#FF3B6C"></div>
+    <div class="color-dot" data-color="#6C5CFF" style="background:#6C5CFF"></div>
+    <div class="color-dot" data-color="#FFD600" style="background:#FFD600"></div>
+    <div class="color-dot" data-color="#00B4FF" style="background:#00B4FF"></div>
+    <input type="range" class="size-slider" id="sizeSlider" min="5" max="50" value="20">
+  </div>
+</div>
+
+<div id="subtitleModal">
+  <p>Add a subtitle to your photo</p>
+  <input type="text" id="subtitleInput" placeholder="Type here or leave blank..." maxlength="80">
+  <div class="modal-btns">
+    <button class="modal-btn secondary" id="cancelPhoto">Cancel</button>
+    <button class="modal-btn primary" id="savePhoto">Save Photo</button>
+  </div>
+</div>
+
+<div id="flashOverlay"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+
+let currentColor='#00FFB2', brushSize=20, erasing=false, painting=false;
+let hitTestSource=null, hitTestReady=false;
+let reticlePos=new THREE.Vector3(), reticleNorm=new THREE.Vector3(0,1,0), reticleVis=false;
+let allStrokes=[], curGroup=[], lastPos=new THREE.Vector3(), paintCount=0;
+let userLat=null, userLng=null, geoMarkers=[];
+let captureNextFrame=false, pendingSubtitle='';
+const MAP_R=0.002, mapC=document.getElementById('mapCanvas'), mC=mapC.getContext('2d');
+
+// --- Three.js ---
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,0.01,50);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(devicePixelRatio);
+renderer.setSize(innerWidth,innerHeight);
+renderer.xr.enabled=true;
+document.body.appendChild(renderer.domElement);
+Object.assign(renderer.domElement.style,{position:'fixed',inset:'0',zIndex:'0'});
+
+scene.add(new THREE.AmbientLight(0xffffff,1.0));
+const dl=new THREE.DirectionalLight(0xffffff,0.5);dl.position.set(0.5,2,1);scene.add(dl);
+
+// Reticle
+const retGeo=new THREE.RingGeometry(0.015,0.02,32).rotateX(-Math.PI/2);
+const retMat=new THREE.MeshBasicMaterial({color:0x00FFB2,transparent:true,opacity:0.8,side:THREE.DoubleSide});
+const reticle=new THREE.Mesh(retGeo,retMat);
+reticle.matrixAutoUpdate=false;reticle.visible=false;scene.add(reticle);
+
+// --- Paint dot with glow ---
+const coreGeo=new THREE.SphereGeometry(1,16,12);
+const glowGeo=new THREE.SphereGeometry(1,12,8);
+
+function spawnDot(pos,norm,col,sz){
+  const r=sz*0.0012; // much bigger radius
+  const c3=new THREE.Color(col);
+
+  // Core sphere - solid, emissive
+  const coreMat=new THREE.MeshStandardMaterial({
+    color:c3, emissive:c3, emissiveIntensity:0.5,
+    transparent:true, opacity:0.75, roughness:0.3, metalness:0.0,
+    depthWrite:true, depthTest:true
+  });
+  const core=new THREE.Mesh(coreGeo,coreMat);
+  core.position.copy(pos).addScaledVector(norm,r*0.3);
+  core.scale.setScalar(r);
+  core.userData.isPaint=true;
+  core.renderOrder=1;
+
+  // Glow sphere - larger, very transparent, additive feel
+  const glowMat=new THREE.MeshBasicMaterial({
+    color:c3, transparent:true, opacity:0.18,
+    depthWrite:false, depthTest:true
+  });
+  const glow=new THREE.Mesh(glowGeo,glowMat);
+  glow.position.copy(core.position);
+  glow.scale.setScalar(r*2.5);
+  glow.renderOrder=0;
+
+  // Outer haze
+  const hazeMat=new THREE.MeshBasicMaterial({
+    color:c3, transparent:true, opacity:0.06,
+    depthWrite:false, depthTest:true
+  });
+  const haze=new THREE.Mesh(glowGeo,hazeMat);
+  haze.position.copy(core.position);
+  haze.scale.setScalar(r*4.5);
+  haze.renderOrder=0;
+
+  const group=new THREE.Group();
+  group.add(core);group.add(glow);group.add(haze);
+  group.userData.isPaint=true;
+  group.userData.center=core.position.clone();
+  scene.add(group);
+  return group;
+}
+
+function eraseAt(pos){
+  const t=brushSize*0.003;
+  for(let s=allStrokes.length-1;s>=0;s--){
+    const g=allStrokes[s];
+    for(let i=g.length-1;i>=0;i--){
+      const cp=g[i].userData.center;
+      if(cp&&cp.distanceTo(pos)<t){
+        scene.remove(g[i]);
+        g[i].traverse(ch=>{if(ch.material)ch.material.dispose()});
+        g.splice(i,1);paintCount--;
+      }
+    }
+    if(!g.length)allStrokes.splice(s,1);
+  }
+  updCount();
+}
+
+function updCount(){document.getElementById('paintCount').textContent=paintCount>0?paintCount+' dots':''}
+
+// --- UI ---
+document.querySelectorAll('.color-dot').forEach(d=>{
+  d.addEventListener('click',()=>{
+    document.querySelectorAll('.color-dot').forEach(x=>x.classList.remove('active'));
+    d.classList.add('active');currentColor=d.dataset.color;erasing=false;
+    document.getElementById('eraserBtn').classList.remove('active');
+    retMat.color.set(currentColor);
+  });
+});
+document.getElementById('sizeSlider').addEventListener('input',e=>brushSize=+e.target.value);
+document.getElementById('eraserBtn').addEventListener('click',()=>{
+  erasing=!erasing;document.getElementById('eraserBtn').classList.toggle('active',erasing);
+  retMat.color.set(erasing?0xFF3B6C:new THREE.Color(currentColor));
+});
+document.getElementById('undoBtn').addEventListener('click',()=>{
+  if(!allStrokes.length)return;
+  const last=allStrokes.pop();
+  last.forEach(m=>{scene.remove(m);m.traverse(ch=>{if(ch.material)ch.material.dispose()})});
+  paintCount-=last.length;updCount();
+});
+
+// Touch
+renderer.domElement.addEventListener('touchstart',()=>{painting=true;curGroup=[]},{passive:true});
+renderer.domElement.addEventListener('touchend',()=>{
+  painting=false;
+  if(curGroup.length){
+    allStrokes.push(curGroup);
+    if(userLat!==null){geoMarkers.push({lat:userLat+(Math.random()-0.5)*8e-4,lng:userLng+(Math.random()-0.5)*8e-4,color:currentColor});drawMap()}
+  }
+  curGroup=[];lastPos.set(0,0,0);
+},{passive:true});
+
+// --- Photo capture ---
+document.getElementById('photoBtn').addEventListener('click',()=>{
+  document.getElementById('subtitleModal').classList.add('show');
+  document.getElementById('subtitleInput').value='';
+  document.getElementById('subtitleInput').focus();
+});
+
+document.getElementById('cancelPhoto').addEventListener('click',()=>{
+  document.getElementById('subtitleModal').classList.remove('show');
+});
+
+document.getElementById('savePhoto').addEventListener('click',()=>{
+  pendingSubtitle=document.getElementById('subtitleInput').value.trim();
+  document.getElementById('subtitleModal').classList.remove('show');
+
+  // Flash effect
+  const flash=document.getElementById('flashOverlay');
+  flash.classList.add('flash');
+  setTimeout(()=>flash.classList.remove('flash'),200);
+
+  // Hide HUD elements temporarily and capture on next frame
+  captureNextFrame=true;
+});
+
+function doCapture(subtitle){
+  try{
+    const srcCanvas=renderer.domElement;
+    const w=srcCanvas.width,h=srcCanvas.height;
+
+    const offC=document.createElement('canvas');
+    offC.width=w;offC.height=h;
+    const oCtx=offC.getContext('2d');
+
+    // Draw the WebXR frame (camera + paint)
+    oCtx.drawImage(srcCanvas,0,0);
+
+    // Subtitle
+    if(subtitle){
+      const fontSize=Math.round(w*0.04);
+      oCtx.font=`600 ${fontSize}px 'DM Sans', sans-serif`;
+      oCtx.textAlign='center';
+      oCtx.textBaseline='bottom';
+
+      // Background bar
+      const metrics=oCtx.measureText(subtitle);
+      const pad=fontSize*0.8;
+      const barH=fontSize*2.2;
+      oCtx.fillStyle='rgba(0,0,0,0.55)';
+      oCtx.fillRect(0,h-barH,w,barH);
+
+      // Text with slight shadow
+      oCtx.shadowColor='rgba(0,0,0,0.6)';
+      oCtx.shadowBlur=8;
+      oCtx.fillStyle='#ffffff';
+      oCtx.fillText(subtitle,w/2,h-fontSize*0.55,w-pad*2);
+      oCtx.shadowBlur=0;
+    }
+
+    // Download
+    offC.toBlob(blob=>{
+      if(!blob)return;
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;a.download='ar-paint-'+ Date.now()+'.png';
+      document.body.appendChild(a);a.click();
+      document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    },'image/png');
+  }catch(e){console.error('Capture error:',e)}
+}
+
+// --- WebXR start ---
+document.getElementById('startBtn').addEventListener('click',async()=>{
+  const w=document.getElementById('warnMsg');
+  if(!navigator.xr){w.style.display='block';w.textContent='WebXR not available. Use Chrome on Android with ARCore.';return}
+  const ok=await navigator.xr.isSessionSupported('immersive-ar').catch(()=>false);
+  if(!ok){w.style.display='block';w.textContent='immersive-ar not supported. Ensure ARCore is installed and you\'re on Chrome Android.';return}
+
+  try{
+    const sess=await navigator.xr.requestSession('immersive-ar',{
+      requiredFeatures:['hit-test'],
+      optionalFeatures:['dom-overlay'],
+      domOverlay:{root:document.getElementById('hud')}
+    });
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('hud').style.display='block';
+    renderer.xr.setReferenceSpaceType('local');
+    await renderer.xr.setSession(sess);
+
+    const ref=await sess.requestReferenceSpace('local');
+    const viewer=await sess.requestReferenceSpace('viewer');
+    sess.requestHitTestSource({space:viewer}).then(s=>{hitTestSource=s;hitTestReady=true});
+    sess.addEventListener('end',()=>{hitTestSource=null;hitTestReady=false});
+
+    renderer.setAnimationLoop((t,frame)=>{
+      if(!frame)return;
+
+      if(hitTestReady&&hitTestSource){
+        const res=frame.getHitTestResults(hitTestSource);
+        if(res.length){
+          const pose=res[0].getPose(ref);
+          if(pose){
+            reticle.visible=true;
+            reticle.matrix.fromArray(pose.transform.matrix);
+            const p=pose.transform.position;
+            reticlePos.set(p.x,p.y,p.z);
+            const m=pose.transform.matrix;
+            reticleNorm.set(m[4],m[5],m[6]).normalize();
+            reticleVis=true;
+            document.getElementById('reticleLabel').textContent=erasing?'Tap surface to erase':'Touch to paint';
+          }
+        }else{
+          reticle.visible=false;reticleVis=false;
+          document.getElementById('reticleLabel').textContent='Point at a surface';
+        }
+      }
+
+      // Paint
+      if(painting&&reticleVis){
+        const minD=brushSize*0.0008;
+        if(erasing){
+          eraseAt(reticlePos);
+        }else if(lastPos.distanceTo(reticlePos)>minD||lastPos.lengthSq()===0){
+          curGroup.push(spawnDot(reticlePos.clone(),reticleNorm.clone(),currentColor,brushSize));
+          lastPos.copy(reticlePos);paintCount++;updCount();
+        }
+      }
+
+      renderer.render(scene,camera);
+
+      // Photo capture after render
+      if(captureNextFrame){
+        captureNextFrame=false;
+        doCapture(pendingSubtitle);
+        pendingSubtitle='';
+      }
+    });
+  }catch(e){w.style.display='block';w.textContent='Failed: '+e.message}
+
+  if('geolocation'in navigator)navigator.geolocation.watchPosition(p=>{userLat=p.coords.latitude;userLng=p.coords.longitude;drawMap()},()=>{},{enableHighAccuracy:true,maximumAge:5000});
+});
+
+// --- Minimap ---
+function drawMap(){
+  const w=mapC.width,h=mapC.height;mC.clearRect(0,0,w,h);
+  mC.fillStyle='#12121f';mC.fillRect(0,0,w,h);
+  mC.strokeStyle='rgba(255,255,255,0.06)';mC.lineWidth=1;
+  for(let i=0;i<w;i+=28){mC.beginPath();mC.moveTo(i,0);mC.lineTo(i,h);mC.stroke()}
+  for(let i=0;i<h;i+=28){mC.beginPath();mC.moveTo(0,i);mC.lineTo(w,i);mC.stroke()}
+  if(userLat===null){mC.fillStyle='rgba(255,255,255,0.3)';mC.font='11px DM Sans';mC.textAlign='center';mC.fillText('No GPS',w/2,h/2);return}
+  for(const m of geoMarkers){
+    const px=((m.lng-userLng)/MAP_R)*(w/2)+w/2,py=((userLat-m.lat)/MAP_R)*(h/2)+h/2;
+    if(px<0||px>w||py<0||py>h)continue;
+    mC.fillStyle=m.color;mC.beginPath();mC.arc(px,py,4,0,Math.PI*2);mC.fill();
+  }
+  mC.fillStyle='#00FFB2';mC.beginPath();mC.arc(w/2,h/2,6,0,Math.PI*2);mC.fill();
+  mC.strokeStyle='#fff';mC.lineWidth=2;mC.stroke();
+  const pulse=(Date.now()%2000)/2000;
+  mC.strokeStyle=`rgba(0,255,178,${1-pulse})`;mC.lineWidth=1.5;
+  mC.beginPath();mC.arc(w/2,h/2,6+pulse*16,0,Math.PI*2);mC.stroke();
+  mC.fillStyle='rgba(255,255,255,0.3)';mC.font='9px DM Sans';mC.textAlign='left';
+  mC.fillText(`~${Math.round(MAP_R*111320)}m`,4,h-4);
+}
+function animMap(){drawMap();requestAnimationFrame(animMap)}animMap();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+
+})();
+</script>
+</body>
+</html>
